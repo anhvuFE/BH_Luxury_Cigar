@@ -98,9 +98,12 @@ const Header = () => (
             >
               LIÊN HỆ
             </Link>
-            <span className="text-black hover:text-amber-600 transition-colors font-medium uppercase text-sm tracking-wide border-b-2 border-transparent hover:border-amber-600 pb-1 cursor-pointer">
+            <Link
+              to="/new-arrival"
+              className="text-black hover:text-amber-600 transition-colors font-medium uppercase text-sm tracking-wide border-b-2 border-transparent hover:border-amber-600 pb-1"
+            >
               NEW ARRIVAL
-            </span>
+            </Link>
             <span className="bg-amber-600 text-white px-4 py-2 rounded font-bold text-sm">
               BEST SELLER
             </span>

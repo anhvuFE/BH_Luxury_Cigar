@@ -209,15 +209,17 @@ const ContactPage: React.FC = () => {
         {/* Map Section */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Vị Trí Cửa Hàng</h2>
-          <div className="bg-gray-200 rounded-xl h-96 flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <p className="text-lg font-medium">Bản đồ Google Maps</p>
-              <p className="text-sm">138 Bình Hàn, TP Hải Dương</p>
-            </div>
+          <div className="rounded-lg overflow-hidden shadow-lg">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3742.969286!2d106.3178!3d20.9385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjDCsDU2JzE4LjYiTiAxMDbCsDE5JzA0LjEiRQ!5e0!3m2!1svi!2s!4v1634567890123!5m2!1svi!2s"
+              width="100%"
+              height="400"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="BH Luxury Cigar Location"
+            ></iframe>
           </div>
         </div>
       </div>

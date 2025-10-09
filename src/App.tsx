@@ -8,6 +8,7 @@ import CollectionsPage from './pages/CollectionsPage';
 import BlogPage from './pages/BlogPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import NewArrivalPage from './pages/NewArrivalPage';
 
 
 
@@ -27,6 +28,7 @@ function App() {
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/new-arrival" element={<NewArrivalPage />} />
           </Routes>
         </main>
         <Footer />
