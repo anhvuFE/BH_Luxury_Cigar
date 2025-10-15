@@ -9,6 +9,7 @@ import BlogPage from './pages/BlogPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import NewArrivalPage from './pages/NewArrivalPage';
+import AdminSeedPage from './pages/AdminSeedPage';
 
 
 
@@ -29,6 +30,7 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/new-arrival" element={<NewArrivalPage />} />
+            <Route path="/admin/seed" element={<AdminSeedPage />} />
           </Routes>
         </main>
         <Footer />
