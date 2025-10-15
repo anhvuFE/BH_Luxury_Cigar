@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { FaSearch, FaEye } from 'react-icons/fa';
-import { MdKeyboardArrowDown } from 'react-icons/md';
+import { HiOutlineSearch, HiOutlineEye, HiOutlineAdjustments, HiOutlineHeart, HiOutlineShoppingBag } from 'react-icons/hi';
+import { HiChevronDown } from 'react-icons/hi2';
 
 const CollectionsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('Date, new to old');
   const [showCount, setShowCount] = useState(12);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Filter states
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
@@ -125,16 +126,38 @@ const CollectionsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-8">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50/30 to-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Page Header */}
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-900 mb-4">
+            Bộ Sưu Tập <span className="font-bold text-amber-600">Đặc Biệt</span>
+          </h1>
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Khám phá những sản phẩm tinh túy được tuyển chọn từ các thương hiệu danh tiếng nhất thế giới
+          </p>
+        </div>
+
+        {/* Mobile Filter Toggle Button */}
+        <div className="lg:hidden mb-6">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-3 bg-white px-6 py-3 rounded-2xl shadow-lg border border-amber-100 w-full justify-center hover:shadow-xl transition-all duration-300"
+          >
+            <HiOutlineAdjustments className="w-5 h-5 text-amber-600" />
+            <span className="font-medium text-gray-700">Bộ lọc</span>
+            <HiChevronDown className={`w-5 h-5 text-amber-600 transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Sidebar Filters */}
-          <div className="w-1/4 bg-white p-6 rounded-lg shadow-sm">
+          <div className={`w-full lg:w-1/4 bg-white p-6 sm:p-8 rounded-3xl shadow-lg border border-amber-100 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             {/* Collection Filter */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">COLLECTION</h3>
-                <MdKeyboardArrowDown className="w-4 h-4 text-gray-400" />
+                <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-2">
                 {collections.map((collection, index) => (
@@ -156,7 +179,7 @@ const CollectionsPage: React.FC = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">VENDOR</h3>
-                <MdKeyboardArrowDown className="w-4 h-4 text-gray-400" />
+                <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-2">
                 {vendors.map((vendor, index) => (
@@ -178,7 +201,7 @@ const CollectionsPage: React.FC = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">PRODUCT TYPE</h3>
-                <MdKeyboardArrowDown className="w-4 h-4 text-gray-400" />
+                <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-2">
                 {productTypes.map((type, index) => (
@@ -200,7 +223,7 @@ const CollectionsPage: React.FC = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">PRICE</h3>
-                <MdKeyboardArrowDown className="w-4 h-4 text-gray-400" />
+                <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-4">
                 <div className="flex gap-2">
@@ -235,7 +258,7 @@ const CollectionsPage: React.FC = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">AVAILABILITY</h3>
-                <MdKeyboardArrowDown className="w-4 h-4 text-gray-400" />
+                <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <label className="flex items-center justify-between text-sm">
                 <div className="flex items-center">
@@ -251,24 +274,24 @@ const CollectionsPage: React.FC = () => {
           </div>
 
           {/* Main Content */}
-          <div className="w-3/4">
+          <div className="w-full lg:w-3/4">
             {/* Search and Sort Bar */}
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+            <div className="bg-white p-4 rounded-lg shadow-sm mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   <div className="relative">
-                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <HiOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Search products"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-64 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full sm:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
-                  <span className="text-gray-600 font-medium">973 Products</span>
+                  <span className="text-gray-600 font-medium text-sm sm:text-base">973 Products</span>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">Show</span>
                     <select
@@ -285,7 +308,7 @@ const CollectionsPage: React.FC = () => {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 text-sm"
+                      className="border border-gray-300 rounded px-3 py-2 text-sm w-full sm:w-auto"
                     >
                       <option value="Date, new to old">Date, new to old</option>
                       <option value="Date, old to new">Date, old to new</option>
@@ -298,32 +321,44 @@ const CollectionsPage: React.FC = () => {
             </div>
 
             {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
               {mockProducts.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 group">
-                  <div className="relative overflow-hidden rounded-t-lg">
+                <div key={product.id} className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 hover:border-amber-200 overflow-hidden">
+                  <div className="relative overflow-hidden">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-48 object-contain bg-gray-50 transition-transform duration-300 group-hover:scale-105"
+                      className="w-full h-48 sm:h-56 lg:h-64 object-contain bg-gradient-to-br from-gray-50 to-amber-50/30 group-hover:scale-110 transition-transform duration-700"
                     />
+
+                    {/* Hover Actions */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
+                      <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-3">
+                        <button className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
+                          <HiOutlineEye className="w-5 h-5" />
+                        </button>
+                        <button className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
+                          <HiOutlineHeart className="w-5 h-5" />
+                        </button>
+                        <button className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg">
+                          <HiOutlineShoppingBag className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-4">
-                    <div className="text-sm text-gray-500 mb-1">{product.brand}</div>
-                    <h3 className="font-semibold text-gray-900 mb-2 text-sm leading-tight">
+
+                  <div className="p-5 sm:p-6">
+                    <div className="text-sm text-amber-600 font-medium mb-2 tracking-wide">{product.brand}</div>
+                    <h3 className="font-semibold text-gray-900 mb-3 text-base sm:text-lg leading-snug line-clamp-2 group-hover:text-amber-700 transition-colors duration-300">
                       {product.name}
                     </h3>
-                    <div className="text-lg font-bold text-gray-900 mb-3">
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
                       {formatPrice(product.price)}
                     </div>
-                    <div className="flex gap-2">
-                      <button className="flex-1 bg-gray-800 text-white py-2 px-4 rounded text-sm hover:bg-gray-700 transition-colors">
-                        ADD TO CART
-                      </button>
-                      <button className="p-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
-                        <FaEye className="w-4 h-4 text-gray-600" />
-                      </button>
-                    </div>
+
+                    <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-2xl text-sm font-medium hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300">
+                      Thêm vào giỏ
+                    </button>
                   </div>
                 </div>
               ))}

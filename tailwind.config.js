@@ -24,9 +24,12 @@ export default {
         }
       },
       fontFamily: {
-        'poppins': ['Poppins', 'sans-serif'],
-        'roboto': ['Roboto', 'sans-serif'],
-        'playfair': ['Playfair Display', 'serif'],
+        'inter': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'heading': ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
+        'body': ['Source Sans Pro', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        'luxury': ['Crimson Text', 'Georgia', 'Times New Roman', 'serif'],
+        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'serif': ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
       },
     },
   },
