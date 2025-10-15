@@ -1,23 +1,29 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { HiOutlineCheck, HiOutlineBookOpen, HiOutlineHeart, HiOutlineLocationMarker, HiChevronRight } from 'react-icons/hi';
 
 const About: React.FC = () => {
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section className="pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-32 lg:pb-20 bg-gradient-to-br from-amber-50/30 via-white to-amber-50/30">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Content */}
-          <div className="space-y-6">
+          <div className="space-y-6 text-center lg:text-left">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-playfair">
-                Về BH Luxury Cigar
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 font-heading relative">
+                <span className="relative">
+                  Về <span className="text-amber-600 relative">
+                    <span className="absolute inset-0 bg-amber-200/30 -skew-x-12 rounded-lg"></span>
+                    <span className="relative">BH Luxury Cigar</span>
+                  </span>
+                </span>
               </h2>
-              <p className="text-lg text-gray-600 leading-relaxed mb-6">
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-4 sm:mb-6 font-body">
                 Chúng tôi là điểm đến uy tín cho những người yêu thích xì gà cao cấp tại Hải Dương.
                 Với niềm đam mê mãnh liệt dành cho nghệ thuật thưởng thức xì gà, chúng tôi mang đến
                 những sản phẩm chất lượng nhất từ khắp nơi trên thế giới.
               </p>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed font-body">
                 Sứ mệnh của chúng tôi là chia sẻ niềm đam mê với xì gà và cung cấp những trải nghiệm
                 tuyệt vời nhất cho khách hàng thông qua dịch vụ tư vấn chuyên nghiệp và sản phẩm
                 chính hãng.
@@ -25,153 +31,136 @@ const About: React.FC = () => {
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div className="group flex items-start space-x-3 sm:space-x-4 justify-center lg:justify-start hover:scale-105 transition-transform duration-300">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-400 to-amber-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-amber-400/50">
+                  <HiOutlineCheck className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Chính Hãng 100%</h3>
-                  <p className="text-gray-600 text-sm">Đảm bảo chất lượng từ nhà sản xuất</p>
+                <div className="text-center lg:text-left">
+                  <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Chính Hãng 100%</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm">Đảm bảo chất lượng từ nhà sản xuất</p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
+              <div className="group flex items-start space-x-3 sm:space-x-4 justify-center lg:justify-start hover:scale-105 transition-transform duration-300">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-400 to-amber-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-amber-400/50">
+                  <HiOutlineBookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Kiến Thức Chuyên Sâu</h3>
-                  <p className="text-gray-600 text-sm">Tư vấn từ những chuyên gia có kinh nghiệm</p>
+                <div className="text-center lg:text-left">
+                  <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Kiến Thức Chuyên Sâu</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm">Tư vấn từ những chuyên gia có kinh nghiệm</p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
+              <div className="group flex items-start space-x-3 sm:space-x-4 justify-center lg:justify-start hover:scale-105 transition-transform duration-300">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-400 to-amber-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-amber-400/50">
+                  <HiOutlineHeart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Đam Mê Chân Thật</h3>
-                  <p className="text-gray-600 text-sm">Chia sẻ niềm đam mê với xì gà cao cấp</p>
+                <div className="text-center lg:text-left">
+                  <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Đam Mê Chân Thật</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm">Chia sẻ niềm đam mê với xì gà cao cấp</p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+              <div className="group flex items-start space-x-3 sm:space-x-4 justify-center lg:justify-start sm:col-span-2 lg:col-span-1 hover:scale-105 transition-transform duration-300">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-400 to-amber-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-amber-400/50">
+                  <HiOutlineLocationMarker className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Vị Trí Thuận Lợi</h3>
-                  <p className="text-gray-600 text-sm">Tại trung tâm thành phố Hải Dương</p>
+                <div className="text-center lg:text-left">
+                  <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Vị Trí Thuận Lợi</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm">Tại trung tâm thành phố Hải Dương</p>
                 </div>
               </div>
             </div>
 
-            <div className="pt-6">
+            <div className="pt-4 sm:pt-6 text-center lg:text-left">
               <Link
                 to="/about"
-                className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium"
+                className="group inline-flex items-center text-amber-600 hover:text-amber-700 font-medium text-sm sm:text-base bg-amber-50 hover:bg-amber-100 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg"
               >
                 Tìm hiểu thêm về chúng tôi
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <HiChevronRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
               </Link>
             </div>
           </div>
 
           {/* Images */}
-          <div className="relative">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
+          <div className="relative mt-8 lg:mt-0 order-first lg:order-last">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4">
+              <div className="space-y-2 sm:space-y-4">
                 <img
                   src="/src/assets/images/about1.jpg"
                   alt="BH Luxury Cigar Store"
-                  className="w-full h-48 object-cover rounded-lg shadow-lg"
+                  className="w-full h-32 sm:h-40 lg:h-48 object-cover rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105"
                 />
                 <img
                   src="/src/assets/images/about2.jpg"
                   alt="Cigar Collection"
-                  className="w-full h-32 object-cover rounded-lg shadow-lg"
+                  className="w-full h-24 sm:h-28 lg:h-32 object-cover rounded-lg shadow-lg"
                 />
               </div>
-              <div className="space-y-4 pt-8">
+              <div className="space-y-2 sm:space-y-4 pt-4 sm:pt-6 lg:pt-8">
                 <img
                   src="/src/assets/images/about3.jpg"
                   alt="Premium Cigars"
-                  className="w-full h-32 object-cover rounded-lg shadow-lg"
+                  className="w-full h-24 sm:h-28 lg:h-32 object-cover rounded-lg shadow-lg"
                 />
                 <img
                   src="/src/assets/images/about4.jpg"
                   alt="Cigar Expert"
-                  className="w-full h-48 object-cover rounded-lg shadow-lg"
+                  className="w-full h-32 sm:h-40 lg:h-48 object-cover rounded-lg shadow-lg"
                 />
               </div>
             </div>
 
             {/* Floating Card */}
-            <div className="absolute -bottom-6 -left-6 bg-primary-500 text-white p-6 rounded-xl shadow-xl">
-              <div className="text-2xl font-bold">5+</div>
-              <div className="text-sm">Năm Kinh Nghiệm</div>
+            <div className="absolute -bottom-3 -left-3 sm:-bottom-4 sm:-left-4 lg:-bottom-6 lg:-left-6 bg-gradient-to-br from-amber-500 to-amber-600 text-white p-3 sm:p-4 lg:p-6 rounded-2xl shadow-2xl hover:scale-110 transition-transform duration-300 border border-amber-400">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold">5+</div>
+              <div className="text-xs sm:text-sm">Năm Kinh Nghiệm</div>
             </div>
           </div>
         </div>
 
         {/* Values Section */}
-        <div className="mt-20">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 font-playfair">
+        <div className="mt-12 sm:mt-16 lg:mt-20">
+          <div className="text-center mb-8 sm:mb-12">
+            <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 font-heading">
               Giá Trị Cốt Lõi
             </h3>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto px-4">
               Những giá trị mà chúng tôi luôn kiên trì và duy trì trong suốt quá trình phục vụ khách hàng.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="group text-center hover:scale-105 transition-transform duration-300">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg group-hover:shadow-amber-500/50">
+                <HiOutlineCheck className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-3">Chất Lượng</h4>
-              <p className="text-gray-600">
+              <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Chất Lượng</h4>
+              <p className="text-sm sm:text-base text-gray-600">
                 Cam kết cung cấp những sản phẩm chính hãng, chất lượng cao nhất
                 từ các thương hiệu uy tín nhất thế giới.
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
+            <div className="group text-center hover:scale-105 transition-transform duration-300">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg group-hover:shadow-amber-500/50">
+                <HiOutlineBookOpen className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-3">Kiến Thức</h4>
-              <p className="text-gray-600">
+              <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Kiến Thức</h4>
+              <p className="text-sm sm:text-base text-gray-600">
                 Đội ngũ chuyên gia với kiến thức sâu rộng về xì gà, sẵn sàng
                 tư vấn và chia sẻ với khách hàng.
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
+            <div className="group text-center sm:col-span-2 lg:col-span-1 hover:scale-105 transition-transform duration-300">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg group-hover:shadow-amber-500/50">
+                <HiOutlineHeart className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-3">Đam Mê</h4>
-              <p className="text-gray-600">
+              <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Đam Mê</h4>
+              <p className="text-sm sm:text-base text-gray-600">
                 Niềm đam mê chân thật với xì gà thúc đẩy chúng tôi không ngừng
                 tìm kiếm và mang về những sản phẩm tốt nhất.
               </p>

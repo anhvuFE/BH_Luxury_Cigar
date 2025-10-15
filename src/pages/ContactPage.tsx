@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { HiOutlinePhone, HiOutlineMail, HiOutlineLocationMarker, HiOutlineClock, HiOutlinePaperAirplane } from 'react-icons/hi';
 import { storeInfo } from '../data/storeData';
 
 const ContactPage: React.FC = () => {
@@ -25,12 +26,25 @@ const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50/30 via-white to-amber-50/30">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
         {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Liên Hệ</h1>
-          <p className="text-lg text-gray-600">Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn cho bạn</p>
+        <div className="text-center mb-16 sm:mb-20 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-amber-400/10 to-amber-500/5 rounded-3xl blur-3xl"></div>
+          <div className="relative z-10">
+            <div className="inline-block mb-6">
+              <span className="text-amber-600 font-medium text-sm tracking-widest uppercase bg-amber-50 px-4 py-2 rounded-full">Kết nối với chúng tôi</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-900 mb-8 font-heading">
+              Liên <span className="font-bold text-amber-600 relative">
+                <span className="absolute inset-0 bg-amber-200/30 -skew-x-12 rounded-lg"></span>
+                <span className="relative">Hệ</span>
+              </span>
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-body">
+              Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn cho bạn về các sản phẩm xì gà cao cấp
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -39,8 +53,11 @@ const ContactPage: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Thông Tin Liên Hệ</h2>
 
             {/* Store Info */}
-            <div className="bg-gray-50 rounded-xl p-8 mb-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">{storeInfo.name}</h3>
+            <div className="bg-gradient-to-br from-amber-50 to-white rounded-3xl p-8 mb-8 shadow-lg border border-amber-100 hover:shadow-2xl transition-all duration-500">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                <span className="w-3 h-3 bg-amber-500 rounded-full mr-3 animate-pulse"></span>
+                {storeInfo.name}
+              </h3>
 
               <div className="space-y-4">
                 <div className="flex items-start">
@@ -94,8 +111,11 @@ const ContactPage: React.FC = () => {
             </div>
 
             {/* Additional Info */}
-            <div className="bg-primary-50 rounded-xl p-6">
-              <h4 className="font-bold text-gray-900 mb-3">Lưu ý quan trọng</h4>
+            <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-3xl p-6 shadow-sm border border-amber-200">
+              <h4 className="font-bold text-gray-900 mb-3 flex items-center">
+                <HiOutlineClock className="w-5 h-5 text-amber-600 mr-2" />
+                Lưu ý quan trọng
+              </h4>
               <div className="text-sm text-gray-600 space-y-2">
                 <p>• Chúng tôi khuyến khích khách hàng đến cửa hàng trực tiếp để được tư vấn và trải nghiệm sản phẩm tốt nhất.</p>
                 <p>• Vui lòng gọi trước để đảm bảo sản phẩm có sẵn.</p>
@@ -105,8 +125,11 @@ const ContactPage: React.FC = () => {
           </div>
 
           {/* Contact Form */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Gửi Tin Nhắn</h2>
+          <div className="bg-white rounded-3xl p-8 shadow-lg border border-amber-100">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+              <HiOutlinePaperAirplane className="w-6 h-6 text-amber-600 mr-3" />
+              Gửi Tin Nhắn
+            </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -121,7 +144,7 @@ const ContactPage: React.FC = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 hover:bg-amber-50/50"
                     placeholder="Nhập họ và tên"
                   />
                 </div>
@@ -137,7 +160,7 @@ const ContactPage: React.FC = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 hover:bg-amber-50/50"
                     placeholder="Nhập email"
                   />
                 </div>
@@ -154,7 +177,7 @@ const ContactPage: React.FC = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 hover:bg-amber-50/50"
                     placeholder="Nhập số điện thoại"
                   />
                 </div>
@@ -168,7 +191,7 @@ const ContactPage: React.FC = () => {
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 hover:bg-amber-50/50"
                   >
                     <option value="">Chọn chủ đề</option>
                     <option value="product-inquiry">Hỏi về sản phẩm</option>
@@ -198,8 +221,9 @@ const ContactPage: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full bg-primary-500 text-white py-3 px-6 rounded-md hover:bg-primary-600 transition-colors font-medium"
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-4 px-6 rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-500 font-medium text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center group"
               >
+                <HiOutlinePaperAirplane className="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform duration-300" />
                 Gửi Tin Nhắn
               </button>
             </form>
@@ -208,8 +232,11 @@ const ContactPage: React.FC = () => {
 
         {/* Map Section */}
         <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Vị Trí Cửa Hàng</h2>
-          <div className="rounded-lg overflow-hidden shadow-lg">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-8 flex items-center justify-center">
+            <HiOutlineLocationMarker className="w-6 h-6 text-amber-600 mr-3" />
+            Vị Trí Cửa Hàng
+          </h2>
+          <div className="rounded-3xl overflow-hidden shadow-2xl border border-amber-100">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3742.969286!2d106.3178!3d20.9385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjDCsDU2JzE4LjYiTiAxMDbCsDE5JzA0LjEiRQ!5e0!3m2!1svi!2s!4v1634567890123!5m2!1svi!2s"
               width="100%"
