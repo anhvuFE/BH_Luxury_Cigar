@@ -17,6 +17,7 @@ import {
   GiTreasureMap,
   GiCrossedSwords,
 } from "react-icons/gi";
+import Products from "../components/sections/Products";
 
 const HomePage = () => (
   <div>
@@ -82,83 +83,9 @@ const HomePage = () => (
       </div>
     </section>
 
-    {/* Products Section - Match với screenshot */}
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-8">Sản Phẩm</h2>
-        </div>
+    {/* Products Section - Firebase + Static Products */}
+    <Products />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          {[
-            {
-              name: "CRAGGANMORE 12 Y.O SPEYSIDE SINGLE MALT",
-              brand: "Cragganmore",
-              price: "1.749.000đ",
-              image: "/src/assets/images/SP/1.png",
-            },
-            {
-              name: "JW BLUE LABEL GHOST & RARE PORT DUNDAS",
-              brand: "JW Whisky",
-              price: "9.746.000đ",
-              image: "/src/assets/images/SP/2.png",
-            },
-            {
-              name: "BÚT LỬA CHĂM XÌ GÀ S.T. DUPONT Behike Le Grand | C23003CL",
-              brand: "S.T. DUPONT",
-              price: "57.244.000đ",
-              image: "/src/assets/images/SP/3.png",
-            },
-            {
-              name: "BÚT BI S.T. DUPONT Classique | 045077N",
-              brand: "S.T. DUPONT",
-              price: "12.683.000đ",
-              image: "/src/assets/images/SP/4.png",
-            },
-            {
-              name: "BÚT LỬA CHĂM XÌ GÀ S.T. DUPONT SLIM7 | 27779",
-              brand: "S.T. DUPONT",
-              price: "7.194.000đ",
-              image: "/src/assets/images/SP/5.png",
-            },
-          ].map((product, index) => {
-            return (
-              <div
-                key={index}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 group text-center"
-              >
-                <div className="relative">
-                  <div className="w-full h-48 bg-gray-50 flex items-center justify-center p-4">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="max-w-full max-h-full object-contain"
-                    />
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 text-sm leading-tight min-h-[2.5rem]">
-                    {product.name}
-                  </h3>
-                  <div className="text-sm text-amber-600 font-medium mb-2">
-                    {product.brand}
-                  </div>
-                  <div className="text-lg font-bold text-amber-600 mb-2">
-                    {product.price}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="text-center mt-12">
-          <button className="bg-amber-600 text-white px-8 py-3 rounded-md hover:bg-amber-700 transition-colors font-semibold">
-            XEM TẤT CẢ
-          </button>
-        </div>
-      </div>
-    </section>
 
     {/* PHU KIỆN XÌ GÀ Section */}
     <section className="py-16 bg-gray-800">
