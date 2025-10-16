@@ -1,32 +1,55 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlineEye, HiOutlineEyeOff, HiOutlineMail, HiOutlineLockClosed, HiChevronRight } from 'react-icons/hi';
+import { authService } from '../services/auth.service';
 
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+    setError(null); // Clear error when user types
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await authService.login({
+        email: formData.email,
+        password: formData.password
+      });
+
+      // Store user info in localStorage
+      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('userRole', response.user.role);
+
+      // Redirect based on role
+      if (response.user.role === 'admin') {
+        navigate('/admin');
+      } else if (response.user.role === 'staff') {
+        navigate('/admin');
+      } else {
+        navigate('/'); // User goes to homepage
+      }
+    } catch (err: any) {
+      setError(err.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+      console.error('Login error:', err);
+    } finally {
       setIsLoading(false);
-      console.log('Login attempt:', formData);
-      alert('Đăng nhập thành công!');
-    }, 1500);
+    }
   };
 
   return (
@@ -49,6 +72,13 @@ const LoginPage: React.FC = () => {
           </p>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
+
         {/* Form */}
         <div className="bg-white rounded-3xl shadow-2xl border border-amber-100 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -70,6 +100,7 @@ const LoginPage: React.FC = () => {
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-3 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 font-inter"
                   placeholder="your@email.com"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -92,11 +123,13 @@ const LoginPage: React.FC = () => {
                   onChange={handleChange}
                   className="block w-full pl-10 pr-10 py-3 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 font-inter"
                   placeholder="••••••••"
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-amber-500 transition-colors" />
@@ -120,9 +153,10 @@ const LoginPage: React.FC = () => {
                   Ghi nhớ đăng nhập
                 </label>
               </div>
+
               <Link
                 to="/forgot-password"
-                className="text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors font-inter"
+                className="text-sm text-amber-600 hover:text-amber-700 transition-colors font-inter"
               >
                 Quên mật khẩu?
               </Link>
@@ -132,35 +166,48 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-inter"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Đang đăng nhập...
+                </div>
               ) : (
-                <>
+                <div className="flex items-center">
                   Đăng Nhập
-                  <HiChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                </>
+                  <HiChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </div>
               )}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-amber-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500 font-inter">Hoặc</span>
-              </div>
+          {/* Demo Accounts Info */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-500 text-center mb-3">Tài khoản demo:</p>
+            <div className="bg-amber-50 rounded-lg p-3 text-xs space-y-1">
+              <p><strong>Admin:</strong> admin@gmail.com / admin</p>
+              <p><strong>User:</strong> xanh@gmail.com / user</p>
             </div>
           </div>
 
-          {/* Sign up link */}
-          <div className="mt-6 text-center">
+          {/* Divider */}
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500 font-inter">Hoặc</span>
+            </div>
+          </div>
+
+          {/* Register Link */}
+          <div className="text-center">
             <p className="text-sm text-gray-600 font-inter">
-              Chưa có tài khoản?{' '}
+              Bạn chưa có tài khoản?{' '}
               <Link
                 to="/register"
                 className="font-medium text-amber-600 hover:text-amber-700 transition-colors"
@@ -171,18 +218,17 @@ const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Back to home */}
         <div className="text-center">
-          <p className="text-xs text-gray-500 font-inter">
-            Bằng việc đăng nhập, bạn đồng ý với{' '}
-            <Link to="/terms" className="text-amber-600 hover:text-amber-700">
-              Điều khoản sử dụng
-            </Link>{' '}
-            và{' '}
-            <Link to="/privacy" className="text-amber-600 hover:text-amber-700">
-              Chính sách bảo mật
-            </Link>
-          </p>
+          <Link
+            to="/"
+            className="inline-flex items-center text-sm text-gray-600 hover:text-amber-600 transition-colors font-inter"
+          >
+            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Quay lại trang chủ
+          </Link>
         </div>
       </div>
     </div>
