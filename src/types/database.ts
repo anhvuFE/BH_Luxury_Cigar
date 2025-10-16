@@ -1,53 +1,68 @@
 export interface Category {
-  id: string;
+  _id: string;
+  id?: string; // For backward compatibility
   name: string;
-  slug: string;
+  slug?: string;
   description?: string;
+  image?: string;
   image_url?: string;
   parent_id?: string;
-  is_active: boolean;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
+  isActive?: boolean;
+  is_active?: boolean;
+  sortOrder?: number;
+  sort_order?: number;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
 }
 
 export interface Product {
-  id: string;
+  _id: string;
+  id?: string; // For backward compatibility
   name: string;
-  slug: string;
+  slug?: string;
   description?: string;
   short_description?: string;
-  brand: string;
-  category_id: string;
-  sku: string;
+  brand?: string;
+  category?: Category | string;
+  category_id?: string;
+  sku?: string;
   price: number;
   compare_price?: number;
   cost_price?: number;
-  stock: number;
-  low_stock_threshold: number;
-  track_quantity: boolean;
-  allow_backorder: boolean;
+  stock?: number;
+  inStock?: boolean;
+  low_stock_threshold?: number;
+  track_quantity?: boolean;
+  allow_backorder?: boolean;
+  image?: string;
   featured_image?: string;
+  images?: string[];
   image_gallery?: unknown[];
   videos?: unknown[];
   specifications?: Record<string, unknown>;
   meta_title?: string;
   meta_description?: string;
   tags?: string[];
-  status: 'active' | 'draft' | 'archived';
-  is_visible: boolean;
-  is_featured: boolean;
-  is_new: boolean;
-  views: number;
-  sales_count: number;
-  average_rating: number;
-  rating_count: number;
-  created_at: string;
-  updated_at: string;
+  status?: 'active' | 'draft' | 'archived';
+  is_visible?: boolean;
+  isFeatured?: boolean;
+  is_featured?: boolean;
+  isNew?: boolean;
+  is_new?: boolean;
+  views?: number;
+  sales_count?: number;
+  average_rating?: number;
+  rating_count?: number;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
   created_by?: string;
+  __v?: number;
 
   // Relations
-  category?: Category;
   reviews?: Review[];
 }
 
