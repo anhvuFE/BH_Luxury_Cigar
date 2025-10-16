@@ -142,15 +142,15 @@ const AdminCustomers: React.FC = () => {
         <div className="mb-6 lg:mb-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent font-heading">
+              <h1 className="text-3xl font-bold text-gray-900">
                 Quản lý khách hàng
               </h1>
-              <p className="mt-2 lg:mt-3 text-gray-600 font-body text-sm lg:text-lg">
+              <p className="mt-2 text-gray-600">
                 Quản lý thông tin và theo dõi hoạt động của khách hàng
               </p>
             </div>
-            <button className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-xl lg:rounded-2xl font-medium text-sm lg:text-base flex items-center hover:shadow-lg transition-all duration-300 hover:scale-105 self-start sm:self-auto">
-              <HiOutlinePlus className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+            <button className="bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center hover:bg-amber-700 transition-colors self-start sm:self-auto">
+              <HiOutlinePlus className="w-5 h-5 mr-2" />
               Thêm khách hàng
             </button>
           </div>
@@ -158,57 +158,57 @@ const AdminCustomers: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                <HiOutlineUsers className="w-6 h-6 text-white" />
               </div>
               <div className="ml-4">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 font-body">Tổng khách hàng</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900 font-heading">156</p>
+                <p className="text-sm font-medium text-gray-600">Tổng khách hàng</p>
+                <p className="text-2xl font-bold text-gray-900">156</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                <HiOutlineUsers className="w-6 h-6 text-white" />
               </div>
               <div className="ml-4">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 font-body">Khách hàng hoạt động</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900 font-heading">142</p>
+                <p className="text-sm font-medium text-gray-600">Khách hàng hoạt động</p>
+                <p className="text-2xl font-bold text-gray-900">142</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                <HiOutlineUsers className="w-6 h-6 text-white" />
               </div>
               <div className="ml-4">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 font-body">Khách hàng mới (tháng)</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900 font-heading">23</p>
+                <p className="text-sm font-medium text-gray-600">Khách hàng mới (tháng)</p>
+                <p className="text-2xl font-bold text-gray-900">23</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center">
+                <HiOutlineUsers className="w-6 h-6 text-white" />
               </div>
               <div className="ml-4">
-                <p className="text-xs lg:text-sm font-medium text-gray-600 font-body">Chi tiêu trung bình</p>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900 font-heading">₫2.8M</p>
+                <p className="text-sm font-medium text-gray-600">Chi tiêu trung bình</p>
+                <p className="text-2xl font-bold text-gray-900">₫2.8M</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6 mb-6 lg:mb-8">
+        <div className="bg-white rounded-lg border border-amber-100 p-6 mb-8">
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -219,7 +219,7 @@ const AdminCustomers: React.FC = () => {
                   placeholder="Tìm kiếm khách hàng..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 lg:py-3 border border-gray-200/50 rounded-xl lg:rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 font-body text-sm lg:text-base"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors text-sm"
                 />
               </div>
             </div>
@@ -229,7 +229,7 @@ const AdminCustomers: React.FC = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 lg:py-3 border border-gray-200/50 rounded-xl lg:rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 font-body text-sm lg:text-base"
+                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors text-sm"
               >
                 <option value="all">Tất cả trạng thái</option>
                 <option value="active">Hoạt động</option>
@@ -238,9 +238,9 @@ const AdminCustomers: React.FC = () => {
 
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="px-4 py-2 lg:py-3 border border-gray-200/50 rounded-xl lg:rounded-2xl hover:bg-gray-50 transition-colors duration-200 flex items-center"
+                className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center">
               >
-                <HiOutlineFilter className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                <HiOutlineFilter className="w-5 h-5 mr-2" />
                 <span className="hidden sm:inline">Bộ lọc</span>
               </button>
             </div>
@@ -248,12 +248,12 @@ const AdminCustomers: React.FC = () => {
         </div>
 
         {/* Customers Table */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden">
+        <div className="bg-white rounded-lg border border-amber-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50/50">
+              <thead className="bg-amber-50 border-b border-amber-100">
                 <tr>
-                  <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs lg:text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Khách hàng
                   </th>
                   <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs lg:text-sm font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">
@@ -262,10 +262,10 @@ const AdminCustomers: React.FC = () => {
                   <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs lg:text-sm font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
                     Địa chỉ
                   </th>
-                  <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs lg:text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Đơn hàng
                   </th>
-                  <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs lg:text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Chi tiêu
                   </th>
                   <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs lg:text-sm font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
@@ -278,52 +278,52 @@ const AdminCustomers: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-200/50">
                 {currentCustomers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-gray-50/30 transition-colors duration-200">
-                    <td className="px-4 lg:px-6 py-4">
+                  <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
                       <div className="flex items-center">
                         <img
-                          className="h-10 w-10 lg:h-12 lg:w-12 rounded-xl object-cover"
+                          className="h-12 w-12 rounded-lg object-cover"
                           src={customer.avatar}
                           alt={customer.name}
                         />
-                        <div className="ml-3 lg:ml-4">
-                          <div className="text-sm lg:text-base font-semibold text-gray-900 font-body">
+                        <div className="ml-4">
+                          <div className="text-sm font-semibold text-gray-900">
                             {customer.name}
                           </div>
-                          <div className="text-xs lg:text-sm text-gray-500 font-body">
+                          <div className="text-sm text-gray-500">
                             #{customer.id}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 hidden md:table-cell">
-                      <div className="text-sm text-gray-900 font-body">{customer.email}</div>
-                      <div className="text-sm text-gray-500 font-body">{customer.phone}</div>
+                      <div className="text-sm text-gray-900">{customer.email}</div>
+                      <div className="text-sm text-gray-500">{customer.phone}</div>
                     </td>
-                    <td className="px-4 lg:px-6 py-4 text-sm text-gray-900 font-body hidden lg:table-cell">
+                    <td className="px-6 py-4 text-sm text-gray-900 hidden lg:table-cell">
                       {customer.address}
                     </td>
-                    <td className="px-4 lg:px-6 py-4 text-sm lg:text-base font-semibold text-gray-900 font-body">
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">
                       {customer.totalOrders}
                     </td>
-                    <td className="px-4 lg:px-6 py-4 text-sm lg:text-base font-bold text-gray-900 font-body">
+                    <td className="px-6 py-4 text-sm font-bold text-gray-900">
                       {customer.totalSpent}
                     </td>
                     <td className="px-4 lg:px-6 py-4 hidden sm:table-cell">
-                      <span className={`inline-flex px-2 lg:px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(customer.status)}`}>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(customer.status)}`}>
                         {customer.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
                       </span>
                     </td>
                     <td className="px-4 lg:px-6 py-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        <button className="text-blue-600 hover:text-blue-800 transition-colors duration-200">
-                          <HiOutlineEye className="w-4 h-4 lg:w-5 lg:h-5" />
+                        <button className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors">
+                          <HiOutlineEye className="w-4 h-4" />
                         </button>
-                        <button className="text-green-600 hover:text-green-800 transition-colors duration-200">
-                          <HiOutlinePencil className="w-4 h-4 lg:w-5 lg:h-5" />
+                        <button className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors">
+                          <HiOutlinePencil className="w-4 h-4" />
                         </button>
-                        <button className="text-red-600 hover:text-red-800 transition-colors duration-200">
-                          <HiOutlineTrash className="w-4 h-4 lg:w-5 lg:h-5" />
+                        <button className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors">
+                          <HiOutlineTrash className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -334,8 +334,8 @@ const AdminCustomers: React.FC = () => {
           </div>
 
           {/* Pagination */}
-          <div className="bg-gray-50/30 px-4 lg:px-6 py-3 lg:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-sm text-gray-700 font-body mb-2 sm:mb-0">
+          <div className="bg-gray-50 px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-gray-700 mb-2 sm:mb-0">
               Hiển thị <span className="font-semibold">{startIndex + 1}</span> đến{' '}
               <span className="font-semibold">{Math.min(endIndex, filteredCustomers.length)}</span> trong tổng số{' '}
               <span className="font-semibold">{filteredCustomers.length}</span> khách hàng
@@ -356,7 +356,7 @@ const AdminCustomers: React.FC = () => {
                     onClick={() => setCurrentPage(page)}
                     className={`px-3 py-2 text-sm font-medium rounded-lg ${
                       currentPage === page
-                        ? 'bg-blue-500 text-white'
+                        ? 'bg-amber-600 text-white'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                     }`}
                   >

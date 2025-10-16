@@ -123,10 +123,10 @@ const AdminProducts: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 font-heading">Quản lý sản phẩm</h1>
-            <p className="mt-2 text-gray-600 font-body">Quản lý tất cả sản phẩm trong cửa hàng</p>
+            <h1 className="text-3xl font-bold text-gray-900">Quản lý sản phẩm</h1>
+            <p className="mt-2 text-gray-600">Quản lý tất cả sản phẩm trong cửa hàng</p>
           </div>
-          <button className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 transform hover:scale-105">
+          <button className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors">
             <HiOutlinePlus className="w-5 h-5 mr-2" />
             Thêm sản phẩm
           </button>
@@ -134,54 +134,54 @@ const AdminProducts: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-6">
+          <div className="bg-white rounded-xl border border-amber-100 p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
                 <HiOutlineEye className="w-6 h-6 text-white" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 font-body">Tổng sản phẩm</p>
-                <p className="text-2xl font-bold text-gray-900 font-heading">{products.length}</p>
+                <p className="text-sm font-medium text-gray-600">Tổng sản phẩm</p>
+                <p className="text-2xl font-bold text-gray-900">{products.length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-6">
+          <div className="bg-white rounded-xl border border-amber-100 p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
                 <HiOutlineEye className="w-6 h-6 text-white" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 font-body">Đang hoạt động</p>
-                <p className="text-2xl font-bold text-gray-900 font-heading">
+                <p className="text-sm font-medium text-gray-600">Đang hoạt động</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {products.filter(p => p.status === 'active').length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-6">
+          <div className="bg-white rounded-xl border border-amber-100 p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
                 <HiOutlineEye className="w-6 h-6 text-white" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 font-body">Hết hàng</p>
-                <p className="text-2xl font-bold text-gray-900 font-heading">
+                <p className="text-sm font-medium text-gray-600">Hết hàng</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {products.filter(p => p.status === 'out_of_stock').length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-6">
+          <div className="bg-white rounded-xl border border-amber-100 p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
                 <HiOutlineEye className="w-6 h-6 text-white" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 font-body">Tổng tồn kho</p>
-                <p className="text-2xl font-bold text-gray-900 font-heading">
+                <p className="text-sm font-medium text-gray-600">Tổng tồn kho</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {products.reduce((sum, p) => sum + p.stock, 0)}
                 </p>
               </div>
@@ -190,7 +190,7 @@ const AdminProducts: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-6 mb-8">
+        <div className="bg-white rounded-xl border border-amber-100 p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div className="relative">
@@ -200,7 +200,7 @@ const AdminProducts: React.FC = () => {
               <input
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
-                className="block w-full pl-10 pr-3 py-2 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 font-body"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -209,7 +209,7 @@ const AdminProducts: React.FC = () => {
             {/* Category Filter */}
             <div className="relative">
               <select
-                className="block w-full px-3 py-2 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 font-body appearance-none"
+                className="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all appearance-none"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -225,7 +225,7 @@ const AdminProducts: React.FC = () => {
             {/* Status Filter */}
             <div className="relative">
               <select
-                className="block w-full px-3 py-2 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 font-body appearance-none"
+                className="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all appearance-none"
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
               >
@@ -239,7 +239,7 @@ const AdminProducts: React.FC = () => {
             </div>
 
             {/* Advanced Filter Button */}
-            <button className="inline-flex items-center px-4 py-2 border border-amber-300 rounded-xl text-amber-700 bg-amber-50 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all duration-300 font-body">
+            <button className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors">
               <HiOutlineFilter className="w-5 h-5 mr-2" />
               Lọc nâng cao
             </button>
@@ -247,27 +247,27 @@ const AdminProducts: React.FC = () => {
         </div>
 
         {/* Products Table */}
-        <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
+        <div className="bg-white rounded-xl border border-amber-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gradient-to-r from-amber-50 to-amber-100/50">
+              <thead className="bg-amber-50 border-b border-amber-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Sản phẩm
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Danh mục
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Giá
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Tồn kho
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Đã bán
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Trạng thái
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
@@ -277,33 +277,33 @@ const AdminProducts: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-amber-50/30 transition-colors duration-200">
+                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
                           <img
-                            className="h-12 w-12 rounded-xl object-cover"
+                            className="h-12 w-12 rounded-lg object-cover"
                             src={product.image}
                             alt={product.name}
                           />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 font-body">{product.name}</div>
-                          <div className="text-sm text-gray-500 font-body">ID: #{product.id}</div>
+                          <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                          <div className="text-sm text-gray-500">ID: #{product.id}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 font-body">{product.category}</div>
+                      <div className="text-sm text-gray-900">{product.category}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900 font-body">{formatPrice(product.price)}</div>
+                      <div className="text-sm font-medium text-gray-900">{formatPrice(product.price)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 font-body">{product.stock}</div>
+                      <div className="text-sm text-gray-900">{product.stock}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 font-body">{product.sales}</div>
+                      <div className="text-sm text-gray-900">{product.sales}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(product.status)}`}>
@@ -312,13 +312,13 @@ const AdminProducts: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
-                        <button className="text-amber-600 hover:text-amber-700 p-2 rounded-lg hover:bg-amber-50 transition-all duration-200">
+                        <button className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors">
                           <HiOutlineEye className="w-4 h-4" />
                         </button>
-                        <button className="text-blue-600 hover:text-blue-700 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200">
+                        <button className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors">
                           <HiOutlinePencil className="w-4 h-4" />
                         </button>
-                        <button className="text-red-600 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all duration-200">
+                        <button className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors">
                           <HiOutlineTrash className="w-4 h-4" />
                         </button>
                       </div>
@@ -341,7 +341,7 @@ const AdminProducts: React.FC = () => {
             </div>
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm text-gray-700 font-body">
+                <p className="text-sm text-gray-700">
                   Hiển thị <span className="font-medium">1</span> đến <span className="font-medium">{filteredProducts.length}</span> trong tổng số <span className="font-medium">{filteredProducts.length}</span> kết quả
                 </p>
               </div>
@@ -350,7 +350,7 @@ const AdminProducts: React.FC = () => {
                   <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                     Trước
                   </button>
-                  <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-amber-50 text-sm font-medium text-amber-600">
+                  <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-amber-600 text-white text-sm font-medium">
                     1
                   </button>
                   <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
