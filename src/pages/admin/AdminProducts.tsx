@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import { adminService, type Product } from '../../services/admin.service';
 import {
   HiOutlinePlus,
   HiOutlineSearch,
@@ -14,93 +15,55 @@ const AdminProducts: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data
-  const products = [
-    {
-      id: 1,
-      name: 'Cohiba Robusto',
-      category: 'Xì gà Cuba',
-      price: 2850000,
-      stock: 25,
-      status: 'active',
-      image: '/src/assets/images/pro1.png',
-      sales: 45,
-      createdAt: '2024-01-15'
-    },
-    {
-      id: 2,
-      name: 'Montecristo No.2',
-      category: 'Xì gà Cuba',
-      price: 3200000,
-      stock: 18,
-      status: 'active',
-      image: '/src/assets/images/pro2.png',
-      sales: 38,
-      createdAt: '2024-01-10'
-    },
-    {
-      id: 3,
-      name: 'Davidoff Aniversario',
-      category: 'Xì gà Dominican',
-      price: 4100000,
-      stock: 12,
-      status: 'active',
-      image: '/src/assets/images/pro3.png',
-      sales: 29,
-      createdAt: '2024-01-08'
-    },
-    {
-      id: 4,
-      name: 'Romeo y Julieta',
-      category: 'Xì gà Cuba',
-      price: 1950000,
-      stock: 0,
-      status: 'out_of_stock',
-      image: '/src/assets/images/pro4.png',
-      sales: 32,
-      createdAt: '2024-01-05'
-    },
-    {
-      id: 5,
-      name: 'Padrón 1964',
-      category: 'Xì gà Nicaragua',
-      price: 5200000,
-      stock: 8,
-      status: 'active',
-      image: '/src/assets/images/pro5.png',
-      sales: 15,
-      createdAt: '2024-01-03'
-    }
-  ];
+  // Fetch products from API
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
-  const categories = ['all', 'Xì gà Cuba', 'Xì gà Dominican', 'Xì gà Nicaragua', 'Phụ kiện'];
-  const statuses = ['all', 'active', 'out_of_stock', 'draft'];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'out_of_stock':
-        return 'bg-red-100 text-red-800';
-      case 'draft':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const productsData = await adminService.getProducts();
+      setProducts(productsData);
+    } catch (err) {
+      setError('Không thể tải danh sách sản phẩm');
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'Hoạt động';
-      case 'out_of_stock':
-        return 'Hết hàng';
-      case 'draft':
-        return 'Nháp';
-      default:
-        return status;
+  // Handle product deletion
+  const handleDeleteProduct = async (productId: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+      return;
     }
+
+    try {
+      await adminService.deleteProduct(productId);
+      setProducts(products.filter(p => p._id !== productId));
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      alert('Không thể xóa sản phẩm');
+    }
+  };
+
+  // Extract unique categories from products
+  const categories = ['all', ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))];
+
+  const getStatusColor = (inStock: boolean) => {
+    return inStock
+      ? 'bg-green-100 text-green-800'
+      : 'bg-red-100 text-red-800';
+  };
+
+  const getStatusText = (inStock: boolean) => {
+    return inStock ? 'Còn hàng' : 'Hết hàng';
   };
 
   const formatPrice = (price: number) => {
@@ -111,9 +74,12 @@ const AdminProducts: React.FC = () => {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          product.brand.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
+    const matchesStatus = selectedStatus === 'all' ||
+                          (selectedStatus === 'inStock' && product.inStock) ||
+                          (selectedStatus === 'outOfStock' && !product.inStock);
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
@@ -132,62 +98,93 @@ const AdminProducts: React.FC = () => {
           </button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl border border-amber-100 p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                <HiOutlineEye className="w-6 h-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Tổng sản phẩm</p>
-                <p className="text-2xl font-bold text-gray-900">{products.length}</p>
-              </div>
-            </div>
+        {/* Loading and Error States */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-600"></div>
           </div>
+        )}
 
-          <div className="bg-white rounded-xl border border-amber-100 p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                <HiOutlineEye className="w-6 h-6 text-white" />
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Đang hoạt động</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {products.filter(p => p.status === 'active').length}
-                </p>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Lỗi</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
+                <button
+                  onClick={fetchProducts}
+                  className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                >
+                  Thử lại
+                </button>
               </div>
             </div>
           </div>
+        )}
 
-          <div className="bg-white rounded-xl border border-amber-100 p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
-                <HiOutlineEye className="w-6 h-6 text-white" />
+        {!loading && !error && (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <div className="bg-white rounded-xl border border-amber-100 p-6">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <HiOutlineEye className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Tổng sản phẩm</p>
+                    <p className="text-2xl font-bold text-gray-900">{products.length}</p>
+                  </div>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Hết hàng</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {products.filter(p => p.status === 'out_of_stock').length}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-xl border border-amber-100 p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
-                <HiOutlineEye className="w-6 h-6 text-white" />
+              <div className="bg-white rounded-xl border border-amber-100 p-6">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                    <HiOutlineEye className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Còn hàng</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {products.filter(p => p.inStock).length}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Tổng tồn kho</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {products.reduce((sum, p) => sum + p.stock, 0)}
-                </p>
+
+              <div className="bg-white rounded-xl border border-amber-100 p-6">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
+                    <HiOutlineEye className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Hết hàng</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {products.filter(p => !p.inStock).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border border-amber-100 p-6">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                    <HiOutlineEye className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Sản phẩm mới</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {products.filter(p => p.isNew).length}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
         {/* Filters */}
         <div className="bg-white rounded-xl border border-amber-100 p-6 mb-8">
@@ -229,11 +226,9 @@ const AdminProducts: React.FC = () => {
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
               >
-                {statuses.map(status => (
-                  <option key={status} value={status}>
-                    {status === 'all' ? 'Tất cả trạng thái' : getStatusText(status)}
-                  </option>
-                ))}
+                <option value="all">Tất cả trạng thái</option>
+                <option value="inStock">Còn hàng</option>
+                <option value="outOfStock">Hết hàng</option>
               </select>
               <HiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             </div>
@@ -256,19 +251,19 @@ const AdminProducts: React.FC = () => {
                     Sản phẩm
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                    Thương hiệu
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Danh mục
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Giá
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                    Tồn kho
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                    Đã bán
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     Trạng thái
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                    Nhãn
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
                     Thao tác
@@ -277,7 +272,7 @@ const AdminProducts: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
@@ -285,13 +280,19 @@ const AdminProducts: React.FC = () => {
                             className="h-12 w-12 rounded-lg object-cover"
                             src={product.image}
                             alt={product.name}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48x48?text=No+Image';
+                            }}
                           />
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                          <div className="text-sm text-gray-500">ID: #{product.id}</div>
+                          <div className="text-sm text-gray-500">ID: #{product._id.slice(-6)}</div>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{product.brand}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{product.category}</div>
@@ -300,15 +301,26 @@ const AdminProducts: React.FC = () => {
                       <div className="text-sm font-medium text-gray-900">{formatPrice(product.price)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{product.stock}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{product.sales}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(product.status)}`}>
-                        {getStatusText(product.status)}
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(product.inStock)}`}>
+                        {getStatusText(product.inStock)}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-wrap gap-1">
+                        {product.isNew && (
+                          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                            Mới
+                          </span>
+                        )}
+                        {product.isFeatured && (
+                          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                            Nổi bật
+                          </span>
+                        )}
+                        {!product.isNew && !product.isFeatured && (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
@@ -318,7 +330,10 @@ const AdminProducts: React.FC = () => {
                         <button className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors">
                           <HiOutlinePencil className="w-4 h-4" />
                         </button>
-                        <button className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors">
+                        <button
+                          onClick={() => handleDeleteProduct(product._id)}
+                          className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors"
+                        >
                           <HiOutlineTrash className="w-4 h-4" />
                         </button>
                       </div>
@@ -329,38 +344,67 @@ const AdminProducts: React.FC = () => {
             </table>
           </div>
 
+          {/* Empty State */}
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8l-1-1m1 1l-1 1M6 5l1-1m-1 1l1 1"
+                />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">Không có sản phẩm</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                {searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all'
+                  ? 'Không tìm thấy sản phẩm phù hợp với bộ lọc'
+                  : 'Chưa có sản phẩm nào được thêm'}
+              </p>
+            </div>
+          )}
+
           {/* Pagination */}
-          <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Trước
-              </button>
-              <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Sau
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Hiển thị <span className="font-medium">1</span> đến <span className="font-medium">{filteredProducts.length}</span> trong tổng số <span className="font-medium">{filteredProducts.length}</span> kết quả
-                </p>
+          {filteredProducts.length > 0 && (
+            <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  Trước
+                </button>
+                <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  Sau
+                </button>
               </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                  <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                    Trước
-                  </button>
-                  <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-amber-600 text-white text-sm font-medium">
-                    1
-                  </button>
-                  <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                    Sau
-                  </button>
-                </nav>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Hiển thị <span className="font-medium">1</span> đến <span className="font-medium">{filteredProducts.length}</span> trong tổng số <span className="font-medium">{filteredProducts.length}</span> kết quả
+                  </p>
+                </div>
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                      Trước
+                    </button>
+                    <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-amber-600 text-white text-sm font-medium">
+                      1
+                    </button>
+                    <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                      Sau
+                    </button>
+                  </nav>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
+          </>
+        )}
       </div>
     </AdminLayout>
   );

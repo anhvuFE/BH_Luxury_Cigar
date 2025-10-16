@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import { adminService, Customer } from '../../services/admin.service';
 import {
   HiOutlineUsers,
   HiOutlineSearch,
@@ -13,103 +14,37 @@ import {
   HiOutlineLocationMarker,
   HiChevronDown,
   HiChevronLeft,
-  HiChevronRight
+  HiChevronRight,
+  HiOutlineExclamationCircle
 } from 'react-icons/hi';
 
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  totalOrders: number;
-  totalSpent: string;
-  joinDate: string;
-  status: 'active' | 'inactive';
-  avatar: string;
-}
 
 const AdminCustomers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data
-  const customers: Customer[] = [
-    {
-      id: 'CUS001',
-      name: 'Nguyễn Văn An',
-      email: 'nguyen.van.an@email.com',
-      phone: '+84 912 345 678',
-      address: 'Quận 1, TP.HCM',
-      totalOrders: 15,
-      totalSpent: '₫42,750,000',
-      joinDate: '2023-08-15',
-      status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    },
-    {
-      id: 'CUS002',
-      name: 'Trần Thị Bình',
-      email: 'tran.thi.binh@email.com',
-      phone: '+84 987 654 321',
-      address: 'Quận 3, TP.HCM',
-      totalOrders: 8,
-      totalSpent: '₫25,600,000',
-      joinDate: '2023-09-22',
-      status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b2e2ea3d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    },
-    {
-      id: 'CUS003',
-      name: 'Lê Minh Châu',
-      email: 'le.minh.chau@email.com',
-      phone: '+84 901 234 567',
-      address: 'Quận 7, TP.HCM',
-      totalOrders: 22,
-      totalSpent: '₫68,900,000',
-      joinDate: '2023-06-10',
-      status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    },
-    {
-      id: 'CUS004',
-      name: 'Phạm Hoàng Đức',
-      email: 'pham.hoang.duc@email.com',
-      phone: '+84 913 456 789',
-      address: 'Quận 2, TP.HCM',
-      totalOrders: 5,
-      totalSpent: '₫12,300,000',
-      joinDate: '2023-10-05',
-      status: 'inactive',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    },
-    {
-      id: 'CUS005',
-      name: 'Vũ Thị Hương',
-      email: 'vu.thi.huong@email.com',
-      phone: '+84 908 765 432',
-      address: 'Quận Bình Thạnh, TP.HCM',
-      totalOrders: 12,
-      totalSpent: '₫36,800,000',
-      joinDate: '2023-07-28',
-      status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    },
-    {
-      id: 'CUS006',
-      name: 'Hoàng Văn Giang',
-      email: 'hoang.van.giang@email.com',
-      phone: '+84 915 678 901',
-      address: 'Quận Tân Bình, TP.HCM',
-      totalOrders: 18,
-      totalSpent: '₫54,200,000',
-      joinDate: '2023-05-12',
-      status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    }
-  ];
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        setLoading(true);
+        const customersData = await adminService.getCustomers();
+        setCustomers(customersData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching customers:', err);
+        setError('Không thể tải danh sách khách hàng. Vui lòng thử lại.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -117,9 +52,35 @@ const AdminCustomers: React.FC = () => {
         return 'bg-green-100 text-green-800';
       case 'inactive':
         return 'bg-red-100 text-red-800';
+      case 'vip':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Hoạt động';
+      case 'inactive':
+        return 'Không hoạt động';
+      case 'vip':
+        return 'VIP';
+      default:
+        return status;
+    }
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(price);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('vi-VN');
   };
 
   const filteredCustomers = customers.filter(customer => {
@@ -128,6 +89,17 @@ const AdminCustomers: React.FC = () => {
     const matchesFilter = filterStatus === 'all' || customer.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
+
+  // Calculate stats from real data
+  const totalCustomers = customers.length;
+  const activeCustomers = customers.filter(c => c.status === 'active').length;
+  const newCustomers = customers.filter(c => {
+    const joinDate = new Date(c.joinDate);
+    const monthAgo = new Date();
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+    return joinDate > monthAgo;
+  }).length;
+  const avgSpent = customers.length > 0 ? customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.length : 0;
 
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
@@ -156,56 +128,87 @@ const AdminCustomers: React.FC = () => {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="bg-white rounded-lg border border-amber-100 p-8 text-center mb-8">
+            <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-amber-600 rounded-full" role="status">
+              <span className="sr-only">Đang tải...</span>
+            </div>
+            <p className="mt-2 text-gray-600">Đang tải dữ liệu...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-white rounded-lg border border-red-200 p-6 mb-8">
+            <div className="flex items-center">
+              <HiOutlineExclamationCircle className="w-6 h-6 text-red-600 mr-3" />
+              <div>
+                <h3 className="text-lg font-medium text-red-800">Lỗi tải dữ liệu</h3>
+                <p className="text-red-600">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
+                >
+                  Thử lại
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-          <div className="bg-white rounded-lg border border-amber-100 p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Tổng khách hàng</p>
-                <p className="text-2xl font-bold text-gray-900">156</p>
+        {!loading && !error && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+            <div className="bg-white rounded-lg border border-amber-100 p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <HiOutlineUsers className="w-6 h-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Tổng khách hàng</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalCustomers}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-lg border border-amber-100 p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Khách hàng hoạt động</p>
-                <p className="text-2xl font-bold text-gray-900">142</p>
+            <div className="bg-white rounded-lg border border-amber-100 p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                  <HiOutlineUsers className="w-6 h-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Khách hàng hoạt động</p>
+                  <p className="text-2xl font-bold text-gray-900">{activeCustomers}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-lg border border-amber-100 p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Khách hàng mới (tháng)</p>
-                <p className="text-2xl font-bold text-gray-900">23</p>
+            <div className="bg-white rounded-lg border border-amber-100 p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                  <HiOutlineUsers className="w-6 h-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Khách hàng mới (tháng)</p>
+                  <p className="text-2xl font-bold text-gray-900">{newCustomers}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-lg border border-amber-100 p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Chi tiêu trung bình</p>
-                <p className="text-2xl font-bold text-gray-900">₫2.8M</p>
+            <div className="bg-white rounded-lg border border-amber-100 p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center">
+                  <HiOutlineUsers className="w-6 h-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Chi tiêu trung bình</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatPrice(avgSpent)}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Search and Filters */}
         <div className="bg-white rounded-lg border border-amber-100 p-6 mb-8">
@@ -234,6 +237,7 @@ const AdminCustomers: React.FC = () => {
                 <option value="all">Tất cả trạng thái</option>
                 <option value="active">Hoạt động</option>
                 <option value="inactive">Không hoạt động</option>
+                <option value="vip">VIP</option>
               </select>
 
               <button
@@ -248,9 +252,10 @@ const AdminCustomers: React.FC = () => {
         </div>
 
         {/* Customers Table */}
-        <div className="bg-white rounded-lg border border-amber-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        {!loading && !error && (
+          <div className="bg-white rounded-lg border border-amber-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
               <thead className="bg-amber-50 border-b border-amber-100">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
@@ -278,12 +283,12 @@ const AdminCustomers: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-200/50">
                 {currentCustomers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={customer._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         <img
                           className="h-12 w-12 rounded-lg object-cover"
-                          src={customer.avatar}
+                          src={customer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(customer.name)}&background=f59e0b&color=fff`}
                           alt={customer.name}
                         />
                         <div className="ml-4">
@@ -291,27 +296,27 @@ const AdminCustomers: React.FC = () => {
                             {customer.name}
                           </div>
                           <div className="text-sm text-gray-500">
-                            #{customer.id}
+                            #{customer._id}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 hidden md:table-cell">
                       <div className="text-sm text-gray-900">{customer.email}</div>
-                      <div className="text-sm text-gray-500">{customer.phone}</div>
+                      {customer.phone && <div className="text-sm text-gray-500">{customer.phone}</div>}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 hidden lg:table-cell">
-                      {customer.address}
+                      -
                     </td>
                     <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                      {customer.totalOrders}
+                      {customer.orders}
                     </td>
                     <td className="px-6 py-4 text-sm font-bold text-gray-900">
-                      {customer.totalSpent}
+                      {formatPrice(customer.totalSpent)}
                     </td>
                     <td className="px-4 lg:px-6 py-4 hidden sm:table-cell">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(customer.status)}`}>
-                        {customer.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
+                        {getStatusText(customer.status)}
                       </span>
                     </td>
                     <td className="px-4 lg:px-6 py-4 text-right">
@@ -375,6 +380,7 @@ const AdminCustomers: React.FC = () => {
             </div>
           </div>
         </div>
+        )}
       </div>
     </AdminLayout>
   );
