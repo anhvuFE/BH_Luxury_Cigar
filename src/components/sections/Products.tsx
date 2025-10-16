@@ -1,30 +1,135 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { HiOutlineHeart, HiOutlineShoppingBag, HiOutlineEye } from "react-icons/hi";
-import { ProductService } from "../../services/supabase";
 import type { Product } from "../../types/database";
 
 const Products: React.FC = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      try {
-        setLoading(true);
-        const products = await ProductService.getFeatured(6);
-        setFeaturedProducts(products || []);
-      } catch (err) {
-        console.error("Error fetching featured products:", err);
-        setError("Failed to load products");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFeaturedProducts();
-  }, []);
+  // Mock data for featured products
+  const featuredProducts: Product[] = [
+    {
+      id: "1",
+      name: "Cohiba Behike 56",
+      slug: "cohiba-behike-56",
+      brand: "Cohiba",
+      description: "Xì gà cao cấp nhất của thương hiệu Cohiba, với hương vị đặc biệt và độ mạnh vừa phải.",
+      price: 2500000,
+      compare_price: 3000000,
+      stock: 10,
+      category_id: "premium-cigars",
+      featured_image: "/src/assets/images/placeholder.jpg",
+      specifications: {
+        origin: "Cuba",
+        material: "Tobacco",
+        age: "5 years"
+      },
+      is_new: true,
+      is_featured: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: "2",
+      name: "Montecristo No. 2",
+      slug: "montecristo-no-2",
+      brand: "Montecristo",
+      description: "Xì gà kinh điển với hương vị phong phú và cân bằng hoàn hảo.",
+      price: 1800000,
+      stock: 15,
+      category_id: "premium-cigars",
+      featured_image: "/src/assets/images/placeholder.jpg",
+      specifications: {
+        origin: "Cuba",
+        material: "Tobacco",
+        age: "3 years"
+      },
+      is_new: false,
+      is_featured: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: "3",
+      name: "Romeo y Julieta Churchill",
+      slug: "romeo-julieta-churchill",
+      brand: "Romeo y Julieta",
+      description: "Xì gà danh tiếng với hương vị nhẹ nhàng và tinh tế.",
+      price: 1500000,
+      compare_price: 1800000,
+      stock: 20,
+      category_id: "premium-cigars",
+      featured_image: "/src/assets/images/placeholder.jpg",
+      specifications: {
+        origin: "Cuba",
+        material: "Tobacco",
+        age: "4 years"
+      },
+      is_new: false,
+      is_featured: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: "4",
+      name: "Partagas Serie D No. 4",
+      slug: "partagas-serie-d-4",
+      brand: "Partagas",
+      description: "Xì gà mạnh mẽ với hương vị đất và gia vị đặc trưng.",
+      price: 1200000,
+      stock: 25,
+      category_id: "premium-cigars",
+      featured_image: "/src/assets/images/placeholder.jpg",
+      specifications: {
+        origin: "Cuba",
+        material: "Tobacco",
+        age: "2 years"
+      },
+      is_new: true,
+      is_featured: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: "5",
+      name: "H. Upmann Magnum 50",
+      slug: "h-upmann-magnum-50",
+      brand: "H. Upmann",
+      description: "Xì gà cân bằng với hương vị mộc và ngọt ngào tự nhiên.",
+      price: 1400000,
+      stock: 18,
+      category_id: "premium-cigars",
+      featured_image: "/src/assets/images/placeholder.jpg",
+      specifications: {
+        origin: "Cuba",
+        material: "Tobacco",
+        age: "3 years"
+      },
+      is_new: false,
+      is_featured: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: "6",
+      name: "Hoyo de Monterrey Epicure No. 2",
+      slug: "hoyo-monterrey-epicure-2",
+      brand: "Hoyo de Monterrey",
+      description: "Xì gà nhẹ nhàng với hương vị kem và hạt dẻ.",
+      price: 1100000,
+      compare_price: 1300000,
+      stock: 0,
+      category_id: "premium-cigars",
+      featured_image: "/src/assets/images/placeholder.jpg",
+      specifications: {
+        origin: "Cuba",
+        material: "Tobacco",
+        age: "2 years"
+      },
+      is_new: false,
+      is_featured: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ];
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -33,42 +138,6 @@ const Products: React.FC = () => {
     }).format(price);
   };
 
-  if (loading) {
-    return (
-      <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 font-playfair">
-              Sản Phẩm Nổi Bật
-            </h2>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-              Đang tải sản phẩm...
-            </p>
-          </div>
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-16 w-16 sm:h-24 sm:w-24 lg:h-32 lg:w-32 border-b-2 border-primary-500"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 font-playfair">
-              Sản Phẩm Nổi Bật
-            </h2>
-            <p className="text-base sm:text-lg text-red-600 max-w-2xl mx-auto px-4">
-              {error}
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-white via-amber-50/30 to-white">

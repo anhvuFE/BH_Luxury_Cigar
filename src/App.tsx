@@ -10,7 +10,6 @@ import BlogPage from './pages/BlogPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import NewArrivalPage from './pages/NewArrivalPage';
-import AdminSeedPage from './pages/AdminSeedPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -31,7 +30,7 @@ function AppContent() {
 
   // Define routes that should not have Header/Footer
   const noLayoutRoutes = ['/login', '/register', '/forgot-password'];
-  const isAdminRoute = location.pathname.startsWith('/admin') && location.pathname !== '/admin/seed';
+  const isAdminRoute = location.pathname.startsWith('/admin');
   const shouldShowLayout = !noLayoutRoutes.includes(location.pathname) && !isAdminRoute;
 
   return (
@@ -58,7 +57,6 @@ function AppContent() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/new-arrival" element={<NewArrivalPage />} />
-          <Route path="/admin/seed" element={<AdminSeedPage />} />
         </Routes>
       </main>
       {shouldShowLayout && <Footer />}
