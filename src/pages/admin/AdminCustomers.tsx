@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { adminService, Customer } from '../../services/admin.service';
+import { adminService, type Customer } from '../../services/admin.service';
 import {
   HiOutlineUsers,
   HiOutlineSearch,

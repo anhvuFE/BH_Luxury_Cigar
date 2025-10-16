@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { adminService, AdminStats } from '../../services/admin.service';
+import { adminService, type AdminStats } from '../../services/admin.service';
 import {
   HiOutlineShoppingBag,
   HiOutlineUsers,
