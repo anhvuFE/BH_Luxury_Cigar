@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import { adminService, type AdminStats } from '../../services/admin.service';
 import {
   HiOutlineShoppingBag,
   HiOutlineUsers,
@@ -14,11 +15,71 @@ import {
 } from 'react-icons/hi';
 
 const AdminDashboard: React.FC = () => {
-  // Mock data
-  const stats = [
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const data = await adminService.getDashboardStats();
+        setStats(data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load dashboard statistics');
+        console.error('Error fetching dashboard stats:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount);
+  };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="p-6 lg:p-8 bg-gradient-to-br from-amber-50/30 via-white to-amber-50/20">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Đang tải dữ liệu...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <AdminLayout>
+        <div className="p-6 lg:p-8 bg-gradient-to-br from-amber-50/30 via-white to-amber-50/20">
+          <div className="text-center py-12">
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+            >
+              Thử lại
+            </button>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  // Transform stats for display
+  const displayStats = [
     {
       name: 'Doanh thu tháng này',
-      value: '₫125,680,000',
+      value: formatCurrency(stats.monthlyRevenue),
       change: '+12.5%',
       changeType: 'increase',
       subtitle: 'so với tháng trước',
@@ -26,15 +87,15 @@ const AdminDashboard: React.FC = () => {
     },
     {
       name: 'Tổng đơn hàng',
-      value: '156',
+      value: stats.totalOrders.toString(),
       change: '+8.2%',
       changeType: 'increase',
-      subtitle: 'đơn hàng mới',
+      subtitle: 'đơn hàng',
       icon: HiOutlineShoppingBag,
     },
     {
       name: 'Khách hàng mới',
-      value: '89',
+      value: stats.newCustomers.toString(),
       change: '+15.3%',
       changeType: 'increase',
       subtitle: 'khách hàng',
@@ -42,7 +103,7 @@ const AdminDashboard: React.FC = () => {
     },
     {
       name: 'Tỷ lệ chuyển đổi',
-      value: '3.24%',
+      value: `${stats.conversionRate}%`,
       change: '+2.1%',
       changeType: 'increase',
       subtitle: 'hiệu suất',
@@ -50,67 +111,8 @@ const AdminDashboard: React.FC = () => {
     },
   ];
 
-  const recentOrders = [
-    {
-      id: 'DH001',
-      customer: 'Nguyễn Văn A',
-      product: 'Cohiba Robusto',
-      amount: '₫2,850,000',
-      status: 'delivered',
-      time: '2 giờ trước'
-    },
-    {
-      id: 'DH002',
-      customer: 'Trần Thị B',
-      product: 'Montecristo No.2',
-      amount: '₫3,200,000',
-      status: 'shipping',
-      time: '5 giờ trước'
-    },
-    {
-      id: 'DH003',
-      customer: 'Lê Minh C',
-      product: 'Davidoff Aniversario',
-      amount: '₫4,100,000',
-      status: 'pending',
-      time: '1 ngày trước'
-    },
-    {
-      id: 'DH004',
-      customer: 'Phạm Hoàng D',
-      product: 'Romeo y Julieta',
-      amount: '₫1,950,000',
-      status: 'delivered',
-      time: '2 ngày trước'
-    },
-  ];
-
-  const topProducts = [
-    {
-      name: 'Cohiba Robusto',
-      sales: 45,
-      revenue: '₫28,250,000',
-      stock: 12,
-      trend: 'up',
-      image: '/src/assets/images/pro1.png'
-    },
-    {
-      name: 'Montecristo No.2',
-      sales: 38,
-      revenue: '₫21,600,000',
-      stock: 8,
-      trend: 'up',
-      image: '/src/assets/images/pro2.png'
-    },
-    {
-      name: 'Davidoff Aniversario',
-      sales: 29,
-      revenue: '₫18,900,000',
-      stock: 15,
-      trend: 'down',
-      image: '/src/assets/images/pro3.png'
-    },
-  ];
+  const recentOrders = stats.recentOrders;
+  const topProducts = stats.topProducts;
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -202,7 +204,7 @@ const AdminDashboard: React.FC = () => {
             <div className="space-y-4">
               {recentOrders.map((order) => (
                 <div
-                  key={order.id}
+                  key={order._id}
                   className="p-4 bg-gradient-to-r from-amber-50/30 to-transparent rounded-xl hover:from-amber-50/50 transition-all duration-300 border border-transparent hover:border-amber-100"
                 >
                   <div className="flex items-center justify-between">
@@ -214,12 +216,12 @@ const AdminDashboard: React.FC = () => {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">{order.customer}</p>
-                        <p className="text-sm text-gray-600">{order.product}</p>
-                        <p className="text-xs text-gray-500 mt-1">#{order.id} · {order.time}</p>
+                        <p className="text-sm text-gray-600">{order.email}</p>
+                        <p className="text-xs text-gray-500 mt-1">#{order._id} · {order.date}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-gray-900 mb-2">{order.amount}</p>
+                      <p className="font-bold text-gray-900 mb-2">{order.total}</p>
                       <div className="flex items-center space-x-1">
                         {getStatusIcon(order.status)}
                         <span className="text-xs font-medium text-gray-700">
@@ -248,7 +250,7 @@ const AdminDashboard: React.FC = () => {
             <div className="space-y-4">
               {topProducts.map((product, index) => (
                 <div
-                  key={product.name}
+                  key={product._id}
                   className="flex items-center space-x-3 p-3 rounded-xl hover:bg-amber-50/30 transition-all duration-300"
                 >
                   <div className="relative">
@@ -256,6 +258,10 @@ const AdminDashboard: React.FC = () => {
                       src={product.image}
                       alt={product.name}
                       className="w-12 h-12 rounded-lg object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder-cigar.jpg';
+                      }}
                     />
                     <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                       index === 0 ? 'bg-gradient-to-br from-yellow-400 to-amber-500' :
@@ -268,21 +274,23 @@ const AdminDashboard: React.FC = () => {
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900 text-sm">{product.name}</p>
                     <div className="flex items-center space-x-3 mt-1">
-                      <span className="text-xs text-gray-600">{product.sales} sold</span>
+                      <span className="text-xs text-gray-600">{product.brand}</span>
                       <span className="text-xs text-gray-400">•</span>
-                      <span className="text-xs text-gray-600">Kho: {product.stock}</span>
+                      <span className="text-xs text-gray-600">{formatCurrency(product.price)}</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gray-900 text-sm">{product.revenue}</p>
-                    <div className="flex items-center justify-end mt-1">
-                      {product.trend === 'up' ? (
-                        <HiOutlineTrendingUp className="w-3 h-3 text-green-500 mr-1" />
-                      ) : (
-                        <HiOutlineTrendingDown className="w-3 h-3 text-red-500 mr-1" />
+                    <div className="flex gap-1">
+                      {product.isNew && (
+                        <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Mới</span>
                       )}
-                      <span className={`text-xs ${product.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                        {product.trend === 'up' ? '+5%' : '-3%'}
+                      {product.isFeatured && (
+                        <span className="px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full">Nổi bật</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-end mt-1">
+                      <span className={`text-xs ${product.inStock ? 'text-green-600' : 'text-red-600'}`}>
+                        {product.inStock ? 'Còn hàng' : 'Hết hàng'}
                       </span>
                     </div>
                   </div>
