@@ -26,6 +26,7 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminSettings from './pages/admin/AdminSettings';
 
 function AppContent() {
   const location = useLocation();
@@ -92,6 +93,14 @@ function AppContent() {
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminAnalytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminSettings />
               </ProtectedRoute>
             }
           />

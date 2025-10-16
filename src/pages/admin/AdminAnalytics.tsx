@@ -112,7 +112,7 @@ const AdminAnalytics: React.FC = () => {
               className={`w-full ${color} rounded-t transition-all duration-500`}
               style={{ height: `${(item.value / maxValue) * 100}%` }}
             />
-            <span className="text-xs text-gray-500 mt-1 font-body">{item.period}</span>
+            <span className="text-xs text-gray-500 mt-1">{item.period}</span>
           </div>
         ))}
       </div>
@@ -126,10 +126,10 @@ const AdminAnalytics: React.FC = () => {
         <div className="mb-6 lg:mb-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent font-heading">
+              <h1 className="text-3xl font-bold text-gray-900">
                 Báo cáo & Phân tích
               </h1>
-              <p className="mt-2 lg:mt-3 text-gray-600 font-body text-sm lg:text-lg">
+              <p className="mt-2 text-gray-600">
                 Theo dõi hiệu suất kinh doanh và xu hướng thị trường
               </p>
             </div>
@@ -137,7 +137,7 @@ const AdminAnalytics: React.FC = () => {
               <select
                 value={selectedPeriod}
                 onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="px-4 py-2 lg:py-3 border border-gray-200/50 rounded-xl lg:rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-300 font-body text-sm lg:text-base"
+                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors text-sm"
               >
                 <option value="week">7 ngày qua</option>
                 <option value="month">30 ngày qua</option>
@@ -145,8 +145,8 @@ const AdminAnalytics: React.FC = () => {
                 <option value="year">Năm này</option>
               </select>
 
-              <button className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-xl lg:rounded-2xl font-medium text-sm lg:text-base flex items-center hover:shadow-lg transition-all duration-300 hover:scale-105">
-                <HiOutlineDownload className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+              <button className="bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center hover:bg-amber-700 transition-colors">
+                <HiOutlineDownload className="w-5 h-5 mr-2" />
                 Xuất báo cáo
               </button>
             </div>
@@ -155,10 +155,10 @@ const AdminAnalytics: React.FC = () => {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8 lg:mb-12">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6 hover:shadow-2xl transition-all duration-300">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
-                <HiOutlineCurrencyDollar className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                <HiOutlineCurrencyDollar className="w-6 h-6 text-white" />
               </div>
               <div className="flex items-center text-green-600">
                 <HiOutlineTrendingUp className="w-4 h-4 mr-1" />
@@ -166,16 +166,16 @@ const AdminAnalytics: React.FC = () => {
               </div>
             </div>
             <div>
-              <p className="text-xs lg:text-sm font-medium text-gray-600 font-body uppercase">Doanh thu</p>
-              <p className="text-xl lg:text-2xl font-bold text-gray-900 font-heading">₫125,680,000</p>
-              <p className="text-xs text-gray-500 font-body mt-1">So với tháng trước</p>
+              <p className="text-sm font-medium text-gray-600 uppercase">Doanh thu</p>
+              <p className="text-2xl font-bold text-gray-900">₫125,680,000</p>
+              <p className="text-xs text-gray-500 mt-1">So với tháng trước</p>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6 hover:shadow-2xl transition-all duration-300">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
-                <HiOutlineShoppingBag className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                <HiOutlineShoppingBag className="w-6 h-6 text-white" />
               </div>
               <div className="flex items-center text-green-600">
                 <HiOutlineTrendingUp className="w-4 h-4 mr-1" />
@@ -183,16 +183,16 @@ const AdminAnalytics: React.FC = () => {
               </div>
             </div>
             <div>
-              <p className="text-xs lg:text-sm font-medium text-gray-600 font-body uppercase">Đơn hàng</p>
-              <p className="text-xl lg:text-2xl font-bold text-gray-900 font-heading">2,468</p>
-              <p className="text-xs text-gray-500 font-body mt-1">So với tháng trước</p>
+              <p className="text-sm font-medium text-gray-600 uppercase">Đơn hàng</p>
+              <p className="text-2xl font-bold text-gray-900">2,468</p>
+              <p className="text-xs text-gray-500 mt-1">So với tháng trước</p>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6 hover:shadow-2xl transition-all duration-300">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
-                <HiOutlineUsers className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                <HiOutlineUsers className="w-6 h-6 text-white" />
               </div>
               <div className="flex items-center text-green-600">
                 <HiOutlineTrendingUp className="w-4 h-4 mr-1" />
@@ -200,16 +200,16 @@ const AdminAnalytics: React.FC = () => {
               </div>
             </div>
             <div>
-              <p className="text-xs lg:text-sm font-medium text-gray-600 font-body uppercase">Khách hàng</p>
-              <p className="text-xl lg:text-2xl font-bold text-gray-900 font-heading">1,245</p>
-              <p className="text-xs text-gray-500 font-body mt-1">So với tháng trước</p>
+              <p className="text-sm font-medium text-gray-600 uppercase">Khách hàng</p>
+              <p className="text-2xl font-bold text-gray-900">1,245</p>
+              <p className="text-xs text-gray-500 mt-1">So với tháng trước</p>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6 hover:shadow-2xl transition-all duration-300">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl lg:rounded-2xl flex items-center justify-center">
-                <HiOutlineChartBar className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center">
+                <HiOutlineChartBar className="w-6 h-6 text-white" />
               </div>
               <div className="flex items-center text-green-600">
                 <HiOutlineTrendingUp className="w-4 h-4 mr-1" />
@@ -217,9 +217,9 @@ const AdminAnalytics: React.FC = () => {
               </div>
             </div>
             <div>
-              <p className="text-xs lg:text-sm font-medium text-gray-600 font-body uppercase">Tỷ lệ chuyển đổi</p>
-              <p className="text-xl lg:text-2xl font-bold text-gray-900 font-heading">3.24%</p>
-              <p className="text-xs text-gray-500 font-body mt-1">So với tháng trước</p>
+              <p className="text-sm font-medium text-gray-600 uppercase">Tỷ lệ chuyển đổi</p>
+              <p className="text-2xl font-bold text-gray-900">3.24%</p>
+              <p className="text-xs text-gray-500 mt-1">So với tháng trước</p>
             </div>
           </div>
         </div>
@@ -227,16 +227,16 @@ const AdminAnalytics: React.FC = () => {
         {/* Charts Section */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-8 lg:mb-12">
           {/* Revenue Chart */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-3 sm:space-y-0">
               <div>
-                <h3 className="text-lg lg:text-xl font-bold text-gray-900 font-heading">Xu hướng doanh thu</h3>
-                <p className="text-xs lg:text-sm text-gray-600 font-body">6 tháng gần đây</p>
+                <h3 className="text-xl font-bold text-gray-900">Xu hướng doanh thu</h3>
+                <p className="text-sm text-gray-600">6 tháng gần đây</p>
               </div>
               <select
                 value={selectedChart}
                 onChange={(e) => setSelectedChart(e.target.value)}
-                className="px-3 py-2 border border-gray-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-sm"
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors text-sm"
               >
                 <option value="revenue">Doanh thu</option>
                 <option value="orders">Đơn hàng</option>
@@ -245,21 +245,21 @@ const AdminAnalytics: React.FC = () => {
             </div>
             <SimpleChart
               data={analyticsData[selectedChart as keyof typeof analyticsData].chartData}
-              color="bg-gradient-to-t from-blue-500 to-blue-400"
+              color="bg-blue-600"
             />
           </div>
 
           {/* Top Products */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg lg:text-xl font-bold text-gray-900 font-heading">Sản phẩm bán chạy</h3>
-                <p className="text-xs lg:text-sm text-gray-600 font-body">Top 5 sản phẩm</p>
+                <h3 className="text-xl font-bold text-gray-900">Sản phẩm bán chạy</h3>
+                <p className="text-sm text-gray-600">Top 5 sản phẩm</p>
               </div>
             </div>
             <div className="space-y-4">
               {topProducts.map((product, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors duration-200">
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold ${
                       index === 0 ? 'bg-yellow-500' :
@@ -270,13 +270,13 @@ const AdminAnalytics: React.FC = () => {
                       {index + 1}
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-semibold text-gray-900 font-body">{product.name}</p>
-                      <p className="text-xs text-gray-600 font-body">{product.orders} đơn hàng</p>
+                      <p className="text-sm font-semibold text-gray-900">{product.name}</p>
+                      <p className="text-xs text-gray-600">{product.orders} đơn hàng</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-gray-900 font-body">{product.revenue}</p>
-                    <p className="text-xs text-green-600 font-body">{product.growth}</p>
+                    <p className="text-sm font-bold text-gray-900">{product.revenue}</p>
+                    <p className="text-xs text-green-600">{product.growth}</p>
                   </div>
                 </div>
               ))}
@@ -287,11 +287,11 @@ const AdminAnalytics: React.FC = () => {
         {/* Sales by Region & Recent Transactions */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
           {/* Sales by Region */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg lg:text-xl font-bold text-gray-900 font-heading">Doanh số theo khu vực</h3>
-                <p className="text-xs lg:text-sm text-gray-600 font-body">Phân bổ theo địa phương</p>
+                <h3 className="text-xl font-bold text-gray-900">Doanh số theo khu vực</h3>
+                <p className="text-sm text-gray-600">Phân bổ theo địa phương</p>
               </div>
             </div>
             <div className="space-y-4">
@@ -299,8 +299,8 @@ const AdminAnalytics: React.FC = () => {
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold text-gray-900 font-body">{region.region}</span>
-                      <span className="text-sm font-bold text-gray-900 font-body">{region.revenue}</span>
+                      <span className="text-sm font-semibold text-gray-900">{region.region}</span>
+                      <span className="text-sm font-bold text-gray-900">{region.revenue}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
                       <span>{region.orders} đơn hàng</span>
@@ -308,7 +308,7 @@ const AdminAnalytics: React.FC = () => {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500"
+                        className="bg-blue-600 h-2 rounded-full transition-all"
                         style={{ width: `${region.percentage}%` }}
                       />
                     </div>
@@ -319,22 +319,22 @@ const AdminAnalytics: React.FC = () => {
           </div>
 
           {/* Recent Transactions */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-4 lg:p-6">
+          <div className="bg-white rounded-lg border border-amber-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg lg:text-xl font-bold text-gray-900 font-heading">Giao dịch gần đây</h3>
-                <p className="text-xs lg:text-sm text-gray-600 font-body">5 giao dịch mới nhất</p>
+                <h3 className="text-xl font-bold text-gray-900">Giao dịch gần đây</h3>
+                <p className="text-sm text-gray-600">5 giao dịch mới nhất</p>
               </div>
             </div>
             <div className="space-y-4">
               {recentTransactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors duration-200">
+                <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div>
-                    <p className="text-sm font-semibold text-gray-900 font-body">{transaction.customer}</p>
-                    <p className="text-xs text-gray-600 font-body">#{transaction.id} • {transaction.date}</p>
+                    <p className="text-sm font-semibold text-gray-900">{transaction.customer}</p>
+                    <p className="text-xs text-gray-600">#{transaction.id} • {transaction.date}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-gray-900 font-body">{transaction.amount}</p>
+                    <p className="text-sm font-bold text-gray-900">{transaction.amount}</p>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
                       {transaction.status === 'completed' ? 'Hoàn thành' :
                        transaction.status === 'pending' ? 'Chờ xử lý' : 'Thất bại'}
