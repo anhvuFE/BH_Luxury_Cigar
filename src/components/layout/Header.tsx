@@ -1,17 +1,32 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  HiOutlinePhone,
-  HiOutlineMail,
   HiOutlineSearch,
   HiOutlineShoppingBag,
   HiMenu,
   HiX,
-  HiOutlineGlobeAlt,
+  HiOutlineLogin,
+  HiOutlineLogout,
+  HiOutlineUser,
 } from "react-icons/hi";
+import authService from "../../services/auth.service";
+
+interface User {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone_number?: string;
+  role: 'customer' | 'staff' | 'admin';
+  created_at: string;
+  updated_at: string;
+}
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
   const navigation = [
     { name: "Trang chủ", href: "/" },
@@ -22,25 +37,70 @@ const Header: React.FC = () => {
     { name: "Liên hệ", href: "/contact" },
   ];
 
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    const isAuth = authService.isAuthenticated();
+    setIsAuthenticated(isAuth);
+
+    if (isAuth) {
+      // Try API first, fallback to localStorage
+      try {
+        const profile = await authService.getProfile();
+        setUser(profile);
+        // Update localStorage with fresh data
+        localStorage.setItem('user', JSON.stringify(profile));
+        localStorage.setItem('userRole', profile.role);
+        console.log('Header user loaded from API:', profile);
+      } catch (apiError) {
+        console.warn('Header API fetch failed, using localStorage:', apiError);
+
+        // Fallback to localStorage
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          try {
+            const localUser = JSON.parse(userData);
+            setUser(localUser);
+            console.log('Header using localStorage:', localUser);
+          } catch (parseError) {
+            console.error('Error parsing user data:', parseError);
+            // Don't logout immediately, just clear user data
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+        } else {
+          console.warn('No localStorage data available');
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      }
+    } else {
+      setUser(null);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Clear local storage even if API call fails
+      localStorage.removeItem('user');
+      localStorage.removeItem('userRole');
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate('/');
+    }
+  };
+
   return (
     <header className="bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white sticky top-0 z-50 shadow-2xl backdrop-blur-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top bar - Clean & Minimal */}
-        <div className="hidden lg:flex justify-between items-center py-2 text-sm border-b border-amber-500/20">
-          <div className="flex items-center space-x-8">
-            <div className="flex items-center text-amber-300/90 hover:text-amber-400 transition-colors cursor-pointer">
-              <HiOutlinePhone className="w-3 h-3 mr-2" />
-              <span className="font-medium">0975 224 557</span>
-            </div>
-            <div className="flex items-center text-amber-300/90 hover:text-amber-400 transition-colors cursor-pointer">
-              <HiOutlineMail className="w-3 h-3 mr-2" />
-              <span className="font-medium">contact@bhluxurycigar.com</span>
-            </div>
-          </div>
-          <div className="flex items-center space-x-6 text-amber-300/90">
-            <span className="text-xs tracking-wide">🇻🇳 VN</span>
-          </div>
-        </div>
 
         {/* Main header - Premium Design */}
         <div className="flex justify-between items-center py-4 lg:py-6">
@@ -84,6 +144,39 @@ const Header: React.FC = () => {
                   0
                 </span>
               </button>
+
+              {/* User Authentication Actions */}
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  {/* User Profile */}
+                  <Link
+                    to="/profile"
+                    className="flex items-center space-x-2 p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group cursor-pointer"
+                    title="Thông tin cá nhân"
+                  >
+                    <HiOutlineUser className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
+                    <span className="text-sm text-amber-300/90 group-hover:text-amber-400 font-medium">
+                      {user?.first_name || 'User'}
+                    </span>
+                  </Link>
+                  {/* Logout Button */}
+                  <button
+                    onClick={handleLogout}
+                    className="p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group"
+                    title="Đăng xuất"
+                  >
+                    <HiOutlineLogout className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className="p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group"
+                  title="Đăng nhập"
+                >
+                  <HiOutlineLogin className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
+                </Link>
+              )}
             </div>
 
             {/* Mobile Actions */}
@@ -97,6 +190,25 @@ const Header: React.FC = () => {
                   0
                 </span>
               </button>
+
+              {/* Mobile Authentication */}
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300"
+                  title="Đăng xuất"
+                >
+                  <HiOutlineLogout className="w-4 h-4 text-amber-300/80" />
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300"
+                  title="Đăng nhập"
+                >
+                  <HiOutlineLogin className="w-4 h-4 text-amber-300/80" />
+                </Link>
+              )}
             </div>
 
             {/* Mobile menu button - Clean */}
@@ -130,27 +242,42 @@ const Header: React.FC = () => {
                 ))}
               </nav>
 
-              {/* Contact info */}
-              <div className="mt-6 pt-4 border-t border-amber-500/20 px-4">
-                <div className="flex flex-col space-y-3">
-                  <div className="flex items-center text-amber-300">
-                    <HiOutlinePhone className="w-4 h-4 mr-3" />
-                    <span className="font-medium">0975224557</span>
-                  </div>
-                  <div className="flex items-center text-amber-300">
-                    <HiOutlineMail className="w-4 h-4 mr-3" />
-                    <span className="font-medium text-sm">
-                      contact@bhluxurycigar.com
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-amber-500/20">
-                    <div className="flex items-center text-amber-300">
-                      <HiOutlineGlobeAlt className="w-4 h-4 mr-2" />
-                      <span className="font-medium">Tiếng Việt</span>
-                    </div>
+              {/* User Authentication */}
+              {isAuthenticated ? (
+                <div className="mt-4 pt-4 border-t border-amber-500/20 px-4">
+                  <div className="flex items-center justify-between">
+                    <Link
+                      to="/profile"
+                      className="flex items-center text-amber-300 hover:text-amber-400 transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <HiOutlineUser className="w-4 h-4 mr-3" />
+                      <span className="font-medium">
+                        Xin chào, {user?.first_name || 'User'}
+                      </span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300"
+                      title="Đăng xuất"
+                    >
+                      <HiOutlineLogout className="w-4 h-4 text-amber-300/80" />
+                    </button>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="mt-4 pt-4 border-t border-amber-500/20 px-4">
+                  <Link
+                    to="/login"
+                    className="flex items-center text-amber-300 hover:text-amber-400 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <HiOutlineLogin className="w-4 h-4 mr-3" />
+                    <span className="font-medium">Đăng nhập</span>
+                  </Link>
+                </div>
+              )}
+
             </div>
           </div>
         )}

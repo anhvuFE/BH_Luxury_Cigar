@@ -95,6 +95,14 @@ class AuthService {
   getToken(): string | null {
     return localStorage.getItem('auth_token');
   }
+
+  async request(endpoint: string, options?: RequestInit): Promise<any> {
+    return apiService.request(endpoint, options);
+  }
+
+  async upload(endpoint: string, formData: FormData, method: string = 'POST'): Promise<any> {
+    return apiService.upload(endpoint, formData, method);
+  }
 }
 
 export const authService = new AuthService();

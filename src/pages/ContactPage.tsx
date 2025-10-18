@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { HiOutlinePhone, HiOutlineMail, HiOutlineLocationMarker, HiOutlineClock, HiOutlinePaperAirplane } from 'react-icons/hi';
 import { storeInfo } from '../data/storeData';
+import { useToast } from '../hooks/useToast';
 
 const ContactPage: React.FC = () => {
+  const { showSuccess } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,7 +24,7 @@ const ContactPage: React.FC = () => {
     e.preventDefault();
     // Handle form submission
     console.log('Form submitted:', formData);
-    alert('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất có thể.');
+    showSuccess('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất có thể.');
   };
 
   return (

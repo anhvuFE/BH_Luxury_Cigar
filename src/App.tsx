@@ -5,6 +5,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ToastProvider } from './hooks/useToast';
 
 // Public pages
 import HomePage from './pages/HomePage';
@@ -18,6 +19,7 @@ import NewArrivalPage from './pages/NewArrivalPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ProfilePage from './pages/ProfilePage';
 
 
 // Admin pages
@@ -53,6 +55,9 @@ function AppContent() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+          {/* User Profile */}
+          <Route path="/profile" element={<ProfilePage />} />
 
 
           {/* Admin Pages - Protected */}
@@ -114,8 +119,10 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <ScrollToTop />
-      <AppContent />
+      <ToastProvider>
+        <ScrollToTop />
+        <AppContent />
+      </ToastProvider>
     </Router>
   );
 }

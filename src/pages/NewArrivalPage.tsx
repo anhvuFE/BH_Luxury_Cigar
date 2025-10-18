@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   HiOutlineSearch,
   HiOutlineEye,
@@ -7,12 +7,53 @@ import {
   HiOutlineShoppingBag,
 } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
+import authService from '../services/auth.service';
+import { useToast } from '../hooks/useToast';
+import { API_CONFIG } from '../config/api';
+
+// Types
+interface Category {
+  _id: string;
+  id?: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  image?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface Product {
+  _id: string;
+  id?: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  brand?: string;
+  category?: Category | string;
+  price: number;
+  stock?: number;
+  inStock?: boolean;
+  image?: string;
+  images?: string[];
+  featured_image?: string;
+  isNew?: boolean;
+  is_new?: boolean;
+  createdAt?: string;
+  created_at?: string;
+}
 
 const NewArrivalPage: React.FC = () => {
+  const { showError, showSuccess } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Date, new to old");
   const [showCount, setShowCount] = useState(12);
   const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
 
   // Filter states
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
@@ -23,139 +64,181 @@ const NewArrivalPage: React.FC = () => {
   const [priceRange, setPriceRange] = useState([0, 1282501000]);
   const [inStockOnly, setInStockOnly] = useState(false);
 
-  // Mock data based on reference
-  const collections = [
-    { name: "Trang Chủ", count: 104 },
-    { name: "Whisky - Rượu Whisky", count: 95 },
-    { name: "Rượu Mạnh", count: 15 },
-    { name: "Phụ Kiện Xì Gà", count: 502 },
-    { name: "Vodka", count: 1 },
-    { name: "RUM", count: 4 },
-    { name: "Single Malts", count: 63 },
-    { name: "Blended Scotch", count: 17 },
-  ];
+  // API data loading
+  useEffect(() => {
+    loadData();
+  }, [searchQuery, sortBy, showCount]);
 
-  const vendors = [
-    { name: "AVANTI EXCLUSIVE", count: 4 },
-    { name: "Auchroisk", count: 1 },
-    { name: "BOVEDA", count: 10 },
-    { name: "Benrinnes", count: 1 },
-    { name: "Brora", count: 1 },
-    { name: "Bulleit", count: 1 },
-    { name: "CHAN DE ROSAS", count: 3 },
-    { name: "CLYNELISH", count: 3 },
-  ];
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      await Promise.all([
+        loadProducts(),
+        loadCategories()
+      ]);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      showError('Không thể tải dữ liệu. Đang hiển thị dữ liệu mẫu.');
+      // Fallback to mock data if API fails
+      setProducts(mockProducts);
+      setTotalProducts(mockProducts.length);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const productTypes = [
-    { name: "ACCESSORIES", count: 789 },
-    { name: "Humidors", count: 25 },
-    { name: "JW Whisky", count: 9 },
-    { name: "LIQUOR & SPIRITS", count: 7 },
-    { name: "LIQUORS-SPIRITS", count: 104 },
-    { name: "OTHER WHISKY", count: 2 },
-    { name: "PREMIUM WHISKY", count: 4 },
-    { name: "RUM", count: 1 },
-    { name: "TEQUILA", count: 2 },
-    { name: "WINES", count: 29 },
-  ];
+  const loadProducts = async () => {
+    try {
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (searchQuery) params.append('search', searchQuery);
+      params.append('limit', showCount.toString());
+      params.append('page', '1');
 
-  // Mock products data - New Arrivals
-  const mockProducts = [
+      // Apply sorting
+      switch (sortBy) {
+        case 'Date, new to old':
+          params.append('sort', '-createdAt');
+          break;
+        case 'Date, old to new':
+          params.append('sort', 'createdAt');
+          break;
+        case 'Price, low to high':
+          params.append('sort', 'price');
+          break;
+        case 'Price, high to low':
+          params.append('sort', '-price');
+          break;
+      }
+
+      // Filter for new arrivals (products created in last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      params.append('createdAt[gte]', thirtyDaysAgo.toISOString());
+
+      const response = await authService.request(`/products?${params.toString()}`);
+      const data = response.data || response;
+
+      setProducts(data.products || data || []);
+      setTotalProducts(data.total || data.length || 0);
+    } catch (error) {
+      console.error('Error loading products:', error);
+      throw error;
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const response = await authService.request('/categories');
+      const data = response.data || response;
+      setCategories(data.categories || data || []);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+      throw error;
+    }
+  };
+
+  // Helper functions
+  const getProductImage = (product: Product) => {
+    if (product.images && product.images.length > 0) {
+      const image = product.images[0];
+      return image.startsWith('http') ? image : `${API_CONFIG.BASE_URL}${image}`;
+    }
+    if (product.image) {
+      return product.image.startsWith('http') ? product.image : `${API_CONFIG.BASE_URL}${product.image}`;
+    }
+    if (product.featured_image) {
+      return product.featured_image.startsWith('http') ? product.featured_image : `${API_CONFIG.BASE_URL}${product.featured_image}`;
+    }
+    return '/src/assets/images/SP/1.png'; // fallback image
+  };
+
+  const isNewProduct = (product: Product) => {
+    if (product.isNew || product.is_new) return true;
+
+    // Check if created within last 30 days
+    const createdDate = new Date(product.createdAt || product.created_at || '');
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return createdDate > thirtyDaysAgo;
+  };
+
+  // Get unique brands from products
+  const getBrands = () => {
+    const brands = products
+      .map(product => product.brand)
+      .filter((brand, index, self) => brand && self.indexOf(brand) === index)
+      .map(brand => ({ name: brand, count: products.filter(p => p.brand === brand).length }));
+    return brands;
+  };
+
+  // Mock products data - New Arrivals (fallback)
+  const mockProducts: Product[] = [
     {
-      id: 1,
+      _id: '1',
       name: "COHIBA BEHIKE 52 - HỘP 10 ĐIẾU",
       brand: "COHIBA",
       price: 45000000,
       image: "/src/assets/images/SP/1.png",
       isNew: true,
+      createdAt: new Date().toISOString(),
+      stock: 10,
+      inStock: true,
     },
     {
-      id: 2,
+      _id: '2',
       name: "MONTECRISTO OPEN EAGLE - HỘP 20 ĐIẾU",
       brand: "MONTECRISTO",
       price: 12500000,
       image: "/src/assets/images/SP/2.png",
       isNew: true,
+      createdAt: new Date().toISOString(),
+      stock: 5,
+      inStock: true,
     },
     {
-      id: 3,
+      _id: '3',
       name: "DAVIDOFF WINSTON CHURCHILL THE LATE HOUR",
       brand: "DAVIDOFF",
       price: 18900000,
       image: "/src/assets/images/SP/3.png",
       isNew: true,
+      createdAt: new Date().toISOString(),
+      stock: 8,
+      inStock: true,
     },
     {
-      id: 4,
+      _id: '4',
       name: "ROMEO Y JULIETA WIDE CHURCHILL",
       brand: "ROMEO Y JULIETA",
       price: 8500000,
       image: "/src/assets/images/SP/4.png",
       isNew: true,
+      createdAt: new Date().toISOString(),
+      stock: 12,
+      inStock: true,
     },
     {
-      id: 5,
+      _id: '5',
       name: "PARTAGAS SERIE D NO.4",
       brand: "PARTAGAS",
       price: 7200000,
       image: "/src/assets/images/SP/5.png",
       isNew: true,
+      createdAt: new Date().toISOString(),
+      stock: 15,
+      inStock: true,
     },
     {
-      id: 6,
+      _id: '6',
       name: "H.UPMANN MAGNUM 54",
       brand: "H.UPMANN",
       price: 9800000,
       image: "/src/assets/images/PR/1.png",
       isNew: true,
-    },
-    {
-      id: 7,
-      name: "HOYO DE MONTERREY EPICURE NO.2",
-      brand: "HOYO DE MONTERREY",
-      price: 6500000,
-      image: "/src/assets/images/PR/2.png",
-      isNew: true,
-    },
-    {
-      id: 8,
-      name: "TRINIDAD VIGIA",
-      brand: "TRINIDAD",
-      price: 15000000,
-      image: "/src/assets/images/PR/3.png",
-      isNew: true,
-    },
-    {
-      id: 9,
-      name: "BOLIVAR ROYAL CORONAS",
-      brand: "BOLIVAR",
-      price: 5800000,
-      image: "/src/assets/images/PR/4.png",
-      isNew: true,
-    },
-    {
-      id: 10,
-      name: "PUNCH PUNCH 48",
-      brand: "PUNCH",
-      price: 11200000,
-      image: "/src/assets/images/PR/5.png",
-      isNew: true,
-    },
-    {
-      id: 11,
-      name: "VEGAS ROBAINA UNICOS",
-      brand: "VEGAS ROBAINA",
-      price: 13500000,
-      image: "/src/assets/images/PR/6.png",
-      isNew: true,
-    },
-    {
-      id: 12,
-      name: "JUAN LOPEZ SELECCION NO.2",
-      brand: "JUAN LOPEZ",
-      price: 4800000,
-      image: "/src/assets/images/PK/1.png",
-      isNew: true,
+      createdAt: new Date().toISOString(),
+      stock: 7,
+      inStock: true,
     },
   ];
 
@@ -213,19 +296,29 @@ const NewArrivalPage: React.FC = () => {
                 <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-2">
-                {collections.map((collection, index) => (
+                {categories.map((category) => (
                   <label
-                    key={index}
+                    key={category._id}
                     className="flex items-center justify-between text-sm"
                   >
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                        checked={selectedCollections.includes(category._id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedCollections([...selectedCollections, category._id]);
+                          } else {
+                            setSelectedCollections(selectedCollections.filter(id => id !== category._id));
+                          }
+                        }}
                       />
-                      <span className="text-amber-600">{collection.name}</span>
+                      <span className="text-amber-600">{category.name}</span>
                     </div>
-                    <span className="text-gray-400">({collection.count})</span>
+                    <span className="text-gray-400">
+                      ({products.filter(p => p.category === category._id || (typeof p.category === 'object' && p.category?._id === category._id)).length})
+                    </span>
                   </label>
                 ))}
               </div>
@@ -240,19 +333,27 @@ const NewArrivalPage: React.FC = () => {
                 <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-2">
-                {vendors.map((vendor, index) => (
+                {getBrands().map((brand) => (
                   <label
-                    key={index}
+                    key={brand.name}
                     className="flex items-center justify-between text-sm"
                   >
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                        checked={selectedVendors.includes(brand.name)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedVendors([...selectedVendors, brand.name]);
+                          } else {
+                            setSelectedVendors(selectedVendors.filter(v => v !== brand.name));
+                          }
+                        }}
                       />
-                      <span className="text-amber-600">{vendor.name}</span>
+                      <span className="text-amber-600">{brand.name}</span>
                     </div>
-                    <span className="text-gray-400">({vendor.count})</span>
+                    <span className="text-gray-400">({brand.count})</span>
                   </label>
                 ))}
               </div>
@@ -267,15 +368,29 @@ const NewArrivalPage: React.FC = () => {
                 <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-2">
-                {productTypes.map((type, index) => (
+                {[
+                  { name: "PHU KIỆN XÌ GÀ", count: products.filter(p => p.name.toLowerCase().includes('phụ kiện') || p.name.toLowerCase().includes('phu kien')).length },
+                  { name: "SINGLE MALTS", count: products.filter(p => p.name.toLowerCase().includes('single malt')).length },
+                  { name: "BLENDED SCOTCH", count: products.filter(p => p.name.toLowerCase().includes('blended') || p.name.toLowerCase().includes('scotch')).length },
+                  { name: "RƯỢU MẠNH", count: products.filter(p => p.name.toLowerCase().includes('rượu')).length },
+                  { name: "XÌ GÀ", count: products.filter(p => p.name.toLowerCase().includes('xì gà') || p.name.toLowerCase().includes('cigar')).length },
+                ].filter(type => type.count > 0).map((type) => (
                   <label
-                    key={index}
+                    key={type.name}
                     className="flex items-center justify-between text-sm"
                   >
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                        checked={selectedProductTypes.includes(type.name)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedProductTypes([...selectedProductTypes, type.name]);
+                          } else {
+                            setSelectedProductTypes(selectedProductTypes.filter(t => t !== type.name));
+                          }
+                        }}
                       />
                       <span className="text-amber-600">{type.name}</span>
                     </div>
@@ -335,10 +450,12 @@ const NewArrivalPage: React.FC = () => {
                   <input
                     type="checkbox"
                     className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
                   />
-                  <span className="text-amber-600">In Stock</span>
+                  <span className="text-amber-600">Còn hàng</span>
                 </div>
-                <span className="text-gray-400">(973)</span>
+                <span className="text-gray-400">({products.filter(p => p.inStock && (p.stock === undefined || p.stock > 0)).length})</span>
               </label>
             </div>
           </div>
@@ -370,7 +487,7 @@ const NewArrivalPage: React.FC = () => {
                     />
                   </div>
                   <span className="text-sm sm:text-base text-gray-600 font-medium">
-                    12 Products
+                    {loading ? 'Đang tải...' : `${totalProducts} Sản phẩm`}
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
@@ -406,61 +523,125 @@ const NewArrivalPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Products Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {mockProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 hover:border-amber-200 overflow-hidden"
-                >
-                  <div className="relative overflow-hidden">
-                    {product.isNew && (
-                      <div className="absolute top-4 left-4 z-10">
-                        <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-1 text-xs font-medium rounded-full shadow-lg">
-                          Mới
-                        </span>
-                      </div>
-                    )}
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-48 sm:h-56 lg:h-64 object-contain bg-gradient-to-br from-gray-50 to-amber-50/30 group-hover:scale-110 transition-transform duration-700"
-                    />
-
-                    {/* Hover Actions */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
-                      <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-3">
-                        <button className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
-                          <HiOutlineEye className="w-5 h-5" />
-                        </button>
-                        <button className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
-                          <HiOutlineHeart className="w-5 h-5" />
-                        </button>
-                        <button className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg">
-                          <HiOutlineShoppingBag className="w-5 h-5" />
-                        </button>
-                      </div>
+            {/* Loading State */}
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {[...Array(6)].map((_, index) => (
+                  <div key={index} className="bg-white rounded-3xl shadow-lg border border-amber-100 overflow-hidden animate-pulse">
+                    <div className="h-48 sm:h-56 lg:h-64 bg-gray-200"></div>
+                    <div className="p-5 sm:p-6">
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-6 bg-gray-200 rounded mb-3"></div>
+                      <div className="h-8 bg-gray-200 rounded mb-4"></div>
+                      <div className="h-10 bg-gray-200 rounded"></div>
                     </div>
                   </div>
+                ))}
+              </div>
+            ) : products.length > 0 ? (
+              /* Products Grid */
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {products.map((product) => (
+                  <div
+                    key={product._id}
+                    className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 hover:border-amber-200 overflow-hidden"
+                  >
+                    <div className="relative overflow-hidden">
+                      {isNewProduct(product) && (
+                        <div className="absolute top-4 left-4 z-10">
+                          <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-1 text-xs font-medium rounded-full shadow-lg">
+                            Mới
+                          </span>
+                        </div>
+                      )}
+                      {(!product.inStock || (product.stock !== undefined && product.stock <= 0)) && (
+                        <div className="absolute top-4 right-4 z-10">
+                          <span className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 text-xs font-medium rounded-full shadow-lg">
+                            Hết hàng
+                          </span>
+                        </div>
+                      )}
+                      <img
+                        src={getProductImage(product)}
+                        alt={product.name}
+                        className="w-full h-48 sm:h-56 lg:h-64 object-contain bg-gradient-to-br from-gray-50 to-amber-50/30 group-hover:scale-110 transition-transform duration-700"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/src/assets/images/SP/1.png';
+                        }}
+                      />
 
-                  <div className="p-5 sm:p-6">
-                    <div className="text-sm text-amber-600 font-medium mb-2 tracking-wide">
-                      {product.brand}
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-3 text-base sm:text-lg leading-snug line-clamp-2 group-hover:text-amber-700 transition-colors duration-300">
-                      {product.name}
-                    </h3>
-                    <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-                      {formatPrice(product.price)}
+                      {/* Hover Actions */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
+                        <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-3">
+                          <button
+                            onClick={() => window.open(`/products/${product.slug || product._id}`, '_blank')}
+                            className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
+                            title="Xem chi tiết"
+                          >
+                            <HiOutlineEye className="w-5 h-5" />
+                          </button>
+                          <button
+                            className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
+                            title="Thêm vào yêu thích"
+                          >
+                            <HiOutlineHeart className="w-5 h-5" />
+                          </button>
+                          <button
+                            className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={!product.inStock || (product.stock !== undefined && product.stock <= 0)}
+                            title="Thêm vào giỏ"
+                          >
+                            <HiOutlineShoppingBag className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
-                    <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-2xl text-sm font-medium hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300">
-                      Thêm vào giỏ
-                    </button>
+                    <div className="p-5 sm:p-6">
+                      <div className="text-sm text-amber-600 font-medium mb-2 tracking-wide">
+                        {product.brand || 'Không có thương hiệu'}
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-3 text-base sm:text-lg leading-snug line-clamp-2 group-hover:text-amber-700 transition-colors duration-300">
+                        {product.name}
+                      </h3>
+                      <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                        {formatPrice(product.price)}
+                      </div>
+
+                      {product.inStock && (product.stock === undefined || product.stock > 0) ? (
+                        <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-2xl text-sm font-medium hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300">
+                          Thêm vào giỏ
+                        </button>
+                      ) : (
+                        <button disabled className="w-full bg-gray-400 text-white py-3 px-6 rounded-2xl text-sm font-medium cursor-not-allowed">
+                          Hết hàng
+                        </button>
+                      )}
+                    </div>
                   </div>
+                ))}
+              </div>
+            ) : (
+              /* No Products State */
+              <div className="text-center py-20">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <HiOutlineShoppingBag className="w-10 h-10 text-gray-400" />
                 </div>
-              ))}
-            </div>
+                <p className="text-gray-600 text-lg mb-6">Không tìm thấy sản phẩm mới nào</p>
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCollections([]);
+                    setSelectedVendors([]);
+                    setSelectedProductTypes([]);
+                  }}
+                  className="inline-block px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300 font-medium"
+                >
+                  Xóa bộ lọc
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

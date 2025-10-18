@@ -71,10 +71,22 @@ class ApiService {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
+        // Handle 401 Unauthorized specifically
+        if (response.status === 401) {
+          this.clearToken();
+          throw new Error('Token expired or invalid');
+        }
+
         const error = await response.json().catch(() => ({
           message: `HTTP error! status: ${response.status}`,
         }));
         throw new Error(error.message || `Request failed with status ${response.status}`);
+      }
+
+      // Check if response is actually JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('API returned non-JSON response');
       }
 
       const data = await response.json();
@@ -121,7 +133,7 @@ class ApiService {
   }
 
   // File upload
-  async upload<T = any>(endpoint: string, formData: FormData): Promise<T> {
+  async upload<T = any>(endpoint: string, formData: FormData, method: string = 'POST'): Promise<T> {
     const url = getApiUrl(endpoint);
     const headers: Record<string, string> = {};
 
@@ -129,20 +141,45 @@ class ApiService {
       headers['Authorization'] = `Bearer ${this.token}`;
     }
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: formData,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({
-        message: `HTTP error! status: ${response.status}`,
-      }));
-      throw new Error(error.message || `Upload failed with status ${response.status}`);
+    try {
+      const response = await fetch(url, {
+        method,
+        headers,
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        // Handle 401 Unauthorized specifically
+        if (response.status === 401) {
+          this.clearToken();
+          throw new Error('Token expired or invalid');
+        }
+
+        const error = await response.json().catch(() => ({
+          message: `HTTP error! status: ${response.status}`,
+        }));
+        throw new Error(error.message || `Upload failed with status ${response.status}`);
+      }
+
+      // Check if response is actually JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('API returned non-JSON response');
+      }
+
+      return response.json();
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout');
+      }
+      throw error;
     }
-
-    return response.json();
   }
 }
 

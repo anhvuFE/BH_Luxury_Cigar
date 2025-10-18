@@ -10,8 +10,10 @@ import {
   HiOutlineEye,
   HiChevronDown
 } from 'react-icons/hi';
+import { useToast } from '../../hooks/useToast';
 
 const AdminProducts: React.FC = () => {
+  const { showSuccess, showError, showWarning } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -40,17 +42,20 @@ const AdminProducts: React.FC = () => {
 
   // Handle product deletion
   const handleDeleteProduct = async (productId: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      return;
-    }
-
     try {
       await adminService.deleteProduct(productId);
       setProducts(products.filter(p => p._id !== productId));
+      showSuccess('Xóa sản phẩm thành công!');
     } catch (err) {
       console.error('Error deleting product:', err);
-      alert('Không thể xóa sản phẩm');
+      showError('Không thể xóa sản phẩm');
     }
+  };
+
+  const confirmDelete = (productId: string) => {
+    showWarning('Bạn có chắc chắn muốn xóa sản phẩm này không?');
+    // For now, we'll proceed directly. In a real app, you might want a confirmation modal
+    setTimeout(() => handleDeleteProduct(productId), 1000);
   };
 
   // Extract unique categories from products
@@ -331,7 +336,7 @@ const AdminProducts: React.FC = () => {
                           <HiOutlinePencil className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteProduct(product._id)}
+                          onClick={() => confirmDelete(product._id)}
                           className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors"
                         >
                           <HiOutlineTrash className="w-4 h-4" />

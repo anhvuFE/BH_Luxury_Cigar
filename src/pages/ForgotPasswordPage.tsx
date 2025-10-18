@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HiOutlineMail, HiChevronRight, HiChevronLeft } from 'react-icons/hi';
+import { useToast } from '../hooks/useToast';
 
 const ForgotPasswordPage: React.FC = () => {
+  const { showSuccess } = useToast();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -23,7 +25,7 @@ const ForgotPasswordPage: React.FC = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      alert('Email đã được gửi lại!');
+      showSuccess('Email đã được gửi lại!');
     }, 1000);
   };
 

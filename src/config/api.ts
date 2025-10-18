@@ -11,9 +11,11 @@ export const API_ENDPOINTS = {
     REGISTER: '/auth/register',
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
-    PROFILE: '/auth/profile',
-    FORGOT_PASSWORD: '/auth/forgot-password',
+    PROFILE: '/auth/me',
+    FORGOT_PASSWORD: '/auth/forgotpassword',
     RESET_PASSWORD: '/auth/reset-password',
+    UPDATE_DETAILS: '/auth/updatedetails',
+    UPDATE_PASSWORD: '/auth/updatepassword',
   },
 
   // User endpoints
@@ -36,6 +38,10 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/products/${id}`,
     FEATURED: '/products/featured',
     SEARCH: '/products/search',
+    FAVORITES: '/products/favorites',
+    CHECK_FAVORITE: (id: string) => `/products/${id}/favorite`,
+    ADD_FAVORITE: (id: string) => `/products/${id}/favorite`,
+    REMOVE_FAVORITE: (id: string) => `/products/${id}/favorite`,
   },
 
   // Category endpoints
