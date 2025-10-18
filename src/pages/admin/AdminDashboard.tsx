@@ -155,7 +155,40 @@ const AdminDashboard: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
+          {stats && [
+            {
+              name: 'Tổng sản phẩm',
+              value: stats.totalProducts || 0,
+              icon: HiOutlineShoppingBag,
+              changeType: 'increase',
+              change: '+12%',
+              subtitle: 'Sản phẩm trong kho'
+            },
+            {
+              name: 'Tổng đơn hàng',
+              value: stats.totalOrders || 0,
+              icon: HiOutlineTruck,
+              changeType: 'increase',
+              change: '+8%',
+              subtitle: 'Đơn hàng tháng này'
+            },
+            {
+              name: 'Khách hàng',
+              value: stats.totalCustomers || 0,
+              icon: HiOutlineUsers,
+              changeType: 'increase',
+              change: '+15%',
+              subtitle: 'Khách hàng đăng ký'
+            },
+            {
+              name: 'Doanh thu',
+              value: formatCurrency(stats.totalRevenue || 0),
+              icon: HiOutlineCurrencyDollar,
+              changeType: 'increase',
+              change: '+22%',
+              subtitle: 'Doanh thu tháng này'
+            }
+          ].map((stat, index) => (
             <div
               key={stat.name}
               className="bg-white rounded-2xl border border-amber-100 p-6 hover:shadow-lg transition-all duration-300 hover:border-amber-200"

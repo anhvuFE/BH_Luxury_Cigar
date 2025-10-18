@@ -2,14 +2,14 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineShoppingBag, HiOutlineEye } from "react-icons/hi";
 import { useFeaturedProducts } from "../../hooks/useProducts";
+import { useCart } from "../../contexts/CartContext";
 import { useToast } from "../../hooks/useToast";
-import authService from "../../services/auth.service";
-import { API_ENDPOINTS } from "../../config/api";
 
 const Products: React.FC = () => {
   const { products: featuredProducts, loading, error } = useFeaturedProducts(6);
-  const { showError, showSuccess } = useToast();
   const navigate = useNavigate();
+  const { addToCart, loading: cartLoading } = useCart();
+  const { showError } = useToast();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -32,24 +32,10 @@ const Products: React.FC = () => {
   // Add to cart
   const handleAddToCart = async (product: any) => {
     if (!product.id) {
-      showError('ID sản phẩm không hợp lệ');
       return;
     }
 
-    try {
-      const productId = product.id;
-      await authService.request(API_ENDPOINTS.CART.ADD_ITEM, {
-        method: 'POST',
-        body: JSON.stringify({
-          product_id: productId,
-          quantity: 1
-        })
-      });
-      showSuccess('Đã thêm vào giỏ hàng!');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      showError('Không thể thêm vào giỏ hàng');
-    }
+    await addToCart(product.id, 1, product);
   };
 
   if (loading) {
@@ -134,10 +120,14 @@ const Products: React.FC = () => {
                 <img
                   src={
                     product.image || product.featured_image ||
-                    "/src/assets/images/placeholder.jpg"
+                    "/assets/images/placeholder.png"
                   }
                   alt={product.name}
                   className="w-full h-56 sm:h-64 lg:h-72 object-cover group-hover:scale-110 transition-transform duration-700"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/assets/images/placeholder.png';
+                  }}
                 />
 
                 {/* Elegant Badges */}
@@ -173,7 +163,7 @@ const Products: React.FC = () => {
                         handleAddToCart(product);
                       }}
                       className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={product.inStock === false || product.stock === 0}
+                      disabled={product.inStock === false || product.stock === 0 || cartLoading}
                       title="Thêm vào giỏ hàng"
                     >
                       <HiOutlineShoppingBag className="w-5 h-5" />

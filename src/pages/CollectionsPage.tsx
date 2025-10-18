@@ -2,24 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineSearch, HiOutlineEye, HiOutlineAdjustments, HiOutlineShoppingBag } from 'react-icons/hi';
 import { HiChevronDown } from 'react-icons/hi2';
+import { useCart } from '../contexts/CartContext';
 import { useToast } from '../hooks/useToast';
+import { usePagination } from '../hooks/usePagination';
+import Pagination from '../components/common/Pagination';
 import authService from '../services/auth.service';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, API_CONFIG } from '../config/api';
+import axios from 'axios';
 
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { showError, showSuccess } = useToast();
+  const { addToCart, loading: cartLoading } = useCart();
+  const { showError } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('Date, new to old');
-  const [showCount, setShowCount] = useState(12);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(0);
+  const [inStockOnly, setInStockOnly] = useState(false);
 
   // API data states
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
-  const [vendors, setVendors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [totalProducts, setTotalProducts] = useState(0);
+  const [paginationLoading, setPaginationLoading] = useState(false);
+
+  // Pagination
+  const pagination = usePagination({
+    initialLimit: 9
+  });
 
 
   // Filter states
@@ -31,62 +44,144 @@ const CollectionsPage: React.FC = () => {
 
   // Load data from API
   useEffect(() => {
-    loadData();
+    loadCategories();
+    loadProducts(1, 9); // Load first page
   }, []);
 
+  // Load products with search, sorting, and filtering
+  useEffect(() => {
+    pagination.setPage(1); // Reset to page 1 when search/sort/filter changes
+  }, [searchQuery, sortBy, selectedCategories, priceRange, inStockOnly]);
 
-  const loadData = async () => {
+  // Load products when pagination changes
+  useEffect(() => {
+    loadProducts(pagination.currentPage, pagination.limit);
+  }, [pagination.currentPage, pagination.limit]);
+
+
+  const loadProducts = async (page: number = 1, limit: number = 9, categories?: string[], isFilter = false) => {
     try {
-      setLoading(true);
+      // Smart loading states:
+      // - First load: show main loading
+      // - Pagination: show pagination loading
+      // - Filter: no loading state (instant)
+      if (page === 1 && pagination.currentPage === 1 && !isFilter) {
+        setLoading(true);
+      } else if (!isFilter) {
+        setPaginationLoading(true);
+      }
 
-      // Load products and categories using proper API endpoints
-      const [productsResponse, categoriesResponse] = await Promise.all([
-        authService.request(API_ENDPOINTS.PRODUCTS.LIST + '?limit=50'),
-        authService.request(API_ENDPOINTS.CATEGORIES.LIST)
-      ]);
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
 
-      // Handle products response
-      const productsData = Array.isArray(productsResponse) ? productsResponse :
-                          productsResponse.data || productsResponse.products || [];
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+
+      // Add category filter
+      const categoriesToUse = categories || selectedCategories;
+      if (categoriesToUse.length > 0) {
+        params.append('category', categoriesToUse.join(','));
+      }
+
+      // Add price range filter
+      if (priceRange[0] > minPrice) {
+        params.append('minPrice', priceRange[0].toString());
+      }
+      if (priceRange[1] < maxPrice) {
+        params.append('maxPrice', priceRange[1].toString());
+      }
+
+      // Add in stock filter
+      if (inStockOnly) {
+        params.append('inStock', 'true');
+      }
+
+      // Add sorting
+      switch (sortBy) {
+        case 'Date, new to old':
+          params.append('sort', '-createdAt');
+          break;
+        case 'Date, old to new':
+          params.append('sort', 'createdAt');
+          break;
+        case 'Price, low to high':
+          params.append('sort', 'price');
+          break;
+        case 'Price, high to low':
+          params.append('sort', '-price');
+          break;
+        case 'Alphabetical, A-Z':
+          params.append('sort', 'name');
+          break;
+        case 'Alphabetical, Z-A':
+          params.append('sort', '-name');
+          break;
+      }
+
+      // Use axios directly to get full response including pagination info
+      const apiUrl = `${API_CONFIG.BASE_URL}${API_CONFIG.BASE_PATH}${API_ENDPOINTS.PRODUCTS.LIST}?${params.toString()}`;
+      const response = await axios.get(apiUrl);
+
+      // Handle response structure
+      const responseData = response.data;
+      const productsData = Array.isArray(responseData) ? responseData :
+                          (responseData.data || responseData.products || []);
+      const total = responseData.total || responseData.totalItems || productsData.length;
+
       setProducts(productsData);
-      setTotalProducts(productsData.length);
+      pagination.setTotalItems(total);
 
-      // Handle categories response
-      const categoriesData = Array.isArray(categoriesResponse) ? categoriesResponse :
-                            categoriesResponse.data || categoriesResponse.categories || [];
-      setCategories(categoriesData);
+      // Calculate price range from all products for filter
+      if (productsData.length > 0) {
+        const prices = productsData.map((p: any) => p.price || 0);
+        const minP = Math.min(...prices);
+        const maxP = Math.max(...prices);
 
-      // Extract unique vendors from products
-      const uniqueVendors = [...new Set(productsData.map(p => p.brand || p.vendor).filter(Boolean))];
-      setVendors(uniqueVendors.map(vendor => ({ name: vendor, count: productsData.filter(p => (p.brand || p.vendor) === vendor).length })));
+        // Only set price range on first load
+        if (minPrice === 0 && maxPrice === 0) {
+          setMinPrice(minP);
+          setMaxPrice(maxP);
+          setPriceRange([minP, maxP]);
+        }
+      }
+
+
+
 
     } catch (error) {
-      console.error('Error loading data:', error);
-      showError('Không thể tải dữ liệu từ API.');
+      console.error('Error loading products:', error);
+      showError('Không thể tải dữ liệu sản phẩm');
       setProducts([]);
-      setCategories([]);
-      setVendors([]);
-      setTotalProducts(0);
+      pagination.setTotalItems(0);
     } finally {
       setLoading(false);
+      if (!isFilter) {
+        setPaginationLoading(false);
+      }
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.BASE_PATH}${API_ENDPOINTS.CATEGORIES.LIST}`);
+      const responseData = response.data;
+      const categoriesData = Array.isArray(responseData) ? responseData :
+                            responseData.data || responseData.categories || [];
+
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+      setCategories([]);
     }
   };
 
   // Add to cart function
-  const handleAddToCart = async (productId) => {
-    try {
-      await authService.request(API_ENDPOINTS.CART.ADD_ITEM, {
-        method: 'POST',
-        body: JSON.stringify({
-          product_id: productId,
-          quantity: 1
-        })
-      });
-      showSuccess('Đã thêm vào giỏ hàng!');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      showError('Không thể thêm vào giỏ hàng');
-    }
+  const handleAddToCart = async (product: any) => {
+    if (!product || !product.id) return;
+    await addToCart(product.id, 1, product);
   };
 
 
@@ -126,7 +221,7 @@ const CollectionsPage: React.FC = () => {
 
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Sidebar Filters */}
-          <div className={`w-full lg:w-1/4 bg-white p-6 sm:p-8 rounded-3xl shadow-lg border border-amber-100 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+          <div className={`w-full lg:w-1/4 h-fit bg-white p-6 sm:p-8 rounded-3xl shadow-lg border border-amber-100 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             {/* Collection Filter */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
@@ -139,59 +234,28 @@ const CollectionsPage: React.FC = () => {
                     <div className="flex items-center">
                       <input
                         type="checkbox"
+                        checked={selectedCategories.includes(category.name)}
+                        onChange={(e) => {
+                          let newCategories;
+                          if (e.target.checked) {
+                            newCategories = [...selectedCategories, category.name];
+                          } else {
+                            newCategories = selectedCategories.filter(cat => cat !== category.name);
+                          }
+                          setSelectedCategories(newCategories);
+
+                          // Instant filter - no loading effect
+                          loadProducts(1, pagination.limit, newCategories, true);
+                        }}
                         className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
                       />
                       <span className="text-amber-600">{category.name}</span>
                     </div>
-                    <span className="text-gray-400">({category.product_count || 0})</span>
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* Vendor Filter */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">VENDOR</h3>
-                <HiChevronDown className="w-4 h-4 text-gray-400" />
-              </div>
-              <div className="space-y-2">
-                {vendors.map((vendor, index) => (
-                  <label key={index} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
-                      />
-                      <span className="text-amber-600">{vendor.name}</span>
-                    </div>
-                    <span className="text-gray-400">({vendor.count})</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Product Type Filter */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">PRODUCT TYPE</h3>
-                <HiChevronDown className="w-4 h-4 text-gray-400" />
-              </div>
-              <div className="space-y-2">
-                {categories.map((type, index) => (
-                  <label key={`type-${index}`} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
-                      />
-                      <span className="text-amber-600">{type.name}</span>
-                    </div>
-                    <span className="text-gray-400">({type.product_count || 0})</span>
-                  </label>
-                ))}
-              </div>
-            </div>
 
             {/* Price Filter */}
             <div className="mb-8">
@@ -203,27 +267,35 @@ const CollectionsPage: React.FC = () => {
                 <div className="flex gap-2">
                   <input
                     type="number"
-                    placeholder="0"
+                    value={priceRange[0]}
+                    onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                    min={minPrice}
+                    max={maxPrice}
                     className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                   />
                   <span className="px-2 py-2 text-gray-500">-</span>
                   <input
                     type="number"
-                    placeholder="1,282,501,000"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                    min={minPrice}
+                    max={maxPrice}
                     className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                   />
                 </div>
                 <div className="relative">
                   <input
                     type="range"
-                    min="0"
-                    max="1282501000"
+                    min={minPrice}
+                    max={maxPrice}
+                    value={priceRange[0]}
+                    onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>0đ</span>
-                  <span>1,282,501,000đ</span>
+                  <span>{minPrice.toLocaleString('vi-VN')}đ</span>
+                  <span>{maxPrice.toLocaleString('vi-VN')}đ</span>
                 </div>
               </div>
             </div>
@@ -238,11 +310,12 @@ const CollectionsPage: React.FC = () => {
                 <div className="flex items-center">
                   <input
                     type="checkbox"
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
                     className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
                   />
                   <span className="text-amber-600">In Stock</span>
                 </div>
-                <span className="text-gray-400">({totalProducts})</span>
               </label>
             </div>
           </div>
@@ -269,13 +342,13 @@ const CollectionsPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">Show</span>
                     <select
-                      value={showCount}
-                      onChange={(e) => setShowCount(Number(e.target.value))}
+                      value={pagination.limit}
+                      onChange={(e) => pagination.setLimit(Number(e.target.value))}
                       className="border border-gray-300 rounded px-2 py-1 text-sm"
                     >
+                      <option value={9}>9</option>
                       <option value={12}>12</option>
                       <option value={24}>24</option>
-                      <option value={48}>48</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2">
@@ -312,17 +385,21 @@ const CollectionsPage: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
                 {products.map((product) => (
-                <div key={product.id} className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 hover:border-amber-200 overflow-hidden">
-                  <div className="relative overflow-hidden">
+                <div key={product.id} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border-0 overflow-hidden h-full flex flex-col transform hover:-translate-y-1">
+                  <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
                     <img
-                      src={product.image}
+                      src={product.image || '/assets/images/placeholder.png'}
                       alt={product.name}
-                      className="w-full h-48 sm:h-56 lg:h-64 object-contain bg-gradient-to-br from-gray-50 to-amber-50/30 group-hover:scale-110 transition-transform duration-700"
+                      className="w-full h-48 sm:h-56 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/assets/images/placeholder.png';
+                      }}
                     />
 
-                    {/* Hover Actions */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
-                      <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-3">
+                    {/* Quick Actions */}
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="flex space-x-2">
                         <button
                           onClick={(e) => {
                             e.preventDefault();
@@ -333,36 +410,43 @@ const CollectionsPage: React.FC = () => {
                             }
                             navigate(`/products/${product.id}`);
                           }}
-                          className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
+                          className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-lg hover:bg-white hover:scale-105 transition-all duration-200 shadow-md"
                         >
-                          <HiOutlineEye className="w-5 h-5" />
+                          <HiOutlineEye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            handleAddToCart(product.id);
+                            handleAddToCart(product);
                           }}
-                          className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg"
+                          disabled={cartLoading}
+                          className="bg-amber-500 text-white p-2 rounded-lg hover:bg-amber-600 hover:scale-105 transition-all duration-200 shadow-md disabled:opacity-50"
                         >
-                          <HiOutlineShoppingBag className="w-5 h-5" />
+                          <HiOutlineShoppingBag className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-5 sm:p-6">
-                    <div className="text-sm text-amber-600 font-medium mb-2 tracking-wide">{product.brand || product.vendor}</div>
-                    <h3 className="font-semibold text-gray-900 mb-3 text-base sm:text-lg leading-snug line-clamp-2 group-hover:text-amber-700 transition-colors duration-300">
+                  <div className="p-4 flex-1 flex flex-col">
+                    <div className="text-xs text-amber-600 font-semibold mb-2 uppercase tracking-wider">{product.brand || product.vendor}</div>
+                    <h3 className="font-bold text-gray-900 mb-3 text-sm leading-tight line-clamp-2 group-hover:text-amber-600 transition-colors duration-200 flex-1">
                       {product.name}
                     </h3>
-                    <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-                      {formatPrice(product.price)}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-lg font-bold text-gray-900">
+                        {formatPrice(product.price)}
+                      </div>
+                      <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        Còn hàng
+                      </div>
                     </div>
 
                     <button
-                      onClick={() => handleAddToCart(product.id)}
-                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-2xl text-sm font-medium hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                      onClick={() => handleAddToCart(product)}
+                      disabled={cartLoading}
+                      className="w-full bg-amber-500 text-white py-2.5 px-4 rounded-xl text-sm font-semibold hover:bg-amber-600 transition-colors duration-200 disabled:opacity-50 mt-auto"
                     >
                       Thêm vào giỏ
                     </button>
@@ -370,6 +454,18 @@ const CollectionsPage: React.FC = () => {
                 </div>
                 ))}
               </div>
+            )}
+
+            {/* Pagination */}
+            {!loading && pagination.totalItems > 0 && (
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                totalItems={pagination.totalItems}
+                itemsPerPage={pagination.limit}
+                onPageChange={pagination.setPage}
+                loading={paginationLoading}
+              />
             )}
           </div>
         </div>
