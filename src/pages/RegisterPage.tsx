@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HiOutlineEye, HiOutlineEyeOff, HiOutlineMail, HiOutlineLockClosed, HiOutlineUser, HiOutlinePhone, HiChevronRight } from 'react-icons/hi';
+import { useToast } from '../hooks/useToast';
 
 const RegisterPage: React.FC = () => {
+  const { showSuccess, showError, showWarning } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,12 +28,12 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Mật khẩu xác nhận không khớp!');
+      showError('Mật khẩu xác nhận không khớp!');
       return;
     }
 
     if (!acceptTerms) {
-      alert('Vui lòng đồng ý với điều khoản sử dụng!');
+      showWarning('Vui lòng đồng ý với điều khoản sử dụng!');
       return;
     }
 
@@ -41,7 +43,7 @@ const RegisterPage: React.FC = () => {
     setTimeout(() => {
       setIsLoading(false);
       console.log('Register attempt:', formData);
-      alert('Đăng ký thành công!');
+      showSuccess('Đăng ký thành công!');
     }, 1500);
   };
 

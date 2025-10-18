@@ -185,14 +185,6 @@ const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          {/* Demo Accounts Info */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center mb-3">Tài khoản demo:</p>
-            <div className="bg-amber-50 rounded-lg p-3 text-xs space-y-1">
-              <p><strong>Admin:</strong> admin@gmail.com / admin</p>
-              <p><strong>User:</strong> xanh@gmail.com / user</p>
-            </div>
-          </div>
 
           {/* Divider */}
           <div className="relative my-8">
