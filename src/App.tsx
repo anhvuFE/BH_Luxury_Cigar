@@ -6,6 +6,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ToastProvider } from './hooks/useToast';
+import { CartProvider } from './contexts/CartContext';
 
 // Public pages
 import HomePage from './pages/HomePage';
@@ -13,8 +14,8 @@ import CollectionsPage from './pages/CollectionsPage';
 import BlogPage from './pages/BlogPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
-import NewArrivalPage from './pages/NewArrivalPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import CartPage from './pages/CartPage';
 
 // Auth pages
 import LoginPage from './pages/LoginPage';
@@ -42,7 +43,7 @@ function AppContent() {
   return (
     <div className="min-h-screen flex flex-col">
       {shouldShowLayout && <Header />}
-      <main className={shouldShowLayout ? "flex-grow" : "min-h-screen"}>
+      <main className={shouldShowLayout ? "flex-grow pt-20" : "min-h-screen"}>
         <Routes>
           {/* Public Pages */}
           <Route path="/" element={<HomePage />} />
@@ -51,7 +52,7 @@ function AppContent() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/new-arrival" element={<NewArrivalPage />} />
+          <Route path="/cart" element={<CartPage />} />
 
           {/* Authentication Pages */}
           <Route path="/login" element={<LoginPage />} />
@@ -122,8 +123,10 @@ function App() {
   return (
     <Router>
       <ToastProvider>
-        <ScrollToTop />
-        <AppContent />
+        <CartProvider>
+          <ScrollToTop />
+          <AppContent />
+        </CartProvider>
       </ToastProvider>
     </Router>
   );

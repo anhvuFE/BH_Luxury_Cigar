@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 import {
   FaFire,
   FaCrown,
@@ -8,8 +11,33 @@ import {
 } from "react-icons/fa";
 import { GiCigar } from "react-icons/gi";
 import Products from "../components/sections/Products";
+import { API_CONFIG, API_ENDPOINTS } from '../config/api';
+import type { Category } from '../types/database';
 
-const HomePage = () => (
+const HomePage = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.BASE_PATH}${API_ENDPOINTS.CATEGORIES.LIST}`);
+      const responseData = response.data;
+
+      if (responseData.success && Array.isArray(responseData.data)) {
+        setCategories(responseData.data.slice(0, 6)); // Limit to 6 categories for grid
+      }
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
   <div>
     {/* Hero Section - Banner 1 */}
     <section className="w-full">
@@ -20,56 +48,47 @@ const HomePage = () => (
       />
     </section>
 
-    {/* Categories Grid - Using Product Images */}
+    {/* Categories Grid - From API */}
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            {
-              title: "PHU KIỆN XÌ GÀ",
-              image: "/src/assets/images/pro1.png",
-            },
-            {
-              title: "SINGLE MALTS",
-              image: "/src/assets/images/pro2.png",
-            },
-            {
-              title: "BLENDED SCOTCH",
-              image: "/src/assets/images/pro3.png",
-            },
-            {
-              title: "RƯỢU MẠNH",
-              image: "/src/assets/images/pro4.png",
-            },
-            {
-              title: "RƯỢU VANG",
-              image: "/src/assets/images/pro5.png",
-            },
-            {
-              title: "HAMPER TẾT COLLECTION",
-              image: "/src/assets/images/pro6.png",
-            },
-          ].map((category, index) => {
-            return (
-              <div
-                key={index}
-                className="relative h-80 rounded-lg overflow-hidden group cursor-pointer"
-              >
-                <img
-                  src={category.image}
-                  alt={category.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-30 group-hover:bg-opacity-20 transition-all duration-300"></div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/50 to-transparent p-6">
-                  <h3 className="text-white text-2xl font-bold text-center tracking-wide">
-                    {category.title}
-                  </h3>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((category) => {
+              return (
+                <Link
+                  key={category._id}
+                  to={`/collections?category=${category.slug || category._id}`}
+                  className="relative h-80 rounded-lg overflow-hidden group cursor-pointer"
+                >
+                  <img
+                    src={category.image || category.image_url || '/src/assets/images/placeholder.png'}
+                    alt={category.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/src/assets/images/placeholder.png';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-30 group-hover:bg-opacity-20 transition-all duration-300"></div>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/50 to-transparent p-6">
+                    <h3 className="text-white text-2xl font-bold text-center tracking-wide">
+                      {category.name.toUpperCase()}
+                    </h3>
+                    {category.description && (
+                      <p className="text-gray-200 text-sm text-center mt-2">
+                        {category.description}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
 
@@ -296,6 +315,7 @@ const HomePage = () => (
       </div>
     </section>
   </div>
-);
+  );
+};
 
 export default HomePage;

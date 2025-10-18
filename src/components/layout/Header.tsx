@@ -10,6 +10,7 @@ import {
   HiOutlineUser,
 } from "react-icons/hi";
 import authService from "../../services/auth.service";
+import { useCart } from "../../contexts/CartContext";
 
 interface User {
   id: string;
@@ -30,11 +31,11 @@ const Header: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const { cartCount } = useCart();
 
   const navigation = [
     { name: "Trang chủ", href: "/" },
     { name: "Sản phẩm", href: "/collections" },
-    { name: "New Arrival", href: "/new-arrival" },
     { name: "Tin tức", href: "/blog" },
     { name: "Về chúng tôi", href: "/about" },
     { name: "Liên hệ", href: "/contact" },
@@ -110,158 +111,135 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white sticky top-0 z-50 shadow-2xl backdrop-blur-lg">
+    <header className="bg-gray-900 border-b border-gray-800 fixed top-0 left-0 right-0 z-[9999] w-full">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Main header - Premium Design */}
-        <div className="flex justify-between items-center py-4 lg:py-6">
+        {/* Main header - Clean Design */}
+        <div className="flex lg:grid lg:grid-cols-3 items-center justify-between py-4">
           {/* Logo - Brand Image */}
-          <Link to="/" className="flex items-center group">
-            <div className="relative">
+          <div className="flex justify-start">
+            <Link to="/" className="flex items-center">
               <img
                 src="/src/assets/images/logo.png"
                 alt="BH Luxury Cigar Logo"
-                className="h-12 sm:h-14 lg:h-16 w-auto group-hover:scale-105 transition-all duration-300 filter drop-shadow-lg"
+                className="h-10 w-auto"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-amber-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg blur-xl"></div>
-            </div>
-          </Link>
+            </Link>
+          </div>
 
-          {/* Desktop Navigation - Elegant */}
-          <nav className="hidden lg:flex items-center space-x-8 xl:space-x-10">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="relative text-white/90 hover:text-amber-300 transition-all duration-500 font-medium text-sm xl:text-base tracking-wide group py-3 px-2 font-inter"
-              >
-                <span className="relative z-10">{item.name}</span>
-                <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-400 to-amber-600 group-hover:w-full transition-all duration-500 rounded-full"></span>
-                <span className="absolute inset-0 bg-amber-500/10 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-lg blur-sm"></span>
-              </Link>
-            ))}
+          {/* Desktop Navigation - Clean */}
+          <nav className="hidden lg:flex justify-center">
+            <div className="flex items-center space-x-6 lg:space-x-8 xl:space-x-10">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="text-gray-300 hover:text-amber-400 transition-colors font-medium text-sm lg:text-base whitespace-nowrap"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
           </nav>
 
           {/* Actions - Clean & Simple */}
-          <div className="flex items-center space-x-2 lg:space-x-3">
+          <div className="flex items-center space-x-3 lg:justify-end">
             {/* Mobile Cart & User - Visible on small screens */}
             <div className="flex lg:hidden items-center space-x-2">
-              <button className="relative p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group">
-                <HiOutlineShoppingBag className="w-5 h-5 text-amber-300/80 group-hover:text-amber-400" />
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-amber-500 text-black text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                  0
-                </span>
-              </button>
+              <Link
+                to="/cart"
+                className="relative p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <HiOutlineShoppingBag className="w-5 h-5 text-gray-300" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </Link>
 
               {isAuthenticated ? (
                 <Link
                   to="/profile"
-                  className="flex items-center space-x-1 p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group"
+                  className="flex items-center space-x-1 p-2 hover:bg-gray-800 rounded-lg transition-colors"
                   title="Profile"
                 >
-                  <HiOutlineUser className="w-5 h-5 text-amber-300/80 group-hover:text-amber-400" />
-                  <span className="text-xs text-amber-300/90 group-hover:text-amber-400 font-medium max-w-[60px] truncate">
+                  <HiOutlineUser className="w-5 h-5 text-gray-300" />
+                  <span className="text-xs text-gray-300 font-medium max-w-[60px] truncate">
                     {user?.first_name || user?.name || 'User'}
                   </span>
                 </Link>
               ) : (
                 <Link
                   to="/login"
-                  className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group"
+                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                   title="Đăng nhập"
                 >
-                  <HiOutlineLogin className="w-5 h-5 text-amber-300/80 group-hover:text-amber-400" />
+                  <HiOutlineLogin className="w-5 h-5 text-gray-300" />
                 </Link>
               )}
             </div>
 
             {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center space-x-3">
-              <button className="p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group">
-                <HiOutlineSearch className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
+            <div className="hidden lg:flex items-center space-x-2">
+              <button className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+                <HiOutlineSearch className="w-5 h-5 text-gray-300" />
               </button>
-              <button className="relative p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group">
-                <HiOutlineShoppingBag className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-amber-500 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  0
-                </span>
-              </button>
+              <Link
+                to="/cart"
+                className="relative p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <HiOutlineShoppingBag className="w-5 h-5 text-gray-300" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </Link>
 
               {/* User Authentication Actions */}
               {isAuthenticated ? (
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   {/* User Profile */}
                   <Link
                     to="/profile"
-                    className="flex items-center space-x-2 p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group cursor-pointer"
+                    className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-800 rounded-lg transition-colors"
                     title="Thông tin cá nhân"
                   >
-                    <HiOutlineUser className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
-                    <span className="text-sm text-amber-300/90 group-hover:text-amber-400 font-medium">
+                    <HiOutlineUser className="w-4 h-4 text-gray-300" />
+                    <span className="text-sm text-gray-300 font-medium">
                       {user?.first_name || user?.name || 'User'}
                     </span>
                   </Link>
                   {/* Logout Button */}
                   <button
                     onClick={handleLogout}
-                    className="p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group"
+                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                     title="Đăng xuất"
                   >
-                    <HiOutlineLogout className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
+                    <HiOutlineLogout className="w-4 h-4 text-gray-300" />
                   </button>
                 </div>
               ) : (
                 <Link
                   to="/login"
-                  className="p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group"
+                  className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
                   title="Đăng nhập"
                 >
-                  <HiOutlineLogin className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
-                </Link>
-              )}
-            </div>
-
-            {/* Mobile Actions */}
-            <div className="flex items-center space-x-1 lg:hidden">
-              <button className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300">
-                <HiOutlineSearch className="w-4 h-4 text-amber-300/80" />
-              </button>
-              <button className="relative p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300">
-                <HiOutlineShoppingBag className="w-4 h-4 text-amber-300/80" />
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-amber-500 text-black text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                  0
-                </span>
-              </button>
-
-              {/* Mobile Authentication */}
-              {isAuthenticated ? (
-                <button
-                  onClick={handleLogout}
-                  className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300"
-                  title="Đăng xuất"
-                >
-                  <HiOutlineLogout className="w-4 h-4 text-amber-300/80" />
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300"
-                  title="Đăng nhập"
-                >
-                  <HiOutlineLogin className="w-4 h-4 text-amber-300/80" />
+                  Đăng nhập
                 </Link>
               )}
             </div>
 
             {/* Mobile menu button - Clean */}
             <button
-              className="lg:hidden p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300"
+              className="lg:hidden p-2 hover:bg-gray-800 rounded-lg transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
-                <HiX className="w-5 h-5 text-amber-300/80" />
+                <HiX className="w-5 h-5 text-gray-300" />
               ) : (
-                <HiMenu className="w-5 h-5 text-amber-300/80" />
+                <HiMenu className="w-5 h-5 text-gray-300" />
               )}
             </button>
           </div>
@@ -270,13 +248,13 @@ const Header: React.FC = () => {
         {/* Mobile Navigation - Clean & Simple */}
         {isMenuOpen && (
           <div className="lg:hidden">
-            <div className="py-4 bg-gray-900/95 backdrop-blur-sm border-t border-amber-500/30">
+            <div className="py-4 bg-gray-800 border-t border-gray-700">
               <nav className="flex flex-col space-y-1 px-4">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     to={item.href}
-                    className="text-white hover:text-amber-400 transition-colors duration-200 font-medium text-base py-3 px-3 rounded-lg hover:bg-amber-500/10 font-inter"
+                    className="text-gray-300 hover:text-amber-400 transition-colors font-medium text-base py-3 px-3 rounded-lg hover:bg-gray-700"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.name}
@@ -286,11 +264,11 @@ const Header: React.FC = () => {
 
               {/* User Authentication */}
               {isAuthenticated ? (
-                <div className="mt-4 pt-4 border-t border-amber-500/20 px-4">
+                <div className="mt-4 pt-4 border-t border-gray-700 px-4">
                   <div className="flex items-center justify-between">
                     <Link
                       to="/profile"
-                      className="flex items-center text-amber-300 hover:text-amber-400 transition-colors"
+                      className="flex items-center text-gray-300 hover:text-amber-400 transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <HiOutlineUser className="w-4 h-4 mr-3" />
@@ -300,18 +278,18 @@ const Header: React.FC = () => {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300"
+                      className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
                       title="Đăng xuất"
                     >
-                      <HiOutlineLogout className="w-4 h-4 text-amber-300/80" />
+                      <HiOutlineLogout className="w-4 h-4 text-gray-300" />
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 pt-4 border-t border-amber-500/20 px-4">
+                <div className="mt-4 pt-4 border-t border-gray-700 px-4">
                   <Link
                     to="/login"
-                    className="flex items-center text-amber-300 hover:text-amber-400 transition-colors"
+                    className="flex items-center text-gray-300 hover:text-amber-400 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <HiOutlineLogin className="w-4 h-4 mr-3" />

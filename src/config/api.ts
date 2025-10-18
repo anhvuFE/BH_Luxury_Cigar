@@ -68,10 +68,10 @@ export const API_ENDPOINTS = {
   // Cart endpoints
   CART: {
     GET: '/cart',
-    ADD_ITEM: '/cart/items',
-    UPDATE_ITEM: (id: string) => `/cart/items/${id}`,
-    REMOVE_ITEM: (id: string) => `/cart/items/${id}`,
-    CLEAR: '/cart/clear',
+    ADD_ITEM: '/cart',
+    UPDATE_ITEM: (id: string) => `/cart/${id}`,
+    REMOVE_ITEM: (id: string) => `/cart/${id}`,
+    CLEAR: '/cart',
   },
 
   // Blog endpoints
