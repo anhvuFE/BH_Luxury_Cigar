@@ -97,7 +97,7 @@ class AuthService {
   }
 
   async request(endpoint: string, options?: RequestInit): Promise<any> {
-    return apiService.request(endpoint, options);
+    return apiService.request(endpoint, options as any);
   }
 
   async upload(endpoint: string, formData: FormData, method: string = 'POST'): Promise<any> {

@@ -98,7 +98,12 @@ export function useProduct(idOrSlug: string, isSlug: boolean = false) {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!idOrSlug) return;
+      if (!idOrSlug || idOrSlug.trim() === '' || idOrSlug === '__skip__') {
+        setLoading(false);
+        setError(null);
+        setProduct(null);
+        return;
+      }
 
       try {
         setLoading(true);

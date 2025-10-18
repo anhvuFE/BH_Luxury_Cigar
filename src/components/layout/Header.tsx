@@ -14,12 +14,15 @@ import authService from "../../services/auth.service";
 interface User {
   id: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  name: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
   phone_number?: string;
-  role: 'customer' | 'staff' | 'admin';
-  created_at: string;
-  updated_at: string;
+  role: 'user' | 'customer' | 'staff' | 'admin';
+  avatar?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const Header: React.FC = () => {
@@ -48,12 +51,20 @@ const Header: React.FC = () => {
     if (isAuth) {
       // Try API first, fallback to localStorage
       try {
-        const profile = await authService.getProfile();
+        const response = await authService.getProfile();
+        console.log('Full API response:', response);
+
+        // Extract user data - handle both direct user object and wrapped response
+        const profile = response.data || response;
         setUser(profile);
+
         // Update localStorage with fresh data
         localStorage.setItem('user', JSON.stringify(profile));
         localStorage.setItem('userRole', profile.role);
         console.log('Header user loaded from API:', profile);
+        console.log('Available user fields:', Object.keys(profile));
+        console.log('first_name:', profile.first_name);
+        console.log('name:', profile.name);
       } catch (apiError) {
         console.warn('Header API fetch failed, using localStorage:', apiError);
 
@@ -133,6 +144,37 @@ const Header: React.FC = () => {
 
           {/* Actions - Clean & Simple */}
           <div className="flex items-center space-x-2 lg:space-x-3">
+            {/* Mobile Cart & User - Visible on small screens */}
+            <div className="flex lg:hidden items-center space-x-2">
+              <button className="relative p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group">
+                <HiOutlineShoppingBag className="w-5 h-5 text-amber-300/80 group-hover:text-amber-400" />
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-amber-500 text-black text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                  0
+                </span>
+              </button>
+
+              {isAuthenticated ? (
+                <Link
+                  to="/profile"
+                  className="flex items-center space-x-1 p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group"
+                  title="Profile"
+                >
+                  <HiOutlineUser className="w-5 h-5 text-amber-300/80 group-hover:text-amber-400" />
+                  <span className="text-xs text-amber-300/90 group-hover:text-amber-400 font-medium max-w-[60px] truncate">
+                    {user?.first_name || user?.name || 'User'}
+                  </span>
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="p-2 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group"
+                  title="Đăng nhập"
+                >
+                  <HiOutlineLogin className="w-5 h-5 text-amber-300/80 group-hover:text-amber-400" />
+                </Link>
+              )}
+            </div>
+
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center space-x-3">
               <button className="p-2.5 hover:bg-amber-500/10 rounded-lg transition-all duration-300 group">
@@ -156,7 +198,7 @@ const Header: React.FC = () => {
                   >
                     <HiOutlineUser className="w-4 h-4 text-amber-300/80 group-hover:text-amber-400" />
                     <span className="text-sm text-amber-300/90 group-hover:text-amber-400 font-medium">
-                      {user?.first_name || 'User'}
+                      {user?.first_name || user?.name || 'User'}
                     </span>
                   </Link>
                   {/* Logout Button */}
@@ -253,7 +295,7 @@ const Header: React.FC = () => {
                     >
                       <HiOutlineUser className="w-4 h-4 mr-3" />
                       <span className="font-medium">
-                        Xin chào, {user?.first_name || 'User'}
+                        Xin chào, {user?.first_name || user?.name || 'User'}
                       </span>
                     </Link>
                     <button

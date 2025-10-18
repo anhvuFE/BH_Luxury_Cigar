@@ -1,16 +1,55 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { HiOutlineHeart, HiOutlineShoppingBag, HiOutlineEye } from "react-icons/hi";
+import { Link, useNavigate } from "react-router-dom";
+import { HiOutlineShoppingBag, HiOutlineEye } from "react-icons/hi";
 import { useFeaturedProducts } from "../../hooks/useProducts";
+import { useToast } from "../../hooks/useToast";
+import authService from "../../services/auth.service";
+import { API_ENDPOINTS } from "../../config/api";
 
 const Products: React.FC = () => {
   const { products: featuredProducts, loading, error } = useFeaturedProducts(6);
+  const { showError, showSuccess } = useToast();
+  const navigate = useNavigate();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(price);
+  };
+
+  // View product details
+  const handleViewProduct = (product: any) => {
+    const productSlug = product.slug || product.id;
+    if (!productSlug) {
+      showError('ID sản phẩm không hợp lệ');
+      return;
+    }
+    navigate(`/products/${productSlug}`);
+  };
+
+
+  // Add to cart
+  const handleAddToCart = async (product: any) => {
+    if (!product.id) {
+      showError('ID sản phẩm không hợp lệ');
+      return;
+    }
+
+    try {
+      const productId = product.id;
+      await authService.request(API_ENDPOINTS.CART.ADD_ITEM, {
+        method: 'POST',
+        body: JSON.stringify({
+          product_id: productId,
+          quantity: 1
+        })
+      });
+      showSuccess('Đã thêm vào giỏ hàng!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      showError('Không thể thêm vào giỏ hàng');
+    }
   };
 
   if (loading) {
@@ -86,9 +125,9 @@ const Products: React.FC = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-12 sm:mb-16">
-          {featuredProducts.map((product) => (
+          {featuredProducts.map((product, index) => (
             <div
-              key={product._id || product.id}
+              key={product.id || `product-${index}`}
               className="group relative bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 border border-amber-100 hover:border-amber-200"
             >
               <div className="relative overflow-hidden rounded-t-2xl">
@@ -120,13 +159,23 @@ const Products: React.FC = () => {
                 {/* Hover Actions */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
                   <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-3">
-                    <button className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
+                    <button
+                      onClick={() => handleViewProduct(product)}
+                      className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
+                      title="Xem chi tiết"
+                    >
                       <HiOutlineEye className="w-5 h-5" />
                     </button>
-                    <button className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
-                      <HiOutlineHeart className="w-5 h-5" />
-                    </button>
-                    <button className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddToCart(product);
+                      }}
+                      className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={product.inStock === false || product.stock === 0}
+                      title="Thêm vào giỏ hàng"
+                    >
                       <HiOutlineShoppingBag className="w-5 h-5" />
                     </button>
                   </div>
@@ -185,6 +234,7 @@ const Products: React.FC = () => {
                   </div>
 
                   <button
+                    onClick={() => handleViewProduct(product)}
                     className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                       (product.inStock !== false && product.stock !== 0)
                         ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105"

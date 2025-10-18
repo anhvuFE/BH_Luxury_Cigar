@@ -3,13 +3,13 @@ import {
   HiOutlineSearch,
   HiOutlineEye,
   HiOutlineAdjustments,
-  HiOutlineHeart,
   HiOutlineShoppingBag,
 } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
 import authService from '../services/auth.service';
 import { useToast } from '../hooks/useToast';
-import { API_CONFIG } from '../config/api';
+import { API_CONFIG, API_ENDPOINTS } from '../config/api';
+import { useNavigate } from 'react-router-dom';
 
 // Types
 interface Category {
@@ -46,6 +46,7 @@ interface Product {
 
 const NewArrivalPage: React.FC = () => {
   const { showError, showSuccess } = useToast();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Date, new to old");
   const [showCount, setShowCount] = useState(12);
@@ -55,19 +56,21 @@ const NewArrivalPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
 
+
   // Filter states
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
   const [selectedVendors, setSelectedVendors] = useState<string[]>([]);
   const [selectedProductTypes, setSelectedProductTypes] = useState<string[]>(
     []
   );
-  const [priceRange, setPriceRange] = useState([0, 1282501000]);
+  // const [priceRange, setPriceRange] = useState([0, 1282501000]);
   const [inStockOnly, setInStockOnly] = useState(false);
 
   // API data loading
   useEffect(() => {
     loadData();
   }, [searchQuery, sortBy, showCount]);
+
 
   const loadData = async () => {
     try {
@@ -78,10 +81,10 @@ const NewArrivalPage: React.FC = () => {
       ]);
     } catch (error) {
       console.error('Error loading data:', error);
-      showError('Không thể tải dữ liệu. Đang hiển thị dữ liệu mẫu.');
-      // Fallback to mock data if API fails
-      setProducts(mockProducts);
-      setTotalProducts(mockProducts.length);
+      showError('Không thể tải dữ liệu từ API.');
+      setProducts([]);
+      setCategories([]);
+      setTotalProducts(0);
     } finally {
       setLoading(false);
     }
@@ -138,6 +141,39 @@ const NewArrivalPage: React.FC = () => {
     }
   };
 
+  // Handler functions
+  const handleViewProduct = (product: Product) => {
+    const productSlug = product.slug || product.id;
+    if (!productSlug) {
+      showError('ID sản phẩm không hợp lệ');
+      return;
+    }
+    navigate(`/products/${productSlug}`);
+  };
+
+
+  const handleAddToCart = async (product: Product) => {
+    if (!product.id) {
+      showError('ID sản phẩm không hợp lệ');
+      return;
+    }
+
+    try {
+      const productId = product.id;
+      await authService.request(API_ENDPOINTS.CART.ADD_ITEM, {
+        method: 'POST',
+        body: JSON.stringify({
+          product_id: productId,
+          quantity: 1
+        })
+      });
+      showSuccess('Đã thêm vào giỏ hàng!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      showError('Không thể thêm vào giỏ hàng');
+    }
+  };
+
   // Helper functions
   const getProductImage = (product: Product) => {
     if (product.images && product.images.length > 0) {
@@ -172,75 +208,6 @@ const NewArrivalPage: React.FC = () => {
     return brands;
   };
 
-  // Mock products data - New Arrivals (fallback)
-  const mockProducts: Product[] = [
-    {
-      _id: '1',
-      name: "COHIBA BEHIKE 52 - HỘP 10 ĐIẾU",
-      brand: "COHIBA",
-      price: 45000000,
-      image: "/src/assets/images/SP/1.png",
-      isNew: true,
-      createdAt: new Date().toISOString(),
-      stock: 10,
-      inStock: true,
-    },
-    {
-      _id: '2',
-      name: "MONTECRISTO OPEN EAGLE - HỘP 20 ĐIẾU",
-      brand: "MONTECRISTO",
-      price: 12500000,
-      image: "/src/assets/images/SP/2.png",
-      isNew: true,
-      createdAt: new Date().toISOString(),
-      stock: 5,
-      inStock: true,
-    },
-    {
-      _id: '3',
-      name: "DAVIDOFF WINSTON CHURCHILL THE LATE HOUR",
-      brand: "DAVIDOFF",
-      price: 18900000,
-      image: "/src/assets/images/SP/3.png",
-      isNew: true,
-      createdAt: new Date().toISOString(),
-      stock: 8,
-      inStock: true,
-    },
-    {
-      _id: '4',
-      name: "ROMEO Y JULIETA WIDE CHURCHILL",
-      brand: "ROMEO Y JULIETA",
-      price: 8500000,
-      image: "/src/assets/images/SP/4.png",
-      isNew: true,
-      createdAt: new Date().toISOString(),
-      stock: 12,
-      inStock: true,
-    },
-    {
-      _id: '5',
-      name: "PARTAGAS SERIE D NO.4",
-      brand: "PARTAGAS",
-      price: 7200000,
-      image: "/src/assets/images/SP/5.png",
-      isNew: true,
-      createdAt: new Date().toISOString(),
-      stock: 15,
-      inStock: true,
-    },
-    {
-      _id: '6',
-      name: "H.UPMANN MAGNUM 54",
-      brand: "H.UPMANN",
-      price: 9800000,
-      image: "/src/assets/images/PR/1.png",
-      isNew: true,
-      createdAt: new Date().toISOString(),
-      stock: 7,
-      inStock: true,
-    },
-  ];
 
   const formatPrice = (price: number) => {
     return (
@@ -342,11 +309,11 @@ const NewArrivalPage: React.FC = () => {
                       <input
                         type="checkbox"
                         className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
-                        checked={selectedVendors.includes(brand.name)}
+                        checked={selectedVendors.includes(brand.name || '')}
                         onChange={(e) => {
-                          if (e.target.checked) {
+                          if (e.target.checked && brand.name) {
                             setSelectedVendors([...selectedVendors, brand.name]);
-                          } else {
+                          } else if (brand.name) {
                             setSelectedVendors(selectedVendors.filter(v => v !== brand.name));
                           }
                         }}
@@ -543,7 +510,7 @@ const NewArrivalPage: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 {products.map((product) => (
                   <div
-                    key={product._id}
+                    key={product.id}
                     className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 hover:border-amber-200 overflow-hidden"
                   >
                     <div className="relative overflow-hidden">
@@ -575,19 +542,18 @@ const NewArrivalPage: React.FC = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
                         <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-3">
                           <button
-                            onClick={() => window.open(`/products/${product.slug || product._id}`, '_blank')}
+                            onClick={() => handleViewProduct(product)}
                             className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
                             title="Xem chi tiết"
                           >
                             <HiOutlineEye className="w-5 h-5" />
                           </button>
                           <button
-                            className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
-                            title="Thêm vào yêu thích"
-                          >
-                            <HiOutlineHeart className="w-5 h-5" />
-                          </button>
-                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleAddToCart(product);
+                            }}
                             className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={!product.inStock || (product.stock !== undefined && product.stock <= 0)}
                             title="Thêm vào giỏ"
@@ -610,7 +576,10 @@ const NewArrivalPage: React.FC = () => {
                       </div>
 
                       {product.inStock && (product.stock === undefined || product.stock > 0) ? (
-                        <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-2xl text-sm font-medium hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300">
+                        <button
+                          onClick={() => handleAddToCart(product)}
+                          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-2xl text-sm font-medium hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                        >
                           Thêm vào giỏ
                         </button>
                       ) : (

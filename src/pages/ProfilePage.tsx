@@ -795,7 +795,7 @@ const ProfilePage: React.FC = () => {
                 ) : favorites.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {favorites.map((product: any) => (
-                      <div key={product._id} className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+                      <div key={product.id} className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
                         <div className="aspect-w-1 aspect-h-1 mb-3 sm:mb-4">
                           <div className="w-full h-40 sm:h-48 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                             {product.images?.[0] ? (

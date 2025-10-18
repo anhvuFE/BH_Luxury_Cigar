@@ -1,22 +1,12 @@
-import { Link } from "react-router-dom";
 import {
-  FaWineGlass,
   FaFire,
   FaCrown,
   FaStar,
   FaShieldAlt,
-  FaMapMarkerAlt,
   FaPhone,
-  FaPalette,
   FaQuoteLeft,
 } from "react-icons/fa";
-import {
-  GiCigar,
-  GiBottleVapors,
-  GiWineBottle,
-  GiTreasureMap,
-  GiCrossedSwords,
-} from "react-icons/gi";
+import { GiCigar } from "react-icons/gi";
 import Products from "../components/sections/Products";
 
 const HomePage = () => (
@@ -86,14 +76,11 @@ const HomePage = () => (
     {/* Products Section - Firebase + Static Products */}
     <Products />
 
-
     {/* PHU KIỆN XÌ GÀ Section */}
     <section className="py-16 bg-gray-800">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-8">
-            PHU KIỆN XÌ GÀ
-          </h2>
+          <h2 className="text-4xl font-bold text-white mb-8">PHU KIỆN XÌ GÀ</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -212,7 +199,8 @@ const HomePage = () => (
             />
             <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-center p-8">
               <h3 className="text-white text-xl font-bold mb-4">
-                GẠT TÀN XÌ GÀ CUBA: MÔN ĐỒ SƯU TẦM ĐẮT LỊCH SỬ VÀ ĐẲNG CẤP TRẦM MỸ
+                GẠT TÀN XÌ GÀ CUBA: MÔN ĐỒ SƯU TẦM ĐẮT LỊCH SỬ VÀ ĐẲNG CẤP TRẦM
+                MỸ
               </h3>
               <button className="bg-amber-600 text-black px-6 py-2 rounded font-semibold hover:bg-amber-500 transition-colors">
                 Xem thêm

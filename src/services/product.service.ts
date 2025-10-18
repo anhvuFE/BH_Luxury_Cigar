@@ -47,7 +47,7 @@ class ProductService {
 
   async getById(id: string): Promise<Product> {
     const response = await apiService.get<ApiResponse<Product>>(API_ENDPOINTS.PRODUCTS.GET(id));
-    return { ...response.data, id: response.data._id };
+    return response.data;
   }
 
   async getBySlug(slug: string): Promise<Product> {
@@ -59,7 +59,7 @@ class ProductService {
       isFeatured: true,
       limit
     });
-    return response.data.map(p => ({ ...p, id: p._id }));
+    return response.data;
   }
 
   async search(query: string, filters?: ProductFilters): Promise<PaginatedProducts> {

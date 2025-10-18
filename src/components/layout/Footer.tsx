@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiOutlinePhone, HiOutlineMail, HiOutlineLocationMarker } from 'react-icons/hi';
 import { HiOutlineHeart } from 'react-icons/hi2';
-import { storeInfo } from '../../data/storeData';
+// import { storeInfo } from '../../data/storeData';
 
 const Footer: React.FC = () => {
   return (
