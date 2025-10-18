@@ -19,15 +19,21 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
 
   useEffect(() => {
     // Trigger enter animation
-    setTimeout(() => setIsVisible(true), 10);
+    const showTimer = setTimeout(() => setIsVisible(true), 10);
+    return () => clearTimeout(showTimer);
+  }, []);
 
+  useEffect(() => {
     // Auto remove after duration
-    const timer = setTimeout(() => {
-      handleRemove();
+    const removeTimer = setTimeout(() => {
+      setIsRemoving(true);
+      setTimeout(() => {
+        onRemove(toast.id);
+      }, 300);
     }, toast.duration || 5000);
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => clearTimeout(removeTimer);
+  }, [toast.id, toast.duration, onRemove]);
 
   const handleRemove = () => {
     setIsRemoving(true);

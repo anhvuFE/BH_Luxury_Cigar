@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { type Toast, ToastContainer } from '../components/ui/Toast';
 
 interface ToastContextType {
@@ -24,7 +24,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   };
 
-  const showToast = (
+  const showToast = useCallback((
     message: string,
     type: 'success' | 'error' | 'warning' | 'info' = 'info',
     duration: number = 5000
@@ -38,33 +38,33 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     };
 
     setToasts(prev => [...prev, newToast]);
-  };
+  }, []);
 
-  const showSuccess = (message: string, duration: number = 4000) => {
+  const showSuccess = useCallback((message: string, duration: number = 4000) => {
     showToast(message, 'success', duration);
-  };
+  }, [showToast]);
 
-  const showError = (message: string, duration: number = 6000) => {
+  const showError = useCallback((message: string, duration: number = 6000) => {
     showToast(message, 'error', duration);
-  };
+  }, [showToast]);
 
-  const showWarning = (message: string, duration: number = 5000) => {
+  const showWarning = useCallback((message: string, duration: number = 5000) => {
     showToast(message, 'warning', duration);
-  };
+  }, [showToast]);
 
-  const showInfo = (message: string, duration: number = 4000) => {
+  const showInfo = useCallback((message: string, duration: number = 4000) => {
     showToast(message, 'info', duration);
-  };
+  }, [showToast]);
 
-  const removeToast = (id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
+  }, []);
 
-  const clearAllToasts = () => {
+  const clearAllToasts = useCallback(() => {
     setToasts([]);
-  };
+  }, []);
 
-  const contextValue: ToastContextType = {
+  const contextValue: ToastContextType = useMemo(() => ({
     showToast,
     showSuccess,
     showError,
@@ -72,7 +72,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     showInfo,
     removeToast,
     clearAllToasts,
-  };
+  }), [showToast, showSuccess, showError, showWarning, showInfo, removeToast, clearAllToasts]);
 
   return (
     <ToastContext.Provider value={contextValue}>

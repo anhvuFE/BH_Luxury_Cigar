@@ -1,122 +1,96 @@
-import React, { useState } from 'react';
-import { HiOutlineSearch, HiOutlineEye, HiOutlineAdjustments, HiOutlineHeart, HiOutlineShoppingBag } from 'react-icons/hi';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { HiOutlineSearch, HiOutlineEye, HiOutlineAdjustments, HiOutlineShoppingBag } from 'react-icons/hi';
 import { HiChevronDown } from 'react-icons/hi2';
+import { useToast } from '../hooks/useToast';
+import authService from '../services/auth.service';
+import { API_ENDPOINTS } from '../config/api';
 
 const CollectionsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { showError, showSuccess } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('Date, new to old');
   const [showCount, setShowCount] = useState(12);
   const [showFilters, setShowFilters] = useState(false);
 
+  // API data states
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalProducts, setTotalProducts] = useState(0);
+
+
   // Filter states
-  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
-  const [selectedVendors, setSelectedVendors] = useState<string[]>([]);
-  const [selectedProductTypes, setSelectedProductTypes] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 1282501000]);
-  const [inStockOnly, setInStockOnly] = useState(false);
+  // const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  // const [selectedVendors, setSelectedVendors] = useState<string[]>([]);
+  // const [selectedProductTypes, setSelectedProductTypes] = useState<string[]>([]);
+  // const [priceRange, setPriceRange] = useState([0, 1282501000]);
+  // const [inStockOnly, setInStockOnly] = useState(false);
 
-  // Mock data based on reference
-  const collections = [
-    { name: 'Trang Chủ', count: 104 },
-    { name: 'Whisky - Rượu Whisky', count: 95 },
-    { name: 'Rượu Mạnh', count: 15 },
-    { name: 'Phụ Kiện Xì Gà', count: 502 },
-    { name: 'Vodka', count: 1 },
-    { name: 'RUM', count: 4 },
-    { name: 'Single Malts', count: 63 },
-    { name: 'Blended Scotch', count: 17 }
-  ];
+  // Load data from API
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const vendors = [
-    { name: 'AVANTI EXCLUSIVE', count: 4 },
-    { name: 'Auchroisk', count: 1 },
-    { name: 'BOVEDA', count: 10 },
-    { name: 'Benrinnes', count: 1 },
-    { name: 'Brora', count: 1 },
-    { name: 'Bulleit', count: 1 },
-    { name: 'CHAN DE ROSAS', count: 3 },
-    { name: 'CLYNELISH', count: 3 }
-  ];
 
-  const productTypes = [
-    { name: 'ACCESSORIES', count: 789 },
-    { name: 'Humidors', count: 25 },
-    { name: 'JW Whisky', count: 9 },
-    { name: 'LIQUOR & SPIRITS', count: 7 },
-    { name: 'LIQUORS-SPIRITS', count: 104 },
-    { name: 'OTHER WHISKY', count: 2 },
-    { name: 'PREMIUM WHISKY', count: 4 },
-    { name: 'RUM', count: 1 },
-    { name: 'TEQUILA', count: 2 },
-    { name: 'WINES', count: 29 }
-  ];
+  const loadData = async () => {
+    try {
+      setLoading(true);
 
-  // Mock products data
-  const mockProducts = [
-    {
-      id: 1,
-      name: 'RƯỢU MORTLACH SINGLE MALT SCOTCH WHISKY BECOME STARCK 55.4% 700ML',
-      brand: 'Mortlach',
-      price: 11000000,
-      image: '/src/assets/images/PR/1.png'
-    },
-    {
-      id: 2,
-      name: 'BÚT LỬA CHĂM XÌ GÀ S.T. DUPONT SLIMMY | 028224',
-      brand: 'S.T. DUPONT',
-      price: 10494000,
-      image: '/src/assets/images/PR/2.png'
-    },
-    {
-      id: 3,
-      name: 'BÚT LỬA CHĂM XÌ GÀ S.T. DUPONT MONOGRAM 1872 LE GRAND | C23180',
-      brand: 'S.T. DUPONT',
-      price: 49291000,
-      image: '/src/assets/images/PR/3.png'
-    },
-    {
-      id: 4,
-      name: 'BÚT LỬA CHĂM XÌ GÀ S.T. DUPONT LIGNE 2 CNY SNAKE SKIN | C16078',
-      brand: 'S.T. DUPONT',
-      price: 46112000,
-      image: '/src/assets/images/PR/4.png'
-    },
-    {
-      id: 5,
-      name: 'BÚT LỬA CHĂM XÌ GÀ S.T. DUPONT MONOGRAM 1872 LE GRAND | C23179',
-      brand: 'S.T. DUPONT',
-      price: 50875000,
-      image: '/src/assets/images/PR/5.png'
-    },
-    {
-      id: 6,
-      name: 'BÚT LỬA CHĂM XÌ GÀ S.T. DUPONT BEHIKE LE GRAND | C23003CL',
-      brand: 'S.T. DUPONT',
-      price: 57244000,
-      image: '/src/assets/images/PR/6.png'
-    },
-    {
-      id: 7,
-      name: 'GẠT TÀN XÌ GÀ BẰNG GỐM FLOR DE CASTILLO SNAKE ASHTRAY',
-      brand: 'FLOR DE CASTILLO',
-      price: 3348000,
-      image: '/src/assets/images/PK/3.png'
-    },
-    {
-      id: 8,
-      name: 'GẠT TÀN XÌ GÀ BẰNG GỐM FLOR DE CASTILLO ART ASHTRAY',
-      brand: 'FLOR DE CASTILLO',
-      price: 3348000,
-      image: '/src/assets/images/PK/4.png'
-    },
-    {
-      id: 9,
-      name: 'GẠT TÀN GỐM S.T. DUPONT FENDER | 006425',
-      brand: 'S.T. DUPONT',
-      price: 13996800,
-      image: '/src/assets/images/PK/5.png'
+      // Load products and categories using proper API endpoints
+      const [productsResponse, categoriesResponse] = await Promise.all([
+        authService.request(API_ENDPOINTS.PRODUCTS.LIST + '?limit=50'),
+        authService.request(API_ENDPOINTS.CATEGORIES.LIST)
+      ]);
+
+      // Handle products response
+      const productsData = Array.isArray(productsResponse) ? productsResponse :
+                          productsResponse.data || productsResponse.products || [];
+      setProducts(productsData);
+      setTotalProducts(productsData.length);
+
+      // Handle categories response
+      const categoriesData = Array.isArray(categoriesResponse) ? categoriesResponse :
+                            categoriesResponse.data || categoriesResponse.categories || [];
+      setCategories(categoriesData);
+
+      // Extract unique vendors from products
+      const uniqueVendors = [...new Set(productsData.map(p => p.brand || p.vendor).filter(Boolean))];
+      setVendors(uniqueVendors.map(vendor => ({ name: vendor, count: productsData.filter(p => (p.brand || p.vendor) === vendor).length })));
+
+    } catch (error) {
+      console.error('Error loading data:', error);
+      showError('Không thể tải dữ liệu từ API.');
+      setProducts([]);
+      setCategories([]);
+      setVendors([]);
+      setTotalProducts(0);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Add to cart function
+  const handleAddToCart = async (productId) => {
+    try {
+      await authService.request(API_ENDPOINTS.CART.ADD_ITEM, {
+        method: 'POST',
+        body: JSON.stringify({
+          product_id: productId,
+          quantity: 1
+        })
+      });
+      showSuccess('Đã thêm vào giỏ hàng!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      showError('Không thể thêm vào giỏ hàng');
+    }
+  };
+
+
+  // All data now comes from API - no more mock data needed
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -160,16 +134,16 @@ const CollectionsPage: React.FC = () => {
                 <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-2">
-                {collections.map((collection, index) => (
+                {categories.map((category, index) => (
                   <label key={index} className="flex items-center justify-between text-sm">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         className="mr-2 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
                       />
-                      <span className="text-amber-600">{collection.name}</span>
+                      <span className="text-amber-600">{category.name}</span>
                     </div>
-                    <span className="text-gray-400">({collection.count})</span>
+                    <span className="text-gray-400">({category.product_count || 0})</span>
                   </label>
                 ))}
               </div>
@@ -204,8 +178,8 @@ const CollectionsPage: React.FC = () => {
                 <HiChevronDown className="w-4 h-4 text-gray-400" />
               </div>
               <div className="space-y-2">
-                {productTypes.map((type, index) => (
-                  <label key={index} className="flex items-center justify-between text-sm">
+                {categories.map((type, index) => (
+                  <label key={`type-${index}`} className="flex items-center justify-between text-sm">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
@@ -213,7 +187,7 @@ const CollectionsPage: React.FC = () => {
                       />
                       <span className="text-amber-600">{type.name}</span>
                     </div>
-                    <span className="text-gray-400">({type.count})</span>
+                    <span className="text-gray-400">({type.product_count || 0})</span>
                   </label>
                 ))}
               </div>
@@ -268,7 +242,7 @@ const CollectionsPage: React.FC = () => {
                   />
                   <span className="text-amber-600">In Stock</span>
                 </div>
-                <span className="text-gray-400">(973)</span>
+                <span className="text-gray-400">({totalProducts})</span>
               </label>
             </div>
           </div>
@@ -289,7 +263,7 @@ const CollectionsPage: React.FC = () => {
                       className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full sm:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
-                  <span className="text-gray-600 font-medium text-sm sm:text-base">973 Products</span>
+                  <span className="text-gray-600 font-medium text-sm sm:text-base">Sản phẩm</span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                   <div className="flex items-center gap-2">
@@ -321,8 +295,23 @@ const CollectionsPage: React.FC = () => {
             </div>
 
             {/* Products Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
-              {mockProducts.map((product) => (
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+                {[...Array(6)].map((_, index) => (
+                  <div key={index} className="bg-white rounded-3xl shadow-lg border border-amber-100 overflow-hidden animate-pulse">
+                    <div className="w-full h-48 sm:h-56 lg:h-64 bg-gray-300"></div>
+                    <div className="p-5 sm:p-6">
+                      <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                      <div className="h-6 bg-gray-300 rounded mb-3"></div>
+                      <div className="h-8 bg-gray-300 rounded mb-4"></div>
+                      <div className="h-10 bg-gray-300 rounded"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+                {products.map((product) => (
                 <div key={product.id} className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 hover:border-amber-200 overflow-hidden">
                   <div className="relative overflow-hidden">
                     <img
@@ -334,13 +323,28 @@ const CollectionsPage: React.FC = () => {
                     {/* Hover Actions */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
                       <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-3">
-                        <button className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!product.id) {
+                              showError('ID sản phẩm không hợp lệ');
+                              return;
+                            }
+                            navigate(`/products/${product.id}`);
+                          }}
+                          className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg"
+                        >
                           <HiOutlineEye className="w-5 h-5" />
                         </button>
-                        <button className="bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
-                          <HiOutlineHeart className="w-5 h-5" />
-                        </button>
-                        <button className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAddToCart(product.id);
+                          }}
+                          className="bg-amber-600 text-white p-3 rounded-full hover:bg-amber-700 hover:scale-110 transition-all duration-300 shadow-lg"
+                        >
                           <HiOutlineShoppingBag className="w-5 h-5" />
                         </button>
                       </div>
@@ -348,7 +352,7 @@ const CollectionsPage: React.FC = () => {
                   </div>
 
                   <div className="p-5 sm:p-6">
-                    <div className="text-sm text-amber-600 font-medium mb-2 tracking-wide">{product.brand}</div>
+                    <div className="text-sm text-amber-600 font-medium mb-2 tracking-wide">{product.brand || product.vendor}</div>
                     <h3 className="font-semibold text-gray-900 mb-3 text-base sm:text-lg leading-snug line-clamp-2 group-hover:text-amber-700 transition-colors duration-300">
                       {product.name}
                     </h3>
@@ -356,13 +360,17 @@ const CollectionsPage: React.FC = () => {
                       {formatPrice(product.price)}
                     </div>
 
-                    <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-2xl text-sm font-medium hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300">
+                    <button
+                      onClick={() => handleAddToCart(product.id)}
+                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-2xl text-sm font-medium hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                    >
                       Thêm vào giỏ
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

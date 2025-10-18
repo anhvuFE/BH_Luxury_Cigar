@@ -14,6 +14,7 @@ import BlogPage from './pages/BlogPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import NewArrivalPage from './pages/NewArrivalPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 
 // Auth pages
 import LoginPage from './pages/LoginPage';
@@ -46,6 +47,7 @@ function AppContent() {
           {/* Public Pages */}
           <Route path="/" element={<HomePage />} />
           <Route path="/collections" element={<CollectionsPage />} />
+          <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />

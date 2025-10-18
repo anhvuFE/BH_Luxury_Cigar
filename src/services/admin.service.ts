@@ -95,7 +95,7 @@ class AdminService {
     try {
       const response = await apiService.get('/products');
       return response.data.map((product: any) => ({
-        _id: product._id,
+        _id: product.id,
         name: product.name,
         brand: product.brand || 'Unknown',
         price: product.price,
