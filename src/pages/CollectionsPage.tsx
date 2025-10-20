@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineSearch, HiOutlineEye, HiOutlineAdjustments, HiOutlineShoppingBag } from 'react-icons/hi';
 import { HiChevronDown } from 'react-icons/hi2';
@@ -6,6 +6,7 @@ import { useCart } from '../contexts/CartContext';
 import { useToast } from '../hooks/useToast';
 import { usePagination } from '../hooks/usePagination';
 import Pagination from '../components/common/Pagination';
+import Select from '../components/common/Select';
 import authService from '../services/auth.service';
 import { API_ENDPOINTS, API_CONFIG } from '../config/api';
 import axios from 'axios';
@@ -48,10 +49,21 @@ const CollectionsPage: React.FC = () => {
     loadProducts(1, 9); // Load first page
   }, []);
 
-  // Load products with search, sorting, and filtering
+  // Debounced filter function
+  const debouncedFilter = useCallback(() => {
+    const timeoutId = setTimeout(() => {
+      pagination.setPage(1); // Reset to page 1 when search/sort/filter changes
+      loadProducts(1, pagination.limit, selectedCategories, true);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, sortBy, selectedCategories, priceRange, inStockOnly, pagination.limit]);
+
+  // Load products with search, sorting, and filtering (debounced for price range)
   useEffect(() => {
-    pagination.setPage(1); // Reset to page 1 when search/sort/filter changes
-  }, [searchQuery, sortBy, selectedCategories, priceRange, inStockOnly]);
+    const cleanup = debouncedFilter();
+    return cleanup;
+  }, [debouncedFilter]);
 
   // Load products when pagination changes
   useEffect(() => {
@@ -87,10 +99,8 @@ const CollectionsPage: React.FC = () => {
       }
 
       // Add price range filter
-      if (priceRange[0] > minPrice) {
+      if (priceRange[0] !== minPrice || priceRange[1] !== maxPrice) {
         params.append('minPrice', priceRange[0].toString());
-      }
-      if (priceRange[1] < maxPrice) {
         params.append('maxPrice', priceRange[1].toString());
       }
 
@@ -284,14 +294,40 @@ const CollectionsPage: React.FC = () => {
                   />
                 </div>
                 <div className="relative">
-                  <input
-                    type="range"
-                    min={minPrice}
-                    max={maxPrice}
-                    value={priceRange[0]}
-                    onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  />
+                  <div className="mb-2">
+                    <label className="text-xs text-gray-600 mb-1 block">Giá từ:</label>
+                    <input
+                      type="range"
+                      min={minPrice}
+                      max={maxPrice}
+                      value={priceRange[0]}
+                      onChange={(e) => {
+                        const newMinPrice = Number(e.target.value);
+                        // Ensure minPrice doesn't exceed maxPrice
+                        if (newMinPrice <= priceRange[1]) {
+                          setPriceRange([newMinPrice, priceRange[1]]);
+                        }
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">Giá đến:</label>
+                    <input
+                      type="range"
+                      min={minPrice}
+                      max={maxPrice}
+                      value={priceRange[1]}
+                      onChange={(e) => {
+                        const newMaxPrice = Number(e.target.value);
+                        // Ensure maxPrice doesn't go below minPrice
+                        if (newMaxPrice >= priceRange[0]) {
+                          setPriceRange([priceRange[0], newMaxPrice]);
+                        }
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    />
+                  </div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{minPrice.toLocaleString('vi-VN')}đ</span>
@@ -341,27 +377,37 @@ const CollectionsPage: React.FC = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">Show</span>
-                    <select
-                      value={pagination.limit}
-                      onChange={(e) => pagination.setLimit(Number(e.target.value))}
-                      className="border border-gray-300 rounded px-2 py-1 text-sm"
-                    >
-                      <option value={9}>9</option>
-                      <option value={12}>12</option>
-                      <option value={24}>24</option>
-                    </select>
+                    <div className="w-20">
+                      <Select
+                        value={pagination.limit}
+                        onChange={(value) => pagination.setLimit(Number(value))}
+                        options={[
+                          { value: 9, label: '9' },
+                          { value: 12, label: '12' },
+                          { value: 24, label: '24' }
+                        ]}
+                        size="sm"
+                        variant="default"
+                        className="border-amber-200 hover:border-amber-300 focus:border-amber-500"
+                      />
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 text-sm w-full sm:w-auto"
-                    >
-                      <option value="Date, new to old">Date, new to old</option>
-                      <option value="Date, old to new">Date, old to new</option>
-                      <option value="Price, low to high">Price, low to high</option>
-                      <option value="Price, high to low">Price, high to low</option>
-                    </select>
+                    <div className="w-full sm:w-48">
+                      <Select
+                        value={sortBy}
+                        onChange={(value) => setSortBy(value as string)}
+                        options={[
+                          { value: 'Date, new to old', label: 'Mới nhất' },
+                          { value: 'Date, old to new', label: 'Cũ nhất' },
+                          { value: 'Price, low to high', label: 'Giá: Thấp → Cao' },
+                          { value: 'Price, high to low', label: 'Giá: Cao → Thấp' }
+                        ]}
+                        size="md"
+                        variant="default"
+                        className="border-amber-200 hover:border-amber-300 focus:border-amber-500"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

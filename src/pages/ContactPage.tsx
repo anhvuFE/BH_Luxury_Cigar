@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { HiOutlinePhone, HiOutlineMail, HiOutlineLocationMarker, HiOutlineClock, HiOutlinePaperAirplane } from 'react-icons/hi';
 import { storeInfo } from '../data/storeData';
 import { useToast } from '../hooks/useToast';
+import Select from '../components/common/Select';
 
 const ContactPage: React.FC = () => {
   const { showSuccess } = useToast();
@@ -185,23 +186,23 @@ const ContactPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                    Chủ đề
-                  </label>
-                  <select
+                  <Select
                     id="subject"
-                    name="subject"
+                    label="Chủ đề"
                     value={formData.subject}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-amber-50/30 transition-all duration-300 hover:bg-amber-50/50"
-                  >
-                    <option value="">Chọn chủ đề</option>
-                    <option value="product-inquiry">Hỏi về sản phẩm</option>
-                    <option value="consultation">Tư vấn</option>
-                    <option value="complaint">Khiếu nại</option>
-                    <option value="partnership">Hợp tác</option>
-                    <option value="other">Khác</option>
-                  </select>
+                    onChange={(value) => setFormData(prev => ({ ...prev, subject: value as string }))}
+                    options={[
+                      { value: 'product-inquiry', label: 'Hỏi về sản phẩm' },
+                      { value: 'consultation', label: 'Tư vấn' },
+                      { value: 'complaint', label: 'Khiếu nại' },
+                      { value: 'partnership', label: 'Hợp tác' },
+                      { value: 'other', label: 'Khác' }
+                    ]}
+                    placeholder="Chọn chủ đề"
+                    variant="filled"
+                    size="lg"
+                    className="bg-amber-50/30 border-amber-200 hover:bg-amber-50/50 focus:border-amber-500 focus:ring-amber-500"
+                  />
                 </div>
               </div>
 

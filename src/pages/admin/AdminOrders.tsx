@@ -10,6 +10,7 @@ import {
   HiOutlineCalendar,
   HiOutlineCurrencyDollar
 } from 'react-icons/hi';
+import Select from '../../components/common/Select';
 
 const AdminOrders: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -262,36 +263,31 @@ const AdminOrders: React.FC = () => {
             </div>
 
             {/* Status Filter */}
-            <div className="relative">
-              <select
-                className="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors appearance-none"
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-              >
-                {statuses.map(status => (
-                  <option key={status} value={status}>
-                    {status === 'all' ? 'Tất cả trạng thái' : getStatusText(status)}
-                  </option>
-                ))}
-              </select>
-              <HiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            </div>
+            <Select
+              value={selectedStatus}
+              onChange={(value) => setSelectedStatus(value as string)}
+              options={statuses.map(status => ({
+                value: status,
+                label: status === 'all' ? 'Tất cả trạng thái' : getStatusText(status)
+              }))}
+              variant="filled"
+              size="md"
+            />
 
             {/* Date Filter */}
-            <div className="relative">
-              <select
-                className="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors appearance-none"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              >
-                <option value="all">Tất cả thời gian</option>
-                <option value="today">Hôm nay</option>
-                <option value="week">Tuần này</option>
-                <option value="month">Tháng này</option>
-                <option value="quarter">Quý này</option>
-              </select>
-              <HiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            </div>
+            <Select
+              value={selectedDate}
+              onChange={(value) => setSelectedDate(value as string)}
+              options={[
+                { value: 'all', label: 'Tất cả thời gian' },
+                { value: 'today', label: 'Hôm nay' },
+                { value: 'week', label: 'Tuần này' },
+                { value: 'month', label: 'Tháng này' },
+                { value: 'quarter', label: 'Quý này' }
+              ]}
+              variant="filled"
+              size="md"
+            />
 
             {/* Advanced Filter Button */}
             <button className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors">
