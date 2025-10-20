@@ -1,0 +1,331 @@
+/* ===========================================
+   LUXURY CIGAR WEBSITE ANIMATIONS
+   =========================================== */
+
+/* Floating Smoke Effects */
+@keyframes floatingSmoke {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px) rotate(90deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-40px) translateX(-10px) rotate(180deg);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-60px) translateX(15px) rotate(270deg);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(-80px) translateX(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.floating-smoke {
+  animation: floatingSmoke 8s ease-in-out infinite;
+}
+
+.floating-smoke-1 { animation-delay: 0s; }
+.floating-smoke-2 { animation-delay: 2s; }
+.floating-smoke-3 { animation-delay: 4s; }
+.floating-smoke-4 { animation-delay: 6s; }
+
+/* Cigar Burning Glow Effect */
+@keyframes cigarGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4),
+                0 0 40px rgba(245, 158, 11, 0.2),
+                inset 0 0 20px rgba(245, 158, 11, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.8),
+                0 0 80px rgba(245, 158, 11, 0.4),
+                inset 0 0 40px rgba(245, 158, 11, 0.3);
+  }
+}
+
+.cigar-glow {
+  animation: cigarGlow 3s ease-in-out infinite;
+}
+
+/* Luxury Text Reveal */
+@keyframes luxuryTextReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(50px) rotateX(-90deg);
+    text-shadow: none;
+  }
+  50% {
+    opacity: 0.5;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.3),
+                 0 0 40px rgba(245, 158, 11, 0.1);
+  }
+}
+
+.luxury-text-reveal {
+  animation: luxuryTextReveal 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Rotating Cigar Ring */
+@keyframes cigarRing {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.6;
+  }
+}
+
+.cigar-ring {
+  animation: cigarRing 20s linear infinite;
+}
+
+/* Premium Card Entrance */
+@keyframes premiumCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(100px) rotateY(-15deg) scale(0.8);
+    filter: blur(5px);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-10px) rotateY(5deg) scale(1.05);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateY(0deg) scale(1);
+    filter: blur(0px);
+  }
+}
+
+.premium-card-entrance {
+  animation: premiumCardEntrance 1s cubic-bezier(0.23, 1, 0.320, 1) forwards;
+}
+
+/* Whisky Pour Effect */
+@keyframes whiskyPour {
+  0% {
+    height: 0%;
+    opacity: 0;
+  }
+  20% {
+    height: 20%;
+    opacity: 0.3;
+  }
+  50% {
+    height: 60%;
+    opacity: 0.7;
+  }
+  100% {
+    height: 100%;
+    opacity: 1;
+  }
+}
+
+.whisky-pour {
+  animation: whiskyPour 2s ease-out forwards;
+}
+
+/* Golden Particles */
+@keyframes goldenParticles {
+  0% {
+    transform: translateY(0) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-200px) translateX(50px) scale(0);
+    opacity: 0;
+  }
+}
+
+.golden-particles {
+  animation: goldenParticles 4s ease-out infinite;
+}
+
+.particle-1 { animation-delay: 0s; }
+.particle-2 { animation-delay: 0.5s; }
+.particle-3 { animation-delay: 1s; }
+.particle-4 { animation-delay: 1.5s; }
+.particle-5 { animation-delay: 2s; }
+
+/* Luxury Shimmer Effect */
+@keyframes luxuryShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.luxury-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(245, 158, 11, 0.15),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: luxuryShimmer 6s ease-in-out infinite;
+}
+
+/* Humidor Opening Effect */
+@keyframes humidorOpen {
+  0% {
+    transform: perspective(1000px) rotateX(0deg);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  50% {
+    transform: perspective(1000px) rotateX(-15deg);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    transform: perspective(1000px) rotateX(0deg);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.humidor-open {
+  animation: humidorOpen 2s ease-in-out infinite;
+}
+
+/* Smoke Trail */
+@keyframes smokeTrail {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.1);
+  }
+  20% {
+    opacity: 0.8;
+    transform: translateY(-20px) scale(0.5);
+  }
+  80% {
+    opacity: 0.3;
+    transform: translateY(-100px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-150px) scale(1.5);
+  }
+}
+
+.smoke-trail {
+  animation: smokeTrail 5s ease-out infinite;
+}
+
+/* Staggered Animations */
+.animate-fade-in-up {
+  animation: luxuryTextReveal 0.8s ease-out forwards;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+.animation-delay-600 {
+  animation-delay: 0.6s;
+  opacity: 0;
+}
+
+.animation-delay-800 {
+  animation-delay: 0.8s;
+  opacity: 0;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+  opacity: 0;
+}
+
+/* Premium Hover Effects */
+.premium-hover {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.premium-hover:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.3),
+              0 0 60px rgba(245, 158, 11, 0.1);
+}
+
+/* Button Luxury Effects */
+.btn-luxury {
+  background: linear-gradient(45deg, #f59e0b, #d97706, #f59e0b);
+  background-size: 300% 300%;
+  animation: luxuryGradient 3s ease infinite;
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes luxuryGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.btn-luxury::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.btn-luxury:hover::before {
+  left: 100%;
+}
+
+/* Testimonial Animation */
+@keyframes testimonialFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.testimonial-float {
+  animation: testimonialFloat 6s ease-in-out infinite;
+}
+
+/* Category Card Stagger */
+.category-stagger-1 { animation-delay: 0.1s; }
+.category-stagger-2 { animation-delay: 0.2s; }
+.category-stagger-3 { animation-delay: 0.3s; }
+.category-stagger-4 { animation-delay: 0.4s; }
+.category-stagger-5 { animation-delay: 0.5s; }
+.category-stagger-6 { animation-delay: 0.6s; }

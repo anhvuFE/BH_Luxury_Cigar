@@ -13,6 +13,7 @@ import {
   HiOutlineRefresh,
   HiChevronDown
 } from 'react-icons/hi';
+import Select from '../../components/common/Select';
 
 const AdminAnalytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
@@ -134,16 +135,18 @@ const AdminAnalytics: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center space-x-3">
-              <select
+              <Select
                 value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors text-sm"
-              >
-                <option value="week">7 ngày qua</option>
-                <option value="month">30 ngày qua</option>
-                <option value="quarter">Quý này</option>
-                <option value="year">Năm này</option>
-              </select>
+                onChange={(value) => setSelectedPeriod(value as string)}
+                options={[
+                  { value: 'week', label: '7 ngày qua' },
+                  { value: 'month', label: '30 ngày qua' },
+                  { value: 'quarter', label: 'Quý này' },
+                  { value: 'year', label: 'Năm này' }
+                ]}
+                variant="filled"
+                size="md"
+              />
 
               <button className="bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center hover:bg-amber-700 transition-colors">
                 <HiOutlineDownload className="w-5 h-5 mr-2" />
@@ -233,15 +236,17 @@ const AdminAnalytics: React.FC = () => {
                 <h3 className="text-xl font-bold text-gray-900">Xu hướng doanh thu</h3>
                 <p className="text-sm text-gray-600">6 tháng gần đây</p>
               </div>
-              <select
+              <Select
                 value={selectedChart}
-                onChange={(e) => setSelectedChart(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors text-sm"
-              >
-                <option value="revenue">Doanh thu</option>
-                <option value="orders">Đơn hàng</option>
-                <option value="customers">Khách hàng</option>
-              </select>
+                onChange={(value) => setSelectedChart(value as string)}
+                options={[
+                  { value: 'revenue', label: 'Doanh thu' },
+                  { value: 'orders', label: 'Đơn hàng' },
+                  { value: 'customers', label: 'Khách hàng' }
+                ]}
+                variant="filled"
+                size="md"
+              />
             </div>
             <SimpleChart
               data={analyticsData[selectedChart as keyof typeof analyticsData].chartData}

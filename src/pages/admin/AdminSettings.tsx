@@ -10,6 +10,7 @@ import {
   HiOutlineColorSwatch,
   HiOutlineDatabase
 } from 'react-icons/hi';
+import Select from '../../components/common/Select';
 
 const AdminSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -311,11 +312,17 @@ const AdminSettings: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Mã hóa
                         </label>
-                        <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                          <option>TLS</option>
-                          <option>SSL</option>
-                          <option>None</option>
-                        </select>
+                        <Select
+                          value="TLS"
+                          onChange={() => {}}
+                          options={[
+                            { value: 'TLS', label: 'TLS' },
+                            { value: 'SSL', label: 'SSL' },
+                            { value: 'None', label: 'None' }
+                          ]}
+                          variant="filled"
+                          size="md"
+                        />
                       </div>
                     </div>
                     <div>

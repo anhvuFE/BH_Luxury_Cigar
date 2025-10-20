@@ -11,6 +11,7 @@ import {
   HiChevronDown
 } from 'react-icons/hi';
 import { useToast } from '../../hooks/useToast';
+import Select from '../../components/common/Select';
 
 const AdminProducts: React.FC = () => {
   const { showSuccess, showError, showWarning } = useToast();
@@ -209,34 +210,29 @@ const AdminProducts: React.FC = () => {
             </div>
 
             {/* Category Filter */}
-            <div className="relative">
-              <select
-                className="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all appearance-none"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                {categories.map(category => (
-                  <option key={category} value={category}>
-                    {category === 'all' ? 'Tất cả danh mục' : category}
-                  </option>
-                ))}
-              </select>
-              <HiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            </div>
+            <Select
+              value={selectedCategory}
+              onChange={(value) => setSelectedCategory(value as string)}
+              options={categories.map(category => ({
+                value: category,
+                label: category === 'all' ? 'Tất cả danh mục' : category
+              }))}
+              variant="filled"
+              size="md"
+            />
 
             {/* Status Filter */}
-            <div className="relative">
-              <select
-                className="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all appearance-none"
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-              >
-                <option value="all">Tất cả trạng thái</option>
-                <option value="inStock">Còn hàng</option>
-                <option value="outOfStock">Hết hàng</option>
-              </select>
-              <HiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            </div>
+            <Select
+              value={selectedStatus}
+              onChange={(value) => setSelectedStatus(value as string)}
+              options={[
+                { value: 'all', label: 'Tất cả trạng thái' },
+                { value: 'inStock', label: 'Còn hàng' },
+                { value: 'outOfStock', label: 'Hết hàng' }
+              ]}
+              variant="filled"
+              size="md"
+            />
 
             {/* Advanced Filter Button */}
             <button className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors">

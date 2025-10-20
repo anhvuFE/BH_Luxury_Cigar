@@ -28,6 +28,8 @@ interface User {
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
@@ -110,6 +112,25 @@ const Header: React.FC = () => {
     }
   };
 
+  const handleSearchToggle = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (isSearchOpen) {
+      setSearchQuery('');
+    } else {
+      // Close mobile menu when opening search
+      setIsMenuOpen(false);
+    }
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/collections?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
+
   return (
     <header className="bg-gray-900 border-b border-gray-800 fixed top-0 left-0 right-0 z-[9999] w-full">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -127,25 +148,63 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation - Clean */}
-          <nav className="hidden lg:flex justify-center">
-            <div className="flex items-center space-x-6 lg:space-x-8 xl:space-x-10">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="text-gray-300 hover:text-amber-400 transition-colors font-medium text-sm lg:text-base whitespace-nowrap"
+          {/* Desktop Navigation & Search - Clean */}
+          <div className="hidden lg:flex justify-center items-center h-10">
+            {!isSearchOpen ? (
+              // Navigation tabs - shown when search is closed
+              <nav className="flex items-center space-x-6 lg:space-x-8 xl:space-x-10 h-full">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="text-gray-300 hover:text-amber-400 transition-colors font-medium text-sm lg:text-base whitespace-nowrap h-full flex items-center"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
+            ) : (
+              // Search input - shown when search is opened
+              <form onSubmit={handleSearchSubmit} className="flex items-center h-full">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Tìm kiếm sản phẩm..."
+                    className="w-80 h-10 px-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-sm"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-700 rounded"
+                  >
+                    <HiOutlineSearch className="w-4 h-4 text-gray-400" />
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSearchToggle}
+                  className="ml-3 p-2 hover:bg-gray-800 rounded-lg transition-colors h-10 w-10 flex items-center justify-center"
+                  title="Đóng tìm kiếm"
                 >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          </nav>
+                  <HiX className="w-5 h-5 text-gray-300" />
+                </button>
+              </form>
+            )}
+          </div>
 
           {/* Actions - Clean & Simple */}
           <div className="flex items-center space-x-3 lg:justify-end">
             {/* Mobile Cart & User - Visible on small screens */}
             <div className="flex lg:hidden items-center space-x-2">
+              <button
+                onClick={handleSearchToggle}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                title="Tìm kiếm"
+              >
+                <HiOutlineSearch className="w-5 h-5 text-gray-300" />
+              </button>
               <Link
                 to="/cart"
                 className="relative p-2 hover:bg-gray-800 rounded-lg transition-colors"
@@ -182,7 +241,11 @@ const Header: React.FC = () => {
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center space-x-2">
-              <button className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+              <button
+                onClick={handleSearchToggle}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                title="Tìm kiếm"
+              >
                 <HiOutlineSearch className="w-5 h-5 text-gray-300" />
               </button>
               <Link
@@ -234,7 +297,13 @@ const Header: React.FC = () => {
             {/* Mobile menu button - Clean */}
             <button
               className="lg:hidden p-2 hover:bg-gray-800 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={() => {
+                setIsMenuOpen(!isMenuOpen);
+                // Close search when opening menu
+                if (!isMenuOpen) {
+                  setIsSearchOpen(false);
+                }
+              }}
             >
               {isMenuOpen ? (
                 <HiX className="w-5 h-5 text-gray-300" />
@@ -244,6 +313,38 @@ const Header: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Mobile Search Overlay */}
+        {isSearchOpen && (
+          <div className="lg:hidden bg-gray-800 border-t border-gray-700 py-4 px-4">
+            <form onSubmit={handleSearchSubmit} className="flex items-center">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Tìm kiếm sản phẩm..."
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-600 rounded"
+                >
+                  <HiOutlineSearch className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={handleSearchToggle}
+                className="ml-3 p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                title="Đóng tìm kiếm"
+              >
+                <HiX className="w-6 h-6 text-gray-300" />
+              </button>
+            </form>
+          </div>
+        )}
 
         {/* Mobile Navigation - Clean & Simple */}
         {isMenuOpen && (

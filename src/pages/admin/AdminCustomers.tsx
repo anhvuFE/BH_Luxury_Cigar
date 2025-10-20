@@ -17,6 +17,7 @@ import {
   HiChevronRight,
   HiOutlineExclamationCircle
 } from 'react-icons/hi';
+import Select from '../../components/common/Select';
 
 
 const AdminCustomers: React.FC = () => {
@@ -229,16 +230,18 @@ const AdminCustomers: React.FC = () => {
 
             {/* Filter */}
             <div className="flex gap-2">
-              <select
+              <Select
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors text-sm"
-              >
-                <option value="all">Tất cả trạng thái</option>
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Không hoạt động</option>
-                <option value="vip">VIP</option>
-              </select>
+                onChange={(value) => setFilterStatus(value as string)}
+                options={[
+                  { value: 'all', label: 'Tất cả trạng thái' },
+                  { value: 'active', label: 'Hoạt động' },
+                  { value: 'inactive', label: 'Không hoạt động' },
+                  { value: 'vip', label: 'VIP' }
+                ]}
+                variant="filled"
+                size="md"
+              />
 
               <button
                 onClick={() => setShowFilters(!showFilters)}
