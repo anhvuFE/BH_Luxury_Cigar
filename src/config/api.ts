@@ -61,7 +61,8 @@ export const API_ENDPOINTS = {
     CREATE: '/orders',
     UPDATE: (id: string) => `/orders/${id}`,
     DELETE: (id: string) => `/orders/${id}`,
-    USER_ORDERS: '/orders/user',
+    USER_ORDERS: '/orders/myorders',
+    USER_TOTAL: '/orders/myorders/total',
     UPDATE_STATUS: (id: string) => `/orders/${id}/status`,
   },
 
