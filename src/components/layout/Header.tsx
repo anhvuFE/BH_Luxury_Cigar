@@ -13,17 +13,9 @@ import authService from "../../services/auth.service";
 import { useCart } from "../../contexts/CartContext";
 
 interface User {
-  id: string;
-  email: string;
   name: string;
   first_name?: string;
-  last_name?: string;
-  phone?: string;
-  phone_number?: string;
   role: 'user' | 'customer' | 'staff' | 'admin';
-  avatar?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 const Header: React.FC = () => {
@@ -55,19 +47,14 @@ const Header: React.FC = () => {
       // Try API first, fallback to localStorage
       try {
         const response = await authService.getProfile();
-        console.log('Full API response:', response);
 
         // Extract user data - handle both direct user object and wrapped response
-        const profile = response.data || response;
+        const profile = response;
         setUser(profile);
 
         // Update localStorage with fresh data
         localStorage.setItem('user', JSON.stringify(profile));
         localStorage.setItem('userRole', profile.role);
-        console.log('Header user loaded from API:', profile);
-        console.log('Available user fields:', Object.keys(profile));
-        console.log('first_name:', profile.first_name);
-        console.log('name:', profile.name);
       } catch (apiError) {
         console.warn('Header API fetch failed, using localStorage:', apiError);
 
@@ -77,7 +64,6 @@ const Header: React.FC = () => {
           try {
             const localUser = JSON.parse(userData);
             setUser(localUser);
-            console.log('Header using localStorage:', localUser);
           } catch (parseError) {
             console.error('Error parsing user data:', parseError);
             // Don't logout immediately, just clear user data

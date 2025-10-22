@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import cartService, { type CartItem } from '../services/cart.service';
 import { useToast } from '../hooks/useToast';
-import authService from '../services/auth.service';
 
 interface CartContextType {
   cart: CartItem[];
@@ -11,7 +10,7 @@ interface CartContextType {
   addToCart: (productId: string, quantity?: number, productInfo?: any) => Promise<void>;
   updateCartItem: (productId: string, quantity: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
-  clearCart: () => Promise<void>;
+  clearCart: (silent?: boolean) => Promise<void>;
   refreshCart: () => Promise<void>;
 }
 
@@ -36,7 +35,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { showSuccess, showError } = useToast();
+  const { showSuccess } = useToast();
 
   // Load cart data on mount
   useEffect(() => {
@@ -167,13 +166,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
-  const clearCart = async () => {
+  const clearCart = async (silent = false) => {
     // Always use localStorage
     setCart([]);
     setCartCount(0);
     setTotalPrice(0);
     clearLocalStorage();
-    showSuccess('Đã xóa toàn bộ giỏ hàng!');
+
+    if (!silent) {
+      showSuccess('Đã xóa toàn bộ giỏ hàng!');
+    }
   };
 
   const value: CartContextType = {
