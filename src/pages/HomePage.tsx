@@ -12,8 +12,8 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaPlay,
-} from "react-icons/fa";
-import { GiCigar } from "react-icons/gi";
+  GiCigar
+} from "../components/ui/OptimizedIcons";
 import Products from "../components/sections/Products";
 import { API_CONFIG, API_ENDPOINTS } from "../config/api";
 import type { Category } from "../types/database";
@@ -26,7 +26,7 @@ const HomePage = () => {
   const bannerSlides = [
     {
       id: 1,
-      image: "/src/assets/images/banner1.png",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       title: "BH LUXURY CIGAR",
       subtitle: "Chuyên gia Xì Gà Cuba hàng đầu Việt Nam",
       description:
@@ -34,7 +34,7 @@ const HomePage = () => {
     },
     {
       id: 2,
-      image: "/src/assets/images/banner2.png",
+      image: "https://images.unsplash.com/photo-1564514298907-560606a3b17e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80",
       title: "ATELIER HAUTE CREATION",
       subtitle: "Nghệ thuật chế tác xì gà đỉnh cao",
       description:
@@ -42,7 +42,7 @@ const HomePage = () => {
     },
     {
       id: 3,
-      image: "/src/assets/images/banner3.png",
+      image: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       title: "WHISKY & CIGAR COLLECTION",
       subtitle: "Bộ sưu tập Whisky & Xì Gà cao cấp",
       description:
@@ -79,13 +79,31 @@ const HomePage = () => {
 
   const loadCategories = async () => {
     try {
+      // Check cache first
+      const cacheKey = 'homepage_categories';
+      const cachedData = sessionStorage.getItem(cacheKey);
+      const cacheTime = sessionStorage.getItem(`${cacheKey}_time`);
+
+      // Use cache if less than 5 minutes old
+      if (cachedData && cacheTime && Date.now() - parseInt(cacheTime) < 300000) {
+        setCategories(JSON.parse(cachedData));
+        setLoading(false);
+        return;
+      }
+
       const response = await axios.get(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.BASE_PATH}${API_ENDPOINTS.CATEGORIES.LIST}`
+        `${API_CONFIG.BASE_URL}${API_CONFIG.BASE_PATH}${API_ENDPOINTS.CATEGORIES.LIST}`,
+        { timeout: 5000 } // 5s timeout for categories
       );
       const responseData = response.data;
 
       if (responseData.success && Array.isArray(responseData.data)) {
-        setCategories(responseData.data.slice(0, 6)); // Limit to 6 categories for grid
+        const limitedCategories = responseData.data.slice(0, 6); // Limit to 6 categories for grid
+        setCategories(limitedCategories);
+
+        // Cache the result
+        sessionStorage.setItem(cacheKey, JSON.stringify(limitedCategories));
+        sessionStorage.setItem(`${cacheKey}_time`, Date.now().toString());
       }
     } catch (error) {
       console.error("Error loading categories:", error);
@@ -130,6 +148,8 @@ const HomePage = () => {
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover object-center"
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "low"}
               />
 
               {/* Animated Dark Overlay */}
@@ -526,7 +546,7 @@ const HomePage = () => {
         {/* Background Image with Parallax */}
         <div className="absolute inset-0">
           <img
-            src="/src/assets/images/banner2.png"
+            src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80"
             alt="ATELIER HAUTE CREATION Banner"
             className="w-full h-full object-cover transform scale-110 group-hover:scale-100 transition-transform duration-[8s] ease-out"
           />
@@ -909,7 +929,7 @@ const HomePage = () => {
         {/* Background Image with Parallax */}
         <div className="absolute inset-0">
           <img
-            src="/src/assets/images/banner3.png"
+            src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
             alt="Whisky Collection Banner"
             className="w-full h-full object-cover transform scale-105 hover:scale-100 transition-transform duration-[10s] ease-out"
           />

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Suspense } from 'react';
 
 // Import components
 import ScrollToTop from './components/ScrollToTop';
@@ -8,29 +9,29 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { ToastProvider } from './hooks/useToast';
 import { CartProvider } from './contexts/CartContext';
 
-// Public pages
+// Critical pages (loaded immediately)
 import HomePage from './pages/HomePage';
 import CollectionsPage from './pages/CollectionsPage';
-import BlogPage from './pages/BlogPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import ProductDetailPage from './pages/ProductDetailPage';
-import CartPage from './pages/CartPage';
 
-// Auth pages
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ProfilePage from './pages/ProfilePage';
-
-
-// Admin pages
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminProducts from './pages/admin/AdminProducts';
-import AdminOrders from './pages/admin/AdminOrders';
-import AdminCustomers from './pages/admin/AdminCustomers';
-import AdminAnalytics from './pages/admin/AdminAnalytics';
-import AdminSettings from './pages/admin/AdminSettings';
+// Lazy loaded imports
+import {
+  ProfilePage,
+  CartPage,
+  BlogPage,
+  ContactPage,
+  AboutPage,
+  ProductDetailPage,
+  LoginPage,
+  RegisterPage,
+  ForgotPasswordPage,
+  AdminDashboard,
+  AdminProducts,
+  AdminOrders,
+  AdminCustomers,
+  AdminAnalytics,
+  AdminSettings
+} from './utils/lazyImports';
+import { PageLoader } from './components/ui/LoadingSpinner';
 
 function AppContent() {
   const location = useLocation();
@@ -44,7 +45,8 @@ function AppContent() {
     <div className="min-h-screen flex flex-col">
       {shouldShowLayout && <Header />}
       <main className={shouldShowLayout ? "flex-grow pt-20" : "min-h-screen"}>
-        <Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
           {/* Public Pages */}
           <Route path="/" element={<HomePage />} />
           <Route path="/collections" element={<CollectionsPage />} />
@@ -112,7 +114,8 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-        </Routes>
+          </Routes>
+        </Suspense>
       </main>
       {shouldShowLayout && <Footer />}
     </div>

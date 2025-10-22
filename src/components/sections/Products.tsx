@@ -1,8 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { HiOutlineShoppingBag, HiOutlineEye } from "react-icons/hi";
-import { GiCigar } from "react-icons/gi";
-import { FaStar, FaShieldAlt } from "react-icons/fa";
+import { GiCigar, FaStar, FaShieldAlt, HiOutlineShoppingBag, HiOutlineEye } from "../ui/OptimizedIcons";
 import { useFeaturedProducts } from "../../hooks/useProducts";
 import { useCart } from "../../contexts/CartContext";
 import { useToast } from "../../hooks/useToast";
@@ -175,6 +173,7 @@ const Products: React.FC = () => {
                     "/assets/images/placeholder.png"
                   }
                   alt={product.name}
+                  loading="lazy"
                   className="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-700 filter group-hover:brightness-110"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;

@@ -463,6 +463,7 @@ const CollectionsPage: React.FC = () => {
                     <img
                       src={product.image || '/assets/images/placeholder.png'}
                       alt={product.name}
+                      loading="lazy"
                       className="w-full h-48 sm:h-56 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;

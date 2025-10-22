@@ -6,7 +6,7 @@ import {
   HiOutlineCheck,
   HiOutlineBookOpen,
   HiChevronRight,
-} from "react-icons/hi";
+} from "../components/ui/OptimizedIcons";
 
 const AboutPage: React.FC = () => {
   return (
@@ -14,7 +14,7 @@ const AboutPage: React.FC = () => {
       {/* Banner Section */}
       <section className="relative w-full overflow-hidden">
         <img
-          src="/src/assets/images/banner4.png"
+          src="https://images.unsplash.com/photo-1509900295431-566ad5d944eb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
           alt="BH Luxury Cigar About Banner"
           className="w-full h-auto object-cover"
         />
@@ -80,7 +80,7 @@ const AboutPage: React.FC = () => {
           </div>
           <div>
             <img
-              src="/src/assets/images/banner5.png"
+              src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
               alt="BH Luxury Cigar Story"
               className="w-full h-96 object-cover rounded-lg shadow-lg"
             />
