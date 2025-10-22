@@ -25,6 +25,7 @@ class ApiService {
 
     // Request interceptor to add auth token
     this.axiosInstance.interceptors.request.use(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (config: any) => {
         if (this.token) {
           config.headers.Authorization = `Bearer ${this.token}`;
@@ -38,11 +39,13 @@ class ApiService {
 
     // Response interceptor for error handling
     this.axiosInstance.interceptors.response.use(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (response: any) => {
         return response;
       },
       (error: unknown) => {
         // Handle 401 Unauthorized specifically
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((error as any)?.response?.status === 401) {
           this.clearToken();
           // Optionally redirect to login page
@@ -52,8 +55,11 @@ class ApiService {
         }
 
         // Enhance error message
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const message = (error as any)?.response?.data?.message ||
+                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                        (error as any)?.response?.data?.error ||
+                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                        (error as any)?.message ||
                        'An unexpected error occurred';
 
