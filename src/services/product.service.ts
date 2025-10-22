@@ -33,7 +33,7 @@ export interface PaginatedProducts {
 
 class ProductService {
   async getAll(filters?: ProductFilters): Promise<PaginatedProducts> {
-    const response = await apiService.get<ApiResponse<Product[]>>(API_ENDPOINTS.PRODUCTS.LIST, filters);
+    const response = await apiService.get<ApiResponse<Product[]>>(API_ENDPOINTS.PRODUCTS.LIST, filters as any);
 
     // Transform backend response to match frontend interface
     return {

@@ -5,10 +5,7 @@ import {
   HiOutlineBell,
   HiOutlineShieldCheck,
   HiOutlineGlobe,
-  HiOutlineMail,
-  HiOutlineKey,
-  HiOutlineColorSwatch,
-  HiOutlineDatabase
+  HiOutlineMail
 } from 'react-icons/hi';
 import Select from '../../components/common/Select';
 

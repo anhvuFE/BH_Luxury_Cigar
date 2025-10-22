@@ -1,5 +1,5 @@
 import React from 'react';
-import { HiChevronLeft, HiChevronRight, HiDotsHorizontal } from 'react-icons/hi';
+import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 
 interface PaginationProps {
   currentPage: number;
@@ -28,8 +28,8 @@ const Pagination: React.FC<PaginationProps> = ({
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
-  // Generate page numbers for desktop (limit to avoid overflow)
-  const getDesktopPageNumbers = () => {
+  // Generate page numbers for desktop (limit to avoid overflow) - currently unused but kept for future use
+  /* const getDesktopPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisiblePages = 5; // Reduced from 7 to 5
 
@@ -70,10 +70,10 @@ const Pagination: React.FC<PaginationProps> = ({
     }
 
     return pages;
-  };
+  }; */
 
-  // Generate mobile page numbers (simplified)
-  const getMobilePageNumbers = () => {
+  // Generate mobile page numbers (simplified) - currently unused but kept for future use
+  /* const getMobilePageNumbers = () => {
     const pages: (number | string)[] = [];
 
     // For mobile, only show prev + current + next
@@ -82,15 +82,16 @@ const Pagination: React.FC<PaginationProps> = ({
     if (currentPage < totalPages) pages.push(currentPage + 1);
 
     return pages;
-  };
+  }; */
 
   // Always show pagination if there are items, even with 1 page
   if (totalItems <= 0) {
     return null;
   }
 
-  const desktopPageNumbers = getDesktopPageNumbers();
-  const mobilePageNumbers = getMobilePageNumbers();
+  // These functions are available if needed in the future
+  // const desktopPageNumbers = getDesktopPageNumbers();
+  // const mobilePageNumbers = getMobilePageNumbers();
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6">

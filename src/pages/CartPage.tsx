@@ -97,7 +97,7 @@ const CartPage: React.FC = () => {
           if (item.productId) {
             await removeFromCart(item.productId);
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.warn("Could not remove invalid item:", item, error);
         }
       }
@@ -107,7 +107,7 @@ const CartPage: React.FC = () => {
       if (cartData) {
         try {
           const parsedCart = JSON.parse(cartData);
-          const cleanCart = parsedCart.filter(item => item.productId && item.productId !== 'undefined');
+          const cleanCart = parsedCart.filter((item: any) => item.productId && item.productId !== 'undefined');
           localStorage.setItem('bh_luxury_cart', JSON.stringify(cleanCart));
           window.location.reload(); // Force reload to refresh cart
         } catch (error) {
@@ -196,13 +196,14 @@ const CartPage: React.FC = () => {
       // Show success message and navigate to collections for continued shopping
       showToast("Đặt hàng thành công!", "success");
       navigate("/collections");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Checkout error:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
 
       // Check if it's a 404 error from the network request
-      if (error.message?.includes('404') ||
-          (error.cause && error.cause.status === 404) ||
-          error.status === 404) {
+      if (errorMessage.includes('404') ||
+          (error instanceof Error && 'cause' in error && (error.cause as any)?.status === 404) ||
+          (error as any)?.status === 404) {
         // API endpoint not implemented yet
         showToast("Đặt hàng thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.", "success");
 
@@ -212,17 +213,17 @@ const CartPage: React.FC = () => {
         // Navigate to collections
         navigate("/collections");
 
-      } else if (error.message?.includes('Product') && error.message?.includes('not found')) {
+      } else if (errorMessage.includes('Product') && errorMessage.includes('not found')) {
         // Product not found in backend database
         showToast("Một số sản phẩm trong giỏ hàng không còn tồn tại. Vui lòng cập nhật giỏ hàng.", "error");
 
         // Don't clear cart in this case, let user review and remove invalid items
 
-      } else if (error.message?.includes('missing product identifier')) {
+      } else if (errorMessage.includes('missing product identifier')) {
         // All formats failed
         showToast("Định dạng sản phẩm không đúng. Vui lòng dọn dẹp giỏ hàng và thêm lại sản phẩm.", "error");
 
-      } else if (error.message && error.message.includes("tương lai")) {
+      } else if (errorMessage.includes("tương lai")) {
         // Don't show the backend's "future development" message
         showToast(
           "Chức năng thanh toán đang được cập nhật. Vui lòng thử lại sau.",
@@ -230,7 +231,7 @@ const CartPage: React.FC = () => {
         );
       } else {
         showToast(
-          error.message || "Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.",
+          errorMessage || "Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.",
           "error"
         );
       }

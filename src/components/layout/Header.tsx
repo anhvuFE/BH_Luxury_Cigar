@@ -13,7 +13,7 @@ import authService from "../../services/auth.service";
 import { useCart } from "../../contexts/CartContext";
 
 interface User {
-  name: string;
+  name?: string;
   first_name?: string;
   role: 'user' | 'customer' | 'staff' | 'admin';
 }

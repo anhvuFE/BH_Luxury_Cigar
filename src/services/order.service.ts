@@ -1,15 +1,32 @@
 import apiService from './api';
 import { API_ENDPOINTS } from '../config/api';
 
+export interface ShippingAddress {
+  name: string;
+  street: string;
+  city: string;
+  state?: string;
+  zipCode?: string;
+  country: string;
+  phone: string;
+}
+
 export interface Order {
   id: string;
   user_id: string;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   total_amount: number;
-  shipping_address: any;
+  shipping_address: ShippingAddress;
   items: OrderItem[];
   created_at: string;
   updated_at: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  image?: string;
 }
 
 export interface OrderItem {
@@ -17,7 +34,7 @@ export interface OrderItem {
   product_id: string;
   quantity: number;
   price: number;
-  product?: any;
+  product?: Product;
 }
 
 export interface CreateOrderDto {
@@ -25,8 +42,12 @@ export interface CreateOrderDto {
     product_id: string;
     quantity: number;
   }[];
-  shipping_address: any;
+  shipping_address: ShippingAddress;
   payment_method: string;
+  itemsPrice?: number;
+  taxPrice?: number;
+  shippingPrice?: number;
+  totalPrice?: number;
 }
 
 class OrderService {

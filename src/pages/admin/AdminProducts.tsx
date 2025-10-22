@@ -7,8 +7,7 @@ import {
   HiOutlineFilter,
   HiOutlinePencil,
   HiOutlineTrash,
-  HiOutlineEye,
-  HiChevronDown
+  HiOutlineEye
 } from 'react-icons/hi';
 import { useToast } from '../../hooks/useToast';
 import Select from '../../components/common/Select';

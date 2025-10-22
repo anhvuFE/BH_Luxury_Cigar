@@ -94,7 +94,21 @@ class AdminService {
   async getProducts(): Promise<Product[]> {
     try {
       const response = await apiService.get('/products');
-      return response.data.map((product: any) => ({
+      interface ApiProduct {
+        id: string;
+        name: string;
+        brand?: string;
+        price: number;
+        image?: string;
+        category?: string;
+        inStock?: boolean;
+        isNew?: boolean;
+        isFeatured?: boolean;
+        description?: string;
+        specifications?: string;
+      }
+
+      return (response as any).data.map((product: ApiProduct) => ({
         _id: product.id,
         name: product.name,
         brand: product.brand || 'Unknown',
@@ -116,7 +130,7 @@ class AdminService {
   async createProduct(productData: Partial<Product>): Promise<Product> {
     try {
       const response = await apiService.post('/products', productData);
-      return response.data;
+      return (response as any).data;
     } catch (error) {
       console.error('Error creating product:', error);
       throw error;
@@ -126,7 +140,7 @@ class AdminService {
   async updateProduct(id: string, productData: Partial<Product>): Promise<Product> {
     try {
       const response = await apiService.put(`/products/${id}`, productData);
-      return response.data;
+      return (response as any).data;
     } catch (error) {
       console.error('Error updating product:', error);
       throw error;

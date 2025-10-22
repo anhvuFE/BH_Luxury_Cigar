@@ -16,6 +16,7 @@ import {
 import authService from '../services/auth.service';
 import { useToast } from '../hooks/useToast';
 import { API_CONFIG } from '../config/api';
+import type { Order, Product } from '../types/database';
 
 interface User {
   _id: string;
@@ -61,8 +62,8 @@ const ProfilePage: React.FC = () => {
     newPassword: '',
     confirmPassword: '',
   });
-  const [orders, setOrders] = useState<any[]>([]);
-  const [favorites, setFavorites] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [favorites, setFavorites] = useState<Product[]>([]);
   const [tabLoading, setTabLoading] = useState(false);
 
   // Avatar upload states
@@ -96,7 +97,7 @@ const ProfilePage: React.FC = () => {
       try {
         const response = await authService.request('/profile');
         // Backend returns {success: true, data: user}
-        const profile = response.data || response;
+        const profile = (response as { data?: User } & User).data || (response as User);
         setUser(profile);
         setEditForm({
           name: profile.name || '',
@@ -142,7 +143,7 @@ const ProfilePage: React.FC = () => {
           setError('Không tìm thấy thông tin người dùng');
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('Không thể tải thông tin người dùng');
       console.error('Profile load error:', err);
     } finally {
@@ -167,13 +168,14 @@ const ProfilePage: React.FC = () => {
 
       setIsEditing(false);
       // Update local user state with response
-      const updatedUser = response.data || response;
+      const updatedUser = (response as { data?: User } & User).data || (response as User);
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       showSuccess('Cập nhật thông tin thành công!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save error:', error);
-      showError(error.message || 'Không thể cập nhật thông tin');
+      const errorMessage = error instanceof Error ? error.message : 'Không thể cập nhật thông tin';
+      showError(errorMessage);
     }
   };
 
@@ -199,7 +201,8 @@ const ProfilePage: React.FC = () => {
     try {
       setTabLoading(true);
       const response = await authService.request('/orders/user');
-      setOrders(response.data || response || []);
+      const ordersData = (response as { data?: Order[] } & Order[]).data || (response as Order[]) || [];
+      setOrders(ordersData);
       console.log('Orders loaded:', response);
     } catch (error) {
       console.warn('Failed to load orders:', error);
@@ -214,7 +217,8 @@ const ProfilePage: React.FC = () => {
     try {
       setTabLoading(true);
       const response = await authService.request('/products/favorites');
-      setFavorites(response.data || response || []);
+      const favoritesData = (response as { data?: Product[] } & Product[]).data || (response as Product[]) || [];
+      setFavorites(favoritesData);
       console.log('Favorites loaded:', response);
     } catch (error) {
       console.warn('Failed to load favorites:', error);
@@ -249,8 +253,9 @@ const ProfilePage: React.FC = () => {
       });
       setError(null);
       showSuccess('Đổi mật khẩu thành công!');
-    } catch (error: any) {
-      setError(error.message || 'Đổi mật khẩu thất bại');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Đổi mật khẩu thất bại';
+      setError(errorMessage);
     } finally {
       setTabLoading(false);
     }
@@ -301,7 +306,7 @@ const ProfilePage: React.FC = () => {
       const response = await authService.upload('/profile', formData, 'PUT');
 
       // Update user state
-      const updatedUser = response.data || response;
+      const updatedUser = (response as { data?: User } & User).data || (response as User);
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
 
@@ -310,8 +315,9 @@ const ProfilePage: React.FC = () => {
       setPreviewUrl(null);
       setError(null);
       showSuccess('Cập nhật ảnh đại diện thành công!');
-    } catch (error: any) {
-      setError(error.message || 'Upload ảnh thất bại');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Upload ảnh thất bại';
+      setError(errorMessage);
     } finally {
       setUploading(false);
     }
@@ -737,15 +743,15 @@ const ProfilePage: React.FC = () => {
                   </div>
                 ) : orders.length > 0 ? (
                   <div className="space-y-3 sm:space-y-4">
-                    {orders.map((order: any) => (
-                      <div key={order._id} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
+                    {orders.map((order) => (
+                      <div key={order.id} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 sm:mb-4 gap-2 sm:gap-4">
                           <div className="flex-1">
                             <h3 className="font-bold text-gray-900 font-inter text-sm sm:text-base">
-                              Đơn hàng #{order._id?.slice(-8)}
+                              Đơn hàng #{order.id?.slice(-8)}
                             </h3>
                             <p className="text-xs sm:text-sm text-gray-600 font-body">
-                              {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                              {new Date(order.created_at).toLocaleDateString('vi-VN')}
                             </p>
                           </div>
                           <span className="px-2 sm:px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs sm:text-sm font-medium font-inter self-start">
@@ -753,7 +759,7 @@ const ProfilePage: React.FC = () => {
                           </span>
                         </div>
                         <p className="text-base sm:text-lg font-bold text-amber-600 font-heading">
-                          {order.total?.toLocaleString('vi-VN')} VNĐ
+                          {order.total_amount?.toLocaleString('vi-VN')} VNĐ
                         </p>
                       </div>
                     ))}
@@ -794,13 +800,13 @@ const ProfilePage: React.FC = () => {
                   </div>
                 ) : favorites.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {favorites.map((product: any) => (
-                      <div key={product.id} className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+                    {favorites.map((product) => (
+                      <div key={product.id || product._id} className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
                         <div className="aspect-w-1 aspect-h-1 mb-3 sm:mb-4">
                           <div className="w-full h-40 sm:h-48 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                            {product.images?.[0] ? (
+                            {product.images?.[0] || product.image || product.featured_image ? (
                               <img
-                                src={product.images[0]}
+                                src={product.images?.[0] || product.image || product.featured_image}
                                 alt={product.name}
                                 className="w-full h-full object-cover"
                               />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import "../styles/animations.css";
@@ -459,7 +459,7 @@ const HomePage = () => {
             ].map((item, index) => {
               return (
                 <div
-                  key={index}
+                  key={`product-${index}-${item.name}`}
                   className={`group relative bg-gradient-to-b from-white to-gray-50 border border-amber-500/20 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 text-center premium-card-entrance category-stagger-${
                     index + 1
                   } premium-hover`}
@@ -855,7 +855,7 @@ const HomePage = () => {
               const IconComponent = brand.icon;
               return (
                 <div
-                  key={index}
+                  key={`brand-${index}-${brand.name}`}
                   className={`group text-center cursor-pointer premium-card-entrance category-stagger-${
                     index + 1
                   } relative`}

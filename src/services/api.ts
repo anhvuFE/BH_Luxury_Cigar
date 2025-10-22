@@ -2,7 +2,7 @@ import axios from 'axios';
 import { API_CONFIG } from '../config/api';
 
 interface RequestOptions {
-  params?: Record<string, any>;
+  params?: Record<string, string | number | boolean>;
   headers?: Record<string, string>;
   timeout?: number;
 }
@@ -25,23 +25,23 @@ class ApiService {
 
     // Request interceptor to add auth token
     this.axiosInstance.interceptors.request.use(
-      (config) => {
+      (config: any) => {
         if (this.token) {
           config.headers.Authorization = `Bearer ${this.token}`;
         }
         return config;
       },
-      (error) => {
+      (error: any) => {
         return Promise.reject(error);
       }
     );
 
     // Response interceptor for error handling
     this.axiosInstance.interceptors.response.use(
-      (response) => {
+      (response: any) => {
         return response;
       },
-      (error) => {
+      (error: any) => {
         // Handle 401 Unauthorized specifically
         if (error.response?.status === 401) {
           this.clearToken();
@@ -73,113 +73,80 @@ class ApiService {
   }
 
   // Generic request method
-  async request(endpoint: string, options = {}) {
-    try {
-      const response = await this.axiosInstance.request({
-        url: endpoint,
-        ...options,
-      });
-
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async request<T = unknown>(endpoint: string, options: any = {}): Promise<T> {
+    const response = await this.axiosInstance.request({
+      url: endpoint,
+      ...options,
+    });
+    return response.data;
   }
 
   // HTTP method shortcuts
-  async get(endpoint: string, params?: Record<string, any>) {
-    try {
-      const response = await this.axiosInstance.get(endpoint, { params });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async get<T = unknown>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
+    const response = await this.axiosInstance.get(endpoint, { params });
+    return response.data;
   }
 
-  async post(endpoint: string, body?: any, options?: RequestOptions) {
-    try {
-      const response = await this.axiosInstance.post(endpoint, body, {
-        params: options?.params,
-        headers: options?.headers,
-        timeout: options?.timeout,
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async post<T = unknown>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    const response = await this.axiosInstance.post(endpoint, body, {
+      params: options?.params,
+      headers: options?.headers,
+      timeout: options?.timeout,
+    });
+    return response.data;
   }
 
-  async put(endpoint: string, body?: any, options?: RequestOptions) {
-    try {
-      const response = await this.axiosInstance.put(endpoint, body, {
-        params: options?.params,
-        headers: options?.headers,
-        timeout: options?.timeout,
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async put<T = unknown>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    const response = await this.axiosInstance.put(endpoint, body, {
+      params: options?.params,
+      headers: options?.headers,
+      timeout: options?.timeout,
+    });
+    return response.data;
   }
 
-  async patch(endpoint: string, body?: any, options?: RequestOptions) {
-    try {
-      const response = await this.axiosInstance.patch(endpoint, body, {
-        params: options?.params,
-        headers: options?.headers,
-        timeout: options?.timeout,
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async patch<T = unknown>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    const response = await this.axiosInstance.patch(endpoint, body, {
+      params: options?.params,
+      headers: options?.headers,
+      timeout: options?.timeout,
+    });
+    return response.data;
   }
 
-  async delete(endpoint: string, params?: Record<string, any>) {
-    try {
-      const response = await this.axiosInstance.delete(endpoint, { params });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async delete<T = unknown>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
+    const response = await this.axiosInstance.delete(endpoint, { params });
+    return response.data;
   }
 
   // File upload with multipart/form-data
-  async upload(endpoint: string, formData: FormData, method: string = 'POST') {
-    try {
-      const response = await this.axiosInstance.request({
-        url: endpoint,
-        method: method,
-        data: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async upload<T = unknown>(endpoint: string, formData: FormData, method: string = 'POST'): Promise<T> {
+    const response = await this.axiosInstance.request({
+      url: endpoint,
+      method: method,
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
   }
 
   // Download file
-  async download(endpoint: string, filename?: string) {
-    try {
-      const response = await this.axiosInstance.get(endpoint, {
-        responseType: 'blob',
-      });
+  async download(endpoint: string, filename?: string): Promise<void> {
+    const response = await this.axiosInstance.get(endpoint, {
+      responseType: 'blob',
+    });
 
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename || 'download');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      throw error;
-    }
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename || 'download');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   }
 }
 

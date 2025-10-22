@@ -96,12 +96,12 @@ class AuthService {
     return localStorage.getItem('auth_token');
   }
 
-  async request(endpoint: string, options?: RequestInit): Promise<any> {
-    return apiService.request(endpoint, options as any);
+  async request<T = unknown>(endpoint: string, options?: RequestInit): Promise<T> {
+    return apiService.request<T>(endpoint, options as Record<string, unknown>);
   }
 
-  async upload(endpoint: string, formData: FormData, method: string = 'POST'): Promise<any> {
-    return apiService.upload(endpoint, formData, method);
+  async upload<T = unknown>(endpoint: string, formData: FormData, method: string = 'POST'): Promise<T> {
+    return apiService.upload<T>(endpoint, formData, method);
   }
 }
 

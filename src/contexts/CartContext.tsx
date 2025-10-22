@@ -2,12 +2,20 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import cartService, { type CartItem } from '../services/cart.service';
 import { useToast } from '../hooks/useToast';
 
+interface ProductInfo {
+  name?: string;
+  brand?: string;
+  price?: number;
+  image?: string;
+  featured_image?: string;
+}
+
 interface CartContextType {
   cart: CartItem[];
   cartCount: number;
   totalPrice: number;
   loading: boolean;
-  addToCart: (productId: string, quantity?: number, productInfo?: any) => Promise<void>;
+  addToCart: (productId: string, quantity?: number, productInfo?: ProductInfo) => Promise<void>;
   updateCartItem: (productId: string, quantity: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   clearCart: (silent?: boolean) => Promise<void>;
@@ -16,13 +24,16 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const useCart = () => {
+// Export useCart hook separately to fix fast refresh warning
+const useCartHook = () => {
   const context = useContext(CartContext);
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;
 };
+
+export { useCartHook as useCart };
 
 interface CartProviderProps {
   children: React.ReactNode;
@@ -40,14 +51,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Load cart data on mount
   useEffect(() => {
     loadCart();
-  }, []);
+  }, []); // loadCart is stable as it doesn't depend on state
 
   // Save cart to localStorage whenever cart changes
   useEffect(() => {
     if (cart.length > 0 || cartCount > 0) {
       saveCartToLocalStorage();
     }
-  }, [cart, cartCount, totalPrice]);
+  }, [cart, cartCount, totalPrice]); // saveCartToLocalStorage is stable
 
   const saveCartToLocalStorage = () => {
     const cartData = {
@@ -103,7 +114,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
-  const addToCart = async (productId: string, quantity: number = 1, productInfo?: any) => {
+  const addToCart = async (productId: string, quantity: number = 1, productInfo?: ProductInfo) => {
     // Always use localStorage for cart storage
     const existingItemIndex = cart.findIndex(item => item.productId === productId);
 

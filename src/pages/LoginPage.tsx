@@ -44,8 +44,9 @@ const LoginPage: React.FC = () => {
       } else {
         navigate('/'); // User goes to homepage
       }
-    } catch (err: any) {
-      setError(err.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Đăng nhập thất bại. Vui lòng thử lại.';
+      setError(errorMessage);
       console.error('Login error:', err);
     } finally {
       setIsLoading(false);

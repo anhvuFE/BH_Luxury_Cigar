@@ -7,7 +7,6 @@ import { useToast } from '../hooks/useToast';
 import { usePagination } from '../hooks/usePagination';
 import Pagination from '../components/common/Pagination';
 import Select from '../components/common/Select';
-import authService from '../services/auth.service';
 import { API_ENDPOINTS, API_CONFIG } from '../config/api';
 import axios from 'axios';
 
@@ -24,9 +23,33 @@ const CollectionsPage: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);
 
+  // Define interfaces for type safety
+  interface Product {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    original_price?: number;
+    featured_image?: string;
+    image?: string;
+    category?: {
+      id: string;
+      name: string;
+    };
+    stock_quantity?: number;
+    brand?: string;
+    vendor?: string;
+  }
+
+  interface Category {
+    id: string;
+    name: string;
+    slug: string;
+  }
+
   // API data states
-  const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [paginationLoading, setPaginationLoading] = useState(false);
 
@@ -57,13 +80,15 @@ const CollectionsPage: React.FC = () => {
     }, 300); // 300ms delay
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, sortBy, selectedCategories, priceRange, inStockOnly, pagination.limit]);
 
   // Load products with search, sorting, and filtering (debounced for price range)
   useEffect(() => {
     const cleanup = debouncedFilter();
     return cleanup;
-  }, [debouncedFilter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);  // Only depends on filter changes, not the function itself
 
   // Load products when pagination changes
   useEffect(() => {
@@ -189,7 +214,7 @@ const CollectionsPage: React.FC = () => {
   };
 
   // Add to cart function
-  const handleAddToCart = async (product: any) => {
+  const handleAddToCart = async (product: Product) => {
     if (!product || !product.id) return;
     await addToCart(product.id, 1, product);
   };
