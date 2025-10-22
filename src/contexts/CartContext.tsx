@@ -33,6 +33,7 @@ const useCartHook = () => {
   return context;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { useCartHook as useCart };
 
 interface CartProviderProps {
@@ -51,14 +52,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Load cart data on mount
   useEffect(() => {
     loadCart();
-  }, []); // loadCart is stable as it doesn't depend on state
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // loadCart is intentionally called only on mount
 
   // Save cart to localStorage whenever cart changes
   useEffect(() => {
     if (cart.length > 0 || cartCount > 0) {
       saveCartToLocalStorage();
     }
-  }, [cart, cartCount, totalPrice]); // saveCartToLocalStorage is stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart, cartCount, totalPrice]); // saveCartToLocalStorage is intentionally not included
 
   const saveCartToLocalStorage = () => {
     const cartData = {

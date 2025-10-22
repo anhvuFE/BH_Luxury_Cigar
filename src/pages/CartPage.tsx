@@ -107,7 +107,7 @@ const CartPage: React.FC = () => {
       if (cartData) {
         try {
           const parsedCart = JSON.parse(cartData);
-          const cleanCart = parsedCart.filter((item: any) => item.productId && item.productId !== 'undefined');
+          const cleanCart = parsedCart.filter((item: { productId?: string }) => item.productId && item.productId !== 'undefined');
           localStorage.setItem('bh_luxury_cart', JSON.stringify(cleanCart));
           window.location.reload(); // Force reload to refresh cart
         } catch (error) {
@@ -202,8 +202,8 @@ const CartPage: React.FC = () => {
 
       // Check if it's a 404 error from the network request
       if (errorMessage.includes('404') ||
-          (error instanceof Error && 'cause' in error && (error.cause as any)?.status === 404) ||
-          (error as any)?.status === 404) {
+          (error instanceof Error && 'cause' in error && (error.cause as { status?: number })?.status === 404) ||
+          (error as { status?: number })?.status === 404) {
         // API endpoint not implemented yet
         showToast("Đặt hàng thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.", "success");
 

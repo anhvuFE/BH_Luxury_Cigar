@@ -28,11 +28,11 @@ export interface Product {
   name: string;
   brand: string;
   price: number;
-  image: string;
+  image?: string;
   category: string;
-  inStock: boolean;
-  isNew: boolean;
-  isFeatured: boolean;
+  inStock?: boolean;
+  isNew?: boolean;
+  isFeatured?: boolean;
   description?: string;
   specifications?: Record<string, string>;
 }
@@ -108,18 +108,18 @@ class AdminService {
         specifications?: string;
       }
 
-      return (response as any).data.map((product: ApiProduct) => ({
+      return (response as { data: ApiProduct[] }).data.map((product: ApiProduct) => ({
         _id: product.id,
         name: product.name,
         brand: product.brand || 'Unknown',
         price: product.price,
         image: product.image,
         category: product.category || 'Uncategorized',
-        inStock: product.inStock,
-        isNew: product.isNew,
-        isFeatured: product.isFeatured,
+        inStock: product.inStock || false,
+        isNew: product.isNew || false,
+        isFeatured: product.isFeatured || false,
         description: product.description,
-        specifications: product.specifications
+        specifications: product.specifications ? { spec: product.specifications } : undefined
       }));
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -130,7 +130,7 @@ class AdminService {
   async createProduct(productData: Partial<Product>): Promise<Product> {
     try {
       const response = await apiService.post('/products', productData);
-      return (response as any).data;
+      return (response as { data: Product }).data;
     } catch (error) {
       console.error('Error creating product:', error);
       throw error;
@@ -140,7 +140,7 @@ class AdminService {
   async updateProduct(id: string, productData: Partial<Product>): Promise<Product> {
     try {
       const response = await apiService.put(`/products/${id}`, productData);
-      return (response as any).data;
+      return (response as { data: Product }).data;
     } catch (error) {
       console.error('Error updating product:', error);
       throw error;

@@ -70,7 +70,8 @@ const CollectionsPage: React.FC = () => {
   useEffect(() => {
     loadCategories();
     loadProducts(1, 9); // Load first page
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);  // loadProducts is intentionally not included
 
   // Debounced filter function
   const debouncedFilter = useCallback(() => {
@@ -93,7 +94,8 @@ const CollectionsPage: React.FC = () => {
   // Load products when pagination changes
   useEffect(() => {
     loadProducts(pagination.currentPage, pagination.limit);
-  }, [pagination.currentPage, pagination.limit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.currentPage, pagination.limit]);  // loadProducts is intentionally not included
 
 
   const loadProducts = async (page: number = 1, limit: number = 9, categories?: string[], isFilter = false) => {
@@ -171,7 +173,7 @@ const CollectionsPage: React.FC = () => {
 
       // Calculate price range from all products for filter
       if (productsData.length > 0) {
-        const prices = productsData.map((p: any) => p.price || 0);
+        const prices = productsData.map((p: Product) => p.price || 0);
         const minP = Math.min(...prices);
         const maxP = Math.max(...prices);
 

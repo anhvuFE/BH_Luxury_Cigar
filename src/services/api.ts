@@ -8,7 +8,7 @@ interface RequestOptions {
 }
 
 class ApiService {
-  private axiosInstance: any;
+  private axiosInstance: ReturnType<typeof axios.create>;
   private token: string | null = null;
 
   constructor() {
@@ -31,7 +31,7 @@ class ApiService {
         }
         return config;
       },
-      (error: any) => {
+      (error: unknown) => {
         return Promise.reject(error);
       }
     );
@@ -41,9 +41,9 @@ class ApiService {
       (response: any) => {
         return response;
       },
-      (error: any) => {
+      (error: unknown) => {
         // Handle 401 Unauthorized specifically
-        if (error.response?.status === 401) {
+        if ((error as any)?.response?.status === 401) {
           this.clearToken();
           // Optionally redirect to login page
           if (typeof window !== 'undefined') {
@@ -52,9 +52,9 @@ class ApiService {
         }
 
         // Enhance error message
-        const message = error.response?.data?.message ||
-                       error.response?.data?.error ||
-                       error.message ||
+        const message = (error as any)?.response?.data?.message ||
+                       (error as any)?.response?.data?.error ||
+                       (error as any)?.message ||
                        'An unexpected error occurred';
 
         return Promise.reject(new Error(message));
@@ -73,7 +73,7 @@ class ApiService {
   }
 
   // Generic request method
-  async request<T = unknown>(endpoint: string, options: any = {}): Promise<T> {
+  async request<T = unknown>(endpoint: string, options: Record<string, unknown> = {}): Promise<T> {
     const response = await this.axiosInstance.request({
       url: endpoint,
       ...options,
