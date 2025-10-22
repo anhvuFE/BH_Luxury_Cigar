@@ -215,7 +215,7 @@ const ProfilePage: React.FC = () => {
       const response = await authService.request('/orders/myorders/total');
       const data = (response as any).data || response;
       setTotalSpending(data.totalSpent || 0);
-    } catch (error) {
+    } catch {
       setTotalSpending(0);
     }
   };
@@ -228,7 +228,7 @@ const ProfilePage: React.FC = () => {
 
       try {
         response = await authService.request('/orders/myorders');
-      } catch (error) {
+      } catch {
         // Fallback to order service
         const { orderService } = await import('../services/order.service');
         response = await orderService.getUserOrders();
@@ -236,7 +236,7 @@ const ProfilePage: React.FC = () => {
 
       const ordersData = (response as { data?: Order[] } & Order[]).data || (response as Order[]) || [];
       setOrders(ordersData);
-    } catch (error) {
+    } catch {
       setOrders([]);
     } finally {
       setTabLoading(false);

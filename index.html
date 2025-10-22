@@ -6,10 +6,24 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/src/assets/images/logo.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/src/assets/images/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Google Fonts - Soft & Friendly -->
+
+    <!-- Performance and Resource Hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="//images.unsplash.com">
+
+    <!-- Preload Critical Images -->
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" fetchpriority="high">
+    <link rel="preload" as="image" href="/src/assets/images/logo.png">
+
+    <!-- Google Fonts - Non-blocking Loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
+
+    <!-- Performance Meta Tags -->
+    <meta name="theme-color" content="#f59e0b">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>BH Luxury Cigar - Chuyên Gia Xì Gà & Rượu Cao Cấp</title>
     <meta name="description" content="BH Luxury Cigar - Cửa hàng xì gà và rượu cao cấp tại 138 Bình Hàn, TP Hải Dương. Chuyên cung cấp xì gà Cuba chính hãng, phụ kiện xì gà và rượu whisky nhập khẩu." />
   </head>

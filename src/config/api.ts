@@ -1,7 +1,7 @@
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   BASE_PATH: import.meta.env.VITE_API_BASE_PATH || '/api',
-  TIMEOUT: 30000,
+  TIMEOUT: 10000, // Reduced from 30s to 10s for faster failures
 };
 
 export const API_ENDPOINTS = {

@@ -77,8 +77,25 @@ export function useFeaturedProducts(limit: number = 6) {
       try {
         setLoading(true);
         setError(null);
+
+        // Check cache first
+        const cacheKey = `featured_products_${limit}`;
+        const cachedData = sessionStorage.getItem(cacheKey);
+        const cacheTime = sessionStorage.getItem(`${cacheKey}_time`);
+
+        // Use cache if less than 3 minutes old
+        if (cachedData && cacheTime && Date.now() - parseInt(cacheTime) < 180000) {
+          setProducts(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
+
         const data = await productService.getFeatured(limit);
         setProducts(data);
+
+        // Cache the result
+        sessionStorage.setItem(cacheKey, JSON.stringify(data));
+        sessionStorage.setItem(`${cacheKey}_time`, Date.now().toString());
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch featured products';
         setError(errorMessage);

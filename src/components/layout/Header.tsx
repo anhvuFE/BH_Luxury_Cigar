@@ -55,13 +55,13 @@ const Header: React.FC = () => {
         const response = await authService.getProfile();
 
         // Extract user data - API returns wrapped response {success: true, data: user}
-        const profile = response.data || response;
+        const profile = (response as any).data || response;
         setUser(profile);
 
         // Update localStorage with fresh data
         localStorage.setItem('user', JSON.stringify(profile));
         localStorage.setItem('userRole', profile?.role || 'user');
-      } catch (apiError) {
+      } catch {
         // Fallback to localStorage
         const userData = localStorage.getItem('user');
 
@@ -69,7 +69,7 @@ const Header: React.FC = () => {
           try {
             const localUser = JSON.parse(userData);
             setUser(localUser);
-          } catch (parseError) {
+          } catch {
             // Don't logout immediately, just clear user data
             setUser(null);
             setIsAuthenticated(false);
