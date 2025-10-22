@@ -7,7 +7,6 @@ import {
   HiOutlineCurrencyDollar,
   HiOutlineTrendingUp,
   HiOutlineTrendingDown,
-  HiOutlineEye,
   HiOutlineClock,
   HiOutlineCheckCircle,
   HiOutlineTruck,
@@ -75,41 +74,6 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
-  // Transform stats for display
-  const displayStats = [
-    {
-      name: 'Doanh thu tháng này',
-      value: formatCurrency(stats.monthlyRevenue),
-      change: '+12.5%',
-      changeType: 'increase',
-      subtitle: 'so với tháng trước',
-      icon: HiOutlineCurrencyDollar,
-    },
-    {
-      name: 'Tổng đơn hàng',
-      value: stats.totalOrders.toString(),
-      change: '+8.2%',
-      changeType: 'increase',
-      subtitle: 'đơn hàng',
-      icon: HiOutlineShoppingBag,
-    },
-    {
-      name: 'Khách hàng mới',
-      value: stats.newCustomers.toString(),
-      change: '+15.3%',
-      changeType: 'increase',
-      subtitle: 'khách hàng',
-      icon: HiOutlineUsers,
-    },
-    {
-      name: 'Tỷ lệ chuyển đổi',
-      value: `${stats.conversionRate}%`,
-      change: '+2.1%',
-      changeType: 'increase',
-      subtitle: 'hiệu suất',
-      icon: HiOutlineTrendingUp,
-    },
-  ];
 
   const recentOrders = stats.recentOrders;
   const topProducts = stats.topProducts;
@@ -188,7 +152,7 @@ const AdminDashboard: React.FC = () => {
               change: '+22%',
               subtitle: 'Doanh thu tháng này'
             }
-          ].map((stat, index) => (
+          ].map((stat) => (
             <div
               key={stat.name}
               className="bg-white rounded-2xl border border-amber-100 p-6 hover:shadow-lg transition-all duration-300 hover:border-amber-200"

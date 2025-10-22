@@ -18,6 +18,12 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}
+
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
@@ -128,7 +134,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
 // Sidebar content component
 const SidebarContent: React.FC<{
-  navigation: any[];
+  navigation: NavigationItem[];
   isActivePath: (path: string) => boolean;
 }> = ({ navigation, isActivePath }) => {
   return (

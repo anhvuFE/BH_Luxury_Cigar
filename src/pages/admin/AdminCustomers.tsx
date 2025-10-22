@@ -9,10 +9,6 @@ import {
   HiOutlineEye,
   HiOutlinePencil,
   HiOutlineTrash,
-  HiOutlineMail,
-  HiOutlinePhone,
-  HiOutlineLocationMarker,
-  HiChevronDown,
   HiChevronLeft,
   HiChevronRight,
   HiOutlineExclamationCircle
@@ -80,9 +76,6 @@ const AdminCustomers: React.FC = () => {
     }).format(price);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('vi-VN');
-  };
 
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

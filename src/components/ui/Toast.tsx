@@ -132,7 +132,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-[9999] pointer-events-none">
+    <div className="fixed top-20 right-4 z-[99999] pointer-events-none">
       <div className="pointer-events-auto">
         {toasts.map((toast) => (
           <ToastItem

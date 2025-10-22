@@ -3,15 +3,10 @@ import AdminLayout from '../../components/admin/AdminLayout';
 import {
   HiOutlineChartBar,
   HiOutlineTrendingUp,
-  HiOutlineTrendingDown,
   HiOutlineCurrencyDollar,
   HiOutlineShoppingBag,
   HiOutlineUsers,
-  HiOutlineClock,
-  HiOutlineCalendar,
-  HiOutlineDownload,
-  HiOutlineRefresh,
-  HiChevronDown
+  HiOutlineDownload
 } from 'react-icons/hi';
 import Select from '../../components/common/Select';
 
@@ -102,7 +97,12 @@ const AdminAnalytics: React.FC = () => {
     }
   };
 
-  const SimpleChart = ({ data, color }: { data: any[], color: string }) => {
+  interface ChartData {
+    period: string;
+    value: number;
+  }
+
+  const SimpleChart = ({ data, color }: { data: ChartData[], color: string }) => {
     const maxValue = Math.max(...data.map(d => d.value));
 
     return (

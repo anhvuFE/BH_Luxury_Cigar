@@ -6,7 +6,6 @@ import {
   HiOutlineEye,
   HiOutlinePencil,
   HiOutlineDownload,
-  HiChevronDown,
   HiOutlineCalendar,
   HiOutlineCurrencyDollar
 } from 'react-icons/hi';
@@ -91,7 +90,6 @@ const AdminOrders: React.FC = () => {
   ];
 
   const statuses = ['all', 'pending', 'confirmed', 'shipping', 'delivered', 'cancelled'];
-  const dateFilters = ['all', 'today', 'week', 'month', 'quarter'];
 
   const getStatusColor = (status: string) => {
     switch (status) {

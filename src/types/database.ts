@@ -108,26 +108,52 @@ export interface BlogPost {
 
 export interface Order {
   id: string;
-  user_id: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  user_id?: string;
+  user?: string | UserProfile;
+
+  // Status fields - API response format
+  status?: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  orderStatus?: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  payment_status?: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentStatus?: 'pending' | 'paid' | 'failed' | 'refunded';
+
+  // Payment
   payment_method?: string;
-  subtotal: number;
-  tax_amount: number;
-  shipping_amount: number;
-  discount_amount: number;
-  total_amount: number;
-  currency: string;
-  shipping_address: Record<string, unknown>;
+  paymentMethod?: string;
+
+  // Pricing - support both formats
+  subtotal?: number;
+  tax_amount?: number;
+  shipping_amount?: number;
+  discount_amount?: number;
+  total_amount?: number;
+  totalPrice?: number;
+  itemsPrice?: number;
+  taxPrice?: number;
+  shippingPrice?: number;
+
+  currency?: string;
+
+  // Addresses
+  shipping_address?: Record<string, unknown>;
+  shippingAddress?: Record<string, unknown>;
   billing_address?: Record<string, unknown>;
+
+  // Other fields
   notes?: string;
   tracking_number?: string;
   coupon_code?: string;
-  created_at: string;
-  updated_at: string;
+  orderNumber?: string;
+  isPaid?: boolean;
+  isDelivered?: boolean;
+
+  // Dates - support both formats
+  created_at?: string;
+  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 
   // Relations
-  user?: UserProfile;
   items?: OrderItem[];
 }
 

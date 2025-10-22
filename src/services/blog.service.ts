@@ -20,11 +20,11 @@ export interface PaginatedBlogPosts {
 
 class BlogService {
   async getAll(filters?: BlogFilters): Promise<PaginatedBlogPosts> {
-    return apiService.get<PaginatedBlogPosts>(API_ENDPOINTS.BLOG.LIST, filters);
+    return apiService.get<PaginatedBlogPosts>(API_ENDPOINTS.BLOG.LIST, filters as Record<string, string | number | boolean>);
   }
 
   async getPublished(filters?: Omit<BlogFilters, 'status'>): Promise<PaginatedBlogPosts> {
-    return apiService.get<PaginatedBlogPosts>(API_ENDPOINTS.BLOG.PUBLISHED, filters);
+    return apiService.get<PaginatedBlogPosts>(API_ENDPOINTS.BLOG.PUBLISHED, filters as Record<string, string | number | boolean>);
   }
 
   async getById(id: string): Promise<BlogPost> {

@@ -7,8 +7,7 @@ import {
   HiOutlineFilter,
   HiOutlinePencil,
   HiOutlineTrash,
-  HiOutlineEye,
-  HiChevronDown
+  HiOutlineEye
 } from 'react-icons/hi';
 import { useToast } from '../../hooks/useToast';
 import Select from '../../components/common/Select';
@@ -302,8 +301,8 @@ const AdminProducts: React.FC = () => {
                       <div className="text-sm font-medium text-gray-900">{formatPrice(product.price)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(product.inStock)}`}>
-                        {getStatusText(product.inStock)}
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(product.inStock || false)}`}>
+                        {getStatusText(product.inStock || false)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

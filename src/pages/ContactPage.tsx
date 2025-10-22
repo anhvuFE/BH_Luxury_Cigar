@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HiOutlinePhone, HiOutlineMail, HiOutlineLocationMarker, HiOutlineClock, HiOutlinePaperAirplane } from 'react-icons/hi';
+import { HiOutlineLocationMarker, HiOutlineClock, HiOutlinePaperAirplane } from 'react-icons/hi';
 import { storeInfo } from '../data/storeData';
 import { useToast } from '../hooks/useToast';
 import Select from '../components/common/Select';

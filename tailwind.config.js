@@ -24,12 +24,12 @@ export default {
         }
       },
       fontFamily: {
-        'inter': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        'heading': ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
-        'body': ['Source Sans Pro', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        'luxury': ['Crimson Text', 'Georgia', 'Times New Roman', 'serif'],
-        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        'serif': ['Merriweather', 'Georgia', 'Times New Roman', 'serif'],
+        'inter': ['ui-rounded', 'Nunito', 'Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'heading': ['ui-rounded', 'Nunito', 'Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'body': ['ui-rounded', 'Nunito', 'Lato', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'luxury': ['Playfair Display', 'Georgia', 'Times New Roman', 'Times', 'serif'],
+        'sans': ['ui-rounded', 'Nunito', 'Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'serif': ['Playfair Display', 'Georgia', 'Times New Roman', 'Times', 'serif'],
       },
     },
   },

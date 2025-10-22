@@ -23,8 +23,9 @@ export function useProducts(options: UseProductsOptions = {}) {
       });
       setProducts(response.data);
       setTotalPages(response.totalPages);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch products');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch products';
+      setError(errorMessage);
       console.error('Error fetching products:', err);
     } finally {
       setLoading(false);
@@ -35,7 +36,8 @@ export function useProducts(options: UseProductsOptions = {}) {
     if (options.autoFetch !== false) {
       fetchProducts();
     }
-  }, [currentPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, options.autoFetch]);
 
   const refetch = () => fetchProducts();
 
@@ -77,8 +79,9 @@ export function useFeaturedProducts(limit: number = 6) {
         setError(null);
         const data = await productService.getFeatured(limit);
         setProducts(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch featured products');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch featured products';
+        setError(errorMessage);
         console.error('Error fetching featured products:', err);
       } finally {
         setLoading(false);
@@ -112,8 +115,9 @@ export function useProduct(idOrSlug: string, isSlug: boolean = false) {
           ? await productService.getBySlug(idOrSlug)
           : await productService.getById(idOrSlug);
         setProduct(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch product');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch product';
+        setError(errorMessage);
         console.error('Error fetching product:', err);
       } finally {
         setLoading(false);
@@ -137,8 +141,9 @@ export function useProductSearch() {
       setError(null);
       const response = await productService.search(query, filters);
       setProducts(response.data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to search products');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to search products';
+      setError(errorMessage);
       console.error('Error searching products:', err);
     } finally {
       setLoading(false);

@@ -6,6 +6,7 @@ import { FaStar, FaShieldAlt } from "react-icons/fa";
 import { useFeaturedProducts } from "../../hooks/useProducts";
 import { useCart } from "../../contexts/CartContext";
 import { useToast } from "../../hooks/useToast";
+import type { Product } from "../../types/database";
 import "../../styles/animations.css";
 
 const Products: React.FC = () => {
@@ -22,8 +23,8 @@ const Products: React.FC = () => {
   };
 
   // View product details
-  const handleViewProduct = (product: any) => {
-    const productSlug = product.slug || product.id;
+  const handleViewProduct = (product: Product) => {
+    const productSlug = product.slug || product.id || product._id;
     if (!productSlug) {
       showError('ID sản phẩm không hợp lệ');
       return;
@@ -33,12 +34,13 @@ const Products: React.FC = () => {
 
 
   // Add to cart
-  const handleAddToCart = async (product: any) => {
-    if (!product.id) {
+  const handleAddToCart = async (product: Product) => {
+    const productId = product.id || product._id;
+    if (!productId) {
       return;
     }
 
-    await addToCart(product.id, 1, product);
+    await addToCart(productId, 1, product);
   };
 
   if (loading) {

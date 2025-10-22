@@ -35,22 +35,24 @@
 .floating-smoke-3 { animation-delay: 4s; }
 .floating-smoke-4 { animation-delay: 6s; }
 
-/* Cigar Burning Glow Effect */
+/* Cigar Burning Glow Effect - DISABLED */
+/*
 @keyframes cigarGlow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4),
-                0 0 40px rgba(245, 158, 11, 0.2),
-                inset 0 0 20px rgba(245, 158, 11, 0.1);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3),
+                0 0 20px rgba(245, 158, 11, 0.15),
+                inset 0 0 10px rgba(245, 158, 11, 0.1);
   }
   50% {
-    box-shadow: 0 0 40px rgba(245, 158, 11, 0.8),
-                0 0 80px rgba(245, 158, 11, 0.4),
-                inset 0 0 40px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.6),
+                0 0 25px rgba(245, 158, 11, 0.3),
+                inset 0 0 15px rgba(245, 158, 11, 0.2);
   }
 }
+*/
 
 .cigar-glow {
-  animation: cigarGlow 3s ease-in-out infinite;
+  /* animation: cigarGlow 3s ease-in-out infinite; */
 }
 
 /* Luxury Text Reveal */
@@ -83,7 +85,7 @@
     opacity: 0.6;
   }
   50% {
-    transform: rotate(180deg) scale(1.1);
+    transform: rotate(180deg) scale(1.02);
     opacity: 1;
   }
   100% {

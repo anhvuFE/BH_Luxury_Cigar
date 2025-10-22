@@ -24,6 +24,17 @@ const ProductDetailPage: React.FC = () => {
   const shouldFetch = id && id.trim() !== '' && id !== 'undefined';
   const { product, loading, error } = useProduct(shouldFetch ? id : '__skip__', false);
 
+  useEffect(() => {
+    if (error && !loading) {
+      showError('Không thể tải thông tin sản phẩm');
+    }
+  }, [error, loading, showError]);
+
+  // Reset image errors when product changes
+  useEffect(() => {
+    setImageErrors(new Set());
+  }, [product]);
+
   // Early return if no ID or invalid ID
   if (!shouldFetch) {
     return (
@@ -44,17 +55,6 @@ const ProductDetailPage: React.FC = () => {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (error && !loading) {
-      showError('Không thể tải thông tin sản phẩm');
-    }
-  }, [error, loading]);
-
-  // Reset image errors when product changes
-  useEffect(() => {
-    setImageErrors(new Set());
-  }, [product]);
 
 
   // Add to cart
@@ -177,7 +177,7 @@ const ProductDetailPage: React.FC = () => {
                 src={imageErrors.has(selectedImageIndex) ? '/assets/images/placeholder.png' : productImages[selectedImageIndex]}
                 alt={product.name}
                 className="w-full h-full object-contain p-4"
-                onError={(e) => {
+                onError={() => {
                   if (!imageErrors.has(selectedImageIndex)) {
                     setImageErrors(prev => new Set([...prev, selectedImageIndex]));
                   }
@@ -202,7 +202,7 @@ const ProductDetailPage: React.FC = () => {
                       src={imageErrors.has(index) ? '/assets/images/placeholder.png' : image}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-full object-contain bg-gray-50"
-                      onError={(e) => {
+                      onError={() => {
                         if (!imageErrors.has(index)) {
                           setImageErrors(prev => new Set([...prev, index]));
                         }
