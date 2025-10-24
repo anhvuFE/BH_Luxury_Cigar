@@ -27,13 +27,19 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+
+    // Prevent infinite loop - if already showing placeholder, don't try again
+    if (target.src.includes('placeholder.png')) {
+      return;
+    }
+
     setImageError(true);
     if (onError) {
       onError(e);
     } else {
       // Default fallback
-      const target = e.target as HTMLImageElement;
-      target.src = '/src/assets/images/placeholder.png';
+      target.src = '/images/placeholder.png';
     }
   };
 

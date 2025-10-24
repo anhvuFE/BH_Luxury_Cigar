@@ -17,7 +17,7 @@ export const blogPosts: BlogPost[] = [
 
       Việc bảo quản đúng cách sẽ giúp xì gà của bạn luôn trong tình trạng tốt nhất.
     `,
-    image: '/src/assets/images/BV/1.png',
+    image: '/images/BV/1.png',
     author: 'BH Luxury Cigar',
     publishDate: '2024-03-15',
     category: 'Hướng dẫn',
@@ -39,7 +39,7 @@ export const blogPosts: BlogPost[] = [
 
       Mỗi thương hiệu đều có đặc trưng riêng và phù hợp với từng sở thích.
     `,
-    image: '/src/assets/images/BV/2.png',
+    image: '/images/BV/2.png',
     author: 'BH Luxury Cigar',
     publishDate: '2024-03-10',
     category: 'Kiến thức',
@@ -61,7 +61,7 @@ export const blogPosts: BlogPost[] = [
 
       Hãy bắt đầu với những điếu nhẹ và từ từ khám phá.
     `,
-    image: '/src/assets/images/BV/3.png',
+    image: '/images/BV/3.png',
     author: 'BH Luxury Cigar',
     publishDate: '2024-03-05',
     category: 'Hướng dẫn',

@@ -9,7 +9,8 @@ export {
   FaQuoteLeft,
   FaChevronLeft,
   FaChevronRight,
-  FaPlay
+  FaPlay,
+  FaUsers
 } from "react-icons/fa";
 
 export {

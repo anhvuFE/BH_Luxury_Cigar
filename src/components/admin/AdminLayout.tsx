@@ -145,7 +145,7 @@ const SidebarContent: React.FC<{
           <Link to="/" className="flex items-center">
             <img
               className="h-10 w-auto"
-              src="/src/assets/images/logo.png"
+              src="/images/logo.png"
               alt="BH Luxury Cigar"
             />
             <div className="ml-3">

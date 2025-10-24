@@ -89,24 +89,24 @@ const About: React.FC = () => {
             <div className="grid grid-cols-2 gap-2 sm:gap-4">
               <div className="space-y-2 sm:space-y-4">
                 <img
-                  src="/src/assets/images/about1.jpg"
+                  src="/images/about1.jpg"
                   alt="BH Luxury Cigar Store"
                   className="w-full h-32 sm:h-40 lg:h-48 object-cover rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105"
                 />
                 <img
-                  src="/src/assets/images/about2.jpg"
+                  src="/images/about2.jpg"
                   alt="Cigar Collection"
                   className="w-full h-24 sm:h-28 lg:h-32 object-cover rounded-lg shadow-lg"
                 />
               </div>
               <div className="space-y-2 sm:space-y-4 pt-4 sm:pt-6 lg:pt-8">
                 <img
-                  src="/src/assets/images/about3.jpg"
+                  src="/images/about3.jpg"
                   alt="Premium Cigars"
                   className="w-full h-24 sm:h-28 lg:h-32 object-cover rounded-lg shadow-lg"
                 />
                 <img
-                  src="/src/assets/images/about4.jpg"
+                  src="/images/about4.jpg"
                   alt="Cigar Expert"
                   className="w-full h-32 sm:h-40 lg:h-48 object-cover rounded-lg shadow-lg"
                 />

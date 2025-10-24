@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   HiOutlineSearch,
@@ -8,9 +8,11 @@ import {
   HiOutlineLogin,
   HiOutlineLogout,
   HiOutlineUser,
+  HiOutlineEye,
 } from "react-icons/hi";
 import authService from "../../services/auth.service";
 import { useCart } from "../../contexts/CartContext";
+import apiService from "../../services/api";
 
 interface User {
   id?: string;
@@ -24,25 +26,72 @@ interface User {
   updated_at?: string;
 }
 
+interface SearchProduct {
+  _id: string;
+  name: string;
+  price: number;
+  discountedPrice?: number;
+  images?: string[];
+  category?: string;
+}
+
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const navigate = useNavigate();
   const { cartCount } = useCart();
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchResultsRef = useRef<HTMLDivElement>(null);
 
   const navigation = [
     { name: "Trang chủ", href: "/" },
     { name: "Sản phẩm", href: "/collections" },
+    { name: "Hướng dẫn", href: "/guide" },
     { name: "Tin tức", href: "/blog" },
     { name: "Về chúng tôi", href: "/about" },
-    { name: "Liên hệ", href: "/contact" },
   ];
 
   useEffect(() => {
     checkAuthStatus();
+  }, []);
+
+  // Handle search query changes with debounce
+  useEffect(() => {
+    if (searchQuery.trim().length > 1) {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      searchTimeoutRef.current = setTimeout(() => {
+        performSearch(searchQuery.trim());
+      }, 300);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
+
+  // Handle click outside to close search results
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchResultsRef.current && !searchResultsRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const checkAuthStatus = async () => {
@@ -101,10 +150,42 @@ const Header: React.FC = () => {
     }
   };
 
+  const performSearch = async (query: string) => {
+    setIsSearching(true);
+    setShowResults(true); // Always show dropdown when searching
+    try {
+      const response = await apiService.get(`/products?search=${encodeURIComponent(query)}&limit=5`);
+      console.log('Search response:', response); // Debug log
+
+      // Handle different response structures
+      let products = [];
+      if (response.data) {
+        if (Array.isArray(response.data)) {
+          products = response.data;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          products = response.data.data;
+        } else if (response.data.products && Array.isArray(response.data.products)) {
+          products = response.data.products;
+        }
+      }
+
+      setSearchResults(products.slice(0, 5));
+      setShowResults(true);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+      setShowResults(true); // Still show dropdown with "no results" message
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const handleSearchToggle = () => {
     setIsSearchOpen(!isSearchOpen);
     if (isSearchOpen) {
       setSearchQuery('');
+      setSearchResults([]);
+      setShowResults(false);
     } else {
       // Close mobile menu when opening search
       setIsMenuOpen(false);
@@ -117,7 +198,13 @@ const Header: React.FC = () => {
       navigate(`/collections?search=${encodeURIComponent(searchQuery.trim())}`);
       setIsSearchOpen(false);
       setSearchQuery('');
+      setSearchResults([]);
+      setShowResults(false);
     }
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
   };
 
   return (
@@ -130,9 +217,9 @@ const Header: React.FC = () => {
           <div className="flex justify-start">
             <Link to="/" className="flex items-center">
               <img
-                src="/src/assets/images/logo.png"
+                src="/images/logo.png"
                 alt="BH Luxury Cigar Logo"
-                className="h-10 w-auto"
+                className="h-20 w-auto"
               />
             </Link>
           </div>
@@ -153,13 +240,14 @@ const Header: React.FC = () => {
                 ))}
               </nav>
             ) : (
-              // Search input - shown when search is opened
+              // Search input with dropdown - shown when search is opened
               <form onSubmit={handleSearchSubmit} className="flex items-center h-full">
-                <div className="relative">
+                <div className="relative" ref={searchResultsRef}>
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => searchQuery.trim().length > 1 && searchResults.length > 0 && setShowResults(true)}
                     placeholder="Tìm kiếm sản phẩm..."
                     className="w-80 h-10 px-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-sm"
                     autoFocus
@@ -170,6 +258,88 @@ const Header: React.FC = () => {
                   >
                     <HiOutlineSearch className="w-4 h-4 text-gray-400" />
                   </button>
+
+                  {/* Search Results Dropdown */}
+                  {showResults && searchQuery.trim().length > 1 && (
+                    <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-lg shadow-2xl border border-gray-200 max-h-96 overflow-y-auto z-50">
+                      {isSearching ? (
+                        <div className="p-4 text-center text-gray-500">
+                          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500"></div>
+                          <p className="mt-2 text-sm">Đang tìm kiếm...</p>
+                        </div>
+                      ) : searchResults.length > 0 ? (
+                        <>
+                          {searchResults.map((product) => (
+                            <Link
+                              key={product._id}
+                              to={`/products/${product._id}`}
+                              className="flex items-center p-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                              onClick={() => {
+                                setIsSearchOpen(false);
+                                setSearchQuery('');
+                                setShowResults(false);
+                              }}
+                            >
+                              <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                {product.images && product.images[0] ? (
+                                  <img
+                                    src={product.images[0].startsWith('http') ? product.images[0] : `/images/${product.images[0]}`}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = '/images/placeholder.png';
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <HiOutlineEye className="w-6 h-6 text-gray-400" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="ml-3 flex-1">
+                                <h4 className="text-sm font-medium text-gray-900 line-clamp-1">{product.name}</h4>
+                                <div className="flex items-center space-x-2 mt-1">
+                                  {product.discountedPrice ? (
+                                    <>
+                                      <span className="text-sm font-semibold text-amber-600">
+                                        {formatPrice(product.discountedPrice)}
+                                      </span>
+                                      <span className="text-xs text-gray-400 line-through">
+                                        {formatPrice(product.price)}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="text-sm font-semibold text-gray-900">
+                                      {formatPrice(product.price)}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                          <Link
+                            to={`/collections?search=${encodeURIComponent(searchQuery.trim())}`}
+                            className="block p-3 text-center text-sm font-medium text-amber-600 hover:bg-amber-50 border-t border-gray-200"
+                            onClick={() => {
+                              setIsSearchOpen(false);
+                              setSearchQuery('');
+                              setShowResults(false);
+                            }}
+                          >
+                            Xem tất cả kết quả cho "{searchQuery}"
+                          </Link>
+                        </>
+                      ) : (
+                        <div className="p-8 text-center">
+                          <div className="text-gray-400 mb-2">
+                            <HiOutlineSearch className="w-12 h-12 mx-auto" />
+                          </div>
+                          <p className="text-gray-600 font-medium">Không tìm thấy sản phẩm</p>
+                          <p className="text-sm text-gray-400 mt-1">Thử tìm kiếm với từ khóa khác</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -307,11 +477,12 @@ const Header: React.FC = () => {
         {isSearchOpen && (
           <div className="lg:hidden bg-gray-800 border-t border-gray-700 py-4 px-4">
             <form onSubmit={handleSearchSubmit} className="flex items-center">
-              <div className="relative flex-1">
+              <div className="relative flex-1" ref={searchResultsRef}>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery.trim().length > 1 && searchResults.length > 0 && setShowResults(true)}
                   placeholder="Tìm kiếm sản phẩm..."
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                   autoFocus
@@ -322,6 +493,90 @@ const Header: React.FC = () => {
                 >
                   <HiOutlineSearch className="w-5 h-5 text-gray-400" />
                 </button>
+
+                {/* Mobile Search Results Dropdown */}
+                {showResults && searchQuery.trim().length > 1 && (
+                  <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-lg shadow-2xl border border-gray-200 max-h-96 overflow-y-auto z-50">
+                    {isSearching ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500"></div>
+                        <p className="mt-2 text-sm">Đang tìm kiếm...</p>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <>
+                        {searchResults.map((product) => (
+                          <Link
+                            key={product._id}
+                            to={`/products/${product._id}`}
+                            className="flex items-center p-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            onClick={() => {
+                              setIsSearchOpen(false);
+                              setSearchQuery('');
+                              setShowResults(false);
+                              setIsMenuOpen(false);
+                            }}
+                          >
+                            <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                              {product.images && product.images[0] ? (
+                                <img
+                                  src={product.images[0].startsWith('http') ? product.images[0] : `/images/${product.images[0]}`}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/images/placeholder.png';
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <HiOutlineEye className="w-6 h-6 text-gray-400" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="ml-3 flex-1">
+                              <h4 className="text-sm font-medium text-gray-900 line-clamp-1">{product.name}</h4>
+                              <div className="flex items-center space-x-2 mt-1">
+                                {product.discountedPrice ? (
+                                  <>
+                                    <span className="text-sm font-semibold text-amber-600">
+                                      {formatPrice(product.discountedPrice)}
+                                    </span>
+                                    <span className="text-xs text-gray-400 line-through">
+                                      {formatPrice(product.price)}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="text-sm font-semibold text-gray-900">
+                                    {formatPrice(product.price)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                        <Link
+                          to={`/collections?search=${encodeURIComponent(searchQuery.trim())}`}
+                          className="block p-3 text-center text-sm font-medium text-amber-600 hover:bg-amber-50 border-t border-gray-200"
+                          onClick={() => {
+                            setIsSearchOpen(false);
+                            setSearchQuery('');
+                            setShowResults(false);
+                            setIsMenuOpen(false);
+                          }}
+                        >
+                          Xem tất cả kết quả cho "{searchQuery}"
+                        </Link>
+                      </>
+                    ) : (
+                      <div className="p-8 text-center">
+                        <div className="text-gray-400 mb-2">
+                          <HiOutlineSearch className="w-12 h-12 mx-auto" />
+                        </div>
+                        <p className="text-gray-600 font-medium">Không tìm thấy sản phẩm</p>
+                        <p className="text-sm text-gray-400 mt-1">Thử tìm kiếm với từ khóa khác</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <button
                 type="button"

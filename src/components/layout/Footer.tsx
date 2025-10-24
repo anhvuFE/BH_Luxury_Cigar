@@ -72,8 +72,8 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-400 hover:text-amber-400 transition-colors text-sm">
-                  Liên hệ
+                <Link to="/guide" className="text-gray-400 hover:text-amber-400 transition-colors text-sm">
+                  Hướng dẫn
                 </Link>
               </li>
             </ul>

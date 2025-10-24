@@ -6,7 +6,7 @@ const STATIC_CACHE_NAME = 'bh-static-v1';
 const STATIC_ASSETS = [
   '/',
   '/src/index.css',
-  '/src/assets/images/logo.png'
+  '/images/logo.png'
 ];
 
 // Unsplash images to cache

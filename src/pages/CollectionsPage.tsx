@@ -18,9 +18,9 @@ const CollectionsPage: React.FC = () => {
   const [sortBy, setSortBy] = useState('Date, new to old');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000000]);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(100000000);
   const [inStockOnly, setInStockOnly] = useState(false);
 
   // Define interfaces for type safety
@@ -69,6 +69,7 @@ const CollectionsPage: React.FC = () => {
   // Load data from API
   useEffect(() => {
     loadCategories();
+    loadAllProductsForPriceRange(); // Load all products to get price range
     loadProducts(1, 9); // Load first page
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);  // loadProducts is intentionally not included
@@ -89,7 +90,7 @@ const CollectionsPage: React.FC = () => {
     const cleanup = debouncedFilter();
     return cleanup;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);  // Only depends on filter changes, not the function itself
+  }, [searchQuery, sortBy, selectedCategories, priceRange, inStockOnly]);  // Re-run when filters change
 
   // Load products when pagination changes
   useEffect(() => {
@@ -126,7 +127,7 @@ const CollectionsPage: React.FC = () => {
       }
 
       // Add price range filter
-      if (priceRange[0] !== minPrice || priceRange[1] !== maxPrice) {
+      if (priceRange[0] > 0 || priceRange[1] < maxPrice) {
         params.append('minPrice', priceRange[0].toString());
         params.append('maxPrice', priceRange[1].toString());
       }
@@ -171,19 +172,7 @@ const CollectionsPage: React.FC = () => {
       setProducts(productsData);
       pagination.setTotalItems(total);
 
-      // Calculate price range from all products for filter
-      if (productsData.length > 0) {
-        const prices = productsData.map((p: Product) => p.price || 0);
-        const minP = Math.min(...prices);
-        const maxP = Math.max(...prices);
-
-        // Only set price range on first load
-        if (minPrice === 0 && maxPrice === 0) {
-          setMinPrice(minP);
-          setMaxPrice(maxP);
-          setPriceRange([minP, maxP]);
-        }
-      }
+      // Don't recalculate price range here, it's already set from all products
 
 
 
@@ -212,6 +201,29 @@ const CollectionsPage: React.FC = () => {
     } catch (error) {
       console.error('Error loading categories:', error);
       setCategories([]);
+    }
+  };
+
+  // Load all products just to get price range
+  const loadAllProductsForPriceRange = async () => {
+    try {
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.BASE_PATH}${API_ENDPOINTS.PRODUCTS.LIST}?limit=1000`);
+      const responseData = response.data;
+      const allProducts = Array.isArray(responseData) ? responseData :
+                         (responseData.data || responseData.products || []);
+
+      if (allProducts.length > 0) {
+        const prices = allProducts.map((p: Product) => p.price || 0).filter(p => p > 0);
+        if (prices.length > 0) {
+          const minP = Math.floor(Math.min(...prices));
+          const maxP = Math.ceil(Math.max(...prices));
+          setMinPrice(minP);
+          setMaxPrice(maxP);
+          setPriceRange([minP, maxP]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading products for price range:', error);
     }
   };
 
@@ -335,6 +347,10 @@ const CollectionsPage: React.FC = () => {
                           setPriceRange([newMinPrice, priceRange[1]]);
                         }
                       }}
+                      onMouseUp={() => {
+                        // Trigger filter immediately on mouse release
+                        loadProducts(1, pagination.limit, selectedCategories, true);
+                      }}
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
                     />
                   </div>
@@ -351,6 +367,10 @@ const CollectionsPage: React.FC = () => {
                         if (newMaxPrice >= priceRange[0]) {
                           setPriceRange([priceRange[0], newMaxPrice]);
                         }
+                      }}
+                      onMouseUp={() => {
+                        // Trigger filter immediately on mouse release
+                        loadProducts(1, pagination.limit, selectedCategories, true);
                       }}
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
                     />

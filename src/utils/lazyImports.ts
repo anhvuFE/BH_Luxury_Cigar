@@ -28,7 +28,7 @@ export const AdminSettings = createLazyComponent(() => import('../pages/admin/Ad
 // High priority pages - Prefetch for better UX
 export const ProfilePage = createLazyComponent(() => import('../pages/ProfilePage'), true);
 export const CartPage = createLazyComponent(() => import('../pages/CartPage'), true);
-export const ContactPage = createLazyComponent(() => import('../pages/ContactPage'), true);
+export const GuidePage = createLazyComponent(() => import('../pages/GuidePage'), true);
 export const AboutPage = createLazyComponent(() => import('../pages/AboutPage'), true);
 
 // Medium priority pages

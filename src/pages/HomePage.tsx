@@ -305,7 +305,7 @@ const HomePage = () => {
               {categories.map((category, index) => {
                 return (
                   <Link
-                    key={category._id}
+                    key={category._id || category.id || `category-${index}`}
                     to={`/collections?category=${
                       category.slug || category._id
                     }`}

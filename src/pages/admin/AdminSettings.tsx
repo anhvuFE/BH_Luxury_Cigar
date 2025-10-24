@@ -259,7 +259,7 @@ const AdminSettings: React.FC = () => {
                       </label>
                       <div className="flex items-center gap-4">
                         <img
-                          src="/src/assets/images/logo.png"
+                          src="/images/logo.png"
                           alt="Logo"
                           className="h-16 w-auto"
                         />

@@ -18,7 +18,7 @@ import {
   ProfilePage,
   CartPage,
   BlogPage,
-  ContactPage,
+  GuidePage,
   AboutPage,
   ProductDetailPage,
   LoginPage,
@@ -53,7 +53,7 @@ function AppContent() {
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/guide" element={<GuidePage />} />
           <Route path="/cart" element={<CartPage />} />
 
           {/* Authentication Pages */}

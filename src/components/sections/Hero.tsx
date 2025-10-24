@@ -10,7 +10,7 @@ const Hero: React.FC = () => {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: `url('/src/assets/images/placeholder.svg')`,
+          backgroundImage: `url('/images/placeholder.png')`,
         }}
       ></div>
       {/* Floating particles */}
@@ -98,7 +98,7 @@ const Hero: React.FC = () => {
             <div className="relative bg-gradient-to-br from-amber-500 to-amber-600 rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl hover:shadow-amber-500/30 transition-all duration-500 group">
               <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <img
-                src="/src/assets/images/placeholder.svg"
+                src="/images/placeholder.png"
                 alt="Premium Cigars"
                 className="relative z-10 w-full h-64 sm:h-80 lg:h-96 object-cover rounded-2xl shadow-lg group-hover:scale-105 transition-transform duration-700"
               />
