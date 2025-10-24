@@ -24,6 +24,7 @@ import {
   LoginPage,
   RegisterPage,
   ForgotPasswordPage,
+  ResetPasswordPage,
   AdminDashboard,
   AdminProducts,
   AdminOrders,
@@ -37,7 +38,7 @@ function AppContent() {
   const location = useLocation();
 
   // Define routes that should not have Header/Footer
-  const noLayoutRoutes = ['/login', '/register', '/forgot-password'];
+  const noLayoutRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
   const isAdminRoute = location.pathname.startsWith('/admin');
   const shouldShowLayout = !noLayoutRoutes.includes(location.pathname) && !isAdminRoute;
 
@@ -60,6 +61,7 @@ function AppContent() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* User Profile */}
           <Route path="/profile" element={<ProfilePage />} />
