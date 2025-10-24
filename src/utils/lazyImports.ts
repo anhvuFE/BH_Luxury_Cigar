@@ -39,3 +39,4 @@ export const BlogPage = createLazyComponent(() => import('../pages/BlogPage'));
 export const LoginPage = createLazyComponent(() => import('../pages/LoginPage'));
 export const RegisterPage = createLazyComponent(() => import('../pages/RegisterPage'));
 export const ForgotPasswordPage = createLazyComponent(() => import('../pages/ForgotPasswordPage'));
+export const ResetPasswordPage = createLazyComponent(() => import('../pages/ResetPasswordPage'));
