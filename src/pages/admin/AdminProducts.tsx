@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminService, type Product } from '../../services/admin.service';
+import { resolveImageUrl } from '../../utils/image';
 import {
   HiOutlinePlus,
   HiOutlineSearch,
@@ -11,9 +12,16 @@ import {
 } from 'react-icons/hi';
 import { useToast } from '../../hooks/useToast';
 import Select from '../../components/common/Select';
+import Pagination from '../../components/common/Pagination';
+import ProductDetailModal from '../../components/admin/ProductDetailModal';
+import ProductCreateModal from '../../components/admin/ProductCreateModal';
+import ProductEditModal from '../../components/admin/ProductEditModal';
+import ProductDeleteModal from '../../components/admin/ProductDeleteModal';
+
+const getProductIdentifier = (product: Product) => product.id || product._id || '';
 
 const AdminProducts: React.FC = () => {
-  const { showSuccess, showError, showWarning } = useToast();
+  const { showSuccess } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -21,17 +29,58 @@ const AdminProducts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const itemsPerPage = 9;
+
+  // Stock counts
+  const [inStockCount, setInStockCount] = useState(0);
+  const [outOfStockCount, setOutOfStockCount] = useState(0);
+  const [newProductsCount, setNewProductsCount] = useState(0);
+
+  // Modal states
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   // Fetch products from API
   useEffect(() => {
     fetchProducts();
+    fetchStockCounts();
   }, []);
 
-  const fetchProducts = async () => {
+  // Fetch all products to calculate stock counts
+  const fetchStockCounts = async () => {
+    try {
+      // Get all products by setting a high limit to get all products
+      const allProductsResponse = await adminService.getProducts(1, 1000);
+      const allProducts = allProductsResponse.data;
+
+      const inStock = allProducts.filter(p => p.inStock !== false).length;
+      const outOfStock = allProducts.filter(p => p.inStock === false).length;
+      const newProducts = allProducts.filter(p => p.isNew === true).length;
+
+      setInStockCount(inStock);
+      setOutOfStockCount(outOfStock);
+      setNewProductsCount(newProducts);
+    } catch (err) {
+      console.error('Error fetching stock counts:', err);
+    }
+  };
+
+  const fetchProducts = async (page = 1) => {
     try {
       setLoading(true);
       setError(null);
-      const productsData = await adminService.getProducts();
-      setProducts(productsData);
+      const response = await adminService.getProducts(page, itemsPerPage);
+      setProducts(response.data);
+      setTotalProducts(response.total);
+      setTotalPages(response.pagination.total);
+      setCurrentPage(page);
     } catch (err) {
       setError('Không thể tải danh sách sản phẩm');
       console.error('Error fetching products:', err);
@@ -40,22 +89,47 @@ const AdminProducts: React.FC = () => {
     }
   };
 
-  // Handle product deletion
-  const handleDeleteProduct = async (productId: string) => {
-    try {
-      await adminService.deleteProduct(productId);
-      setProducts(products.filter(p => p._id !== productId));
-      showSuccess('Xóa sản phẩm thành công!');
-    } catch (err) {
-      console.error('Error deleting product:', err);
-      showError('Không thể xóa sản phẩm');
-    }
+  // Modal handlers
+  const handleViewProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDetailModalOpen(true);
   };
 
-  const confirmDelete = (productId: string) => {
-    showWarning('Bạn có chắc chắn muốn xóa sản phẩm này không?');
-    // For now, we'll proceed directly. In a real app, you might want a confirmation modal
-    setTimeout(() => handleDeleteProduct(productId), 1000);
+  const handleCreateProduct = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDeleteModalOpen(true);
+  };
+
+  // CRUD operations
+  const onProductCreated = (newProduct: Product) => {
+    setProducts(prev => [newProduct, ...prev]);
+    fetchStockCounts(); // Refresh stock counts
+    showSuccess('Tạo sản phẩm thành công!');
+  };
+
+  const onProductUpdated = (updatedProduct: Product) => {
+    setProducts(prev => prev.map(p => {
+      const currentId = getProductIdentifier(p);
+      const updatedId = getProductIdentifier(updatedProduct);
+      return currentId === updatedId ? updatedProduct : p;
+    }));
+    fetchStockCounts(); // Refresh stock counts
+    showSuccess('Cập nhật sản phẩm thành công!');
+  };
+
+  const onProductDeleted = (productId: string) => {
+    setProducts(prev => prev.filter(p => getProductIdentifier(p) !== productId));
+    fetchStockCounts(); // Refresh stock counts
+    showSuccess('Xóa sản phẩm thành công!');
   };
 
   // Extract unique categories from products
@@ -97,7 +171,10 @@ const AdminProducts: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900">Quản lý sản phẩm</h1>
             <p className="mt-2 text-gray-600">Quản lý tất cả sản phẩm trong cửa hàng</p>
           </div>
-          <button className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors">
+          <button
+            onClick={handleCreateProduct}
+            className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
+          >
             <HiOutlinePlus className="w-5 h-5 mr-2" />
             Thêm sản phẩm
           </button>
@@ -143,7 +220,7 @@ const AdminProducts: React.FC = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Tổng sản phẩm</p>
-                    <p className="text-2xl font-bold text-gray-900">{products.length}</p>
+                    <p className="text-2xl font-bold text-gray-900">{totalProducts}</p>
                   </div>
                 </div>
               </div>
@@ -155,9 +232,7 @@ const AdminProducts: React.FC = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Còn hàng</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {products.filter(p => p.inStock).length}
-                    </p>
+                    <p className="text-2xl font-bold text-gray-900">{inStockCount}</p>
                   </div>
                 </div>
               </div>
@@ -169,9 +244,7 @@ const AdminProducts: React.FC = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Hết hàng</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {products.filter(p => !p.inStock).length}
-                    </p>
+                    <p className="text-2xl font-bold text-gray-900">{outOfStockCount}</p>
                   </div>
                 </div>
               </div>
@@ -183,9 +256,7 @@ const AdminProducts: React.FC = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Sản phẩm mới</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {products.filter(p => p.isNew).length}
-                    </p>
+                    <p className="text-2xl font-bold text-gray-900">{newProductsCount}</p>
                   </div>
                 </div>
               </div>
@@ -272,22 +343,22 @@ const AdminProducts: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredProducts.map((product) => (
-                  <tr key={product._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={getProductIdentifier(product)} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
                           <img
                             className="h-12 w-12 rounded-lg object-cover"
-                            src={product.image}
+                            src={resolveImageUrl(product.image)}
                             alt={product.name}
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48x48?text=No+Image';
+                              (e.target as HTMLImageElement).src = '/images/default-product.svg';
                             }}
                           />
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                          <div className="text-sm text-gray-500">ID: #{product._id.slice(-6)}</div>
+                          <div className="text-sm text-gray-500">ID: #{product.id?.slice(-6) || 'N/A'}</div>
                         </div>
                       </div>
                     </td>
@@ -324,15 +395,24 @@ const AdminProducts: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
-                        <button className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors">
+                        <button
+                          onClick={() => handleViewProduct(product)}
+                          className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors"
+                          title="Xem chi tiết"
+                        >
                           <HiOutlineEye className="w-4 h-4" />
                         </button>
-                        <button className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors">
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors"
+                          title="Chỉnh sửa"
+                        >
                           <HiOutlinePencil className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => confirmDelete(product._id)}
+                          onClick={() => handleDeleteProduct(product)}
                           className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors"
+                          title="Xóa sản phẩm"
                         >
                           <HiOutlineTrash className="w-4 h-4" />
                         </button>
@@ -380,31 +460,46 @@ const AdminProducts: React.FC = () => {
                   Sau
                 </button>
               </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Hiển thị <span className="font-medium">1</span> đến <span className="font-medium">{filteredProducts.length}</span> trong tổng số <span className="font-medium">{filteredProducts.length}</span> kết quả
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                      Trước
-                    </button>
-                    <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-amber-600 text-white text-sm font-medium">
-                      1
-                    </button>
-                    <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                      Sau
-                    </button>
-                  </nav>
-                </div>
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalProducts}
+                itemsPerPage={itemsPerPage}
+                onPageChange={fetchProducts}
+                loading={loading}
+              />
             </div>
           )}
         </div>
           </>
         )}
+
+        {/* Modals */}
+        <ProductDetailModal
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          product={selectedProduct}
+        />
+
+        <ProductCreateModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onProductCreated={onProductCreated}
+        />
+
+        <ProductEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          product={selectedProduct}
+          onProductUpdated={onProductUpdated}
+        />
+
+        <ProductDeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          product={selectedProduct}
+          onProductDeleted={onProductDeleted}
+        />
       </div>
     </AdminLayout>
   );
