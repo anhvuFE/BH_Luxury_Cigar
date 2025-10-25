@@ -167,10 +167,10 @@ const AdminSettings: React.FC = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        data: {
+        body: JSON.stringify({
           currentPassword: passwordForm.currentPassword,
           newPassword: passwordForm.newPassword
-        }
+        })
       });
 
       setPasswordForm({

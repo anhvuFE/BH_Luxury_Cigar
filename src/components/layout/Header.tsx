@@ -30,6 +30,40 @@ interface SearchProduct {
   image?: string;
 }
 
+type SearchApiNestedData = {
+  data?: SearchProduct[];
+  products?: SearchProduct[];
+};
+
+type SearchApiResponse = SearchProduct[] | {
+  data?: SearchProduct[] | SearchApiNestedData;
+  products?: SearchProduct[];
+};
+
+const extractProductsFromResponse = (payload: SearchApiResponse): SearchProduct[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload.data) {
+    if (Array.isArray(payload.data)) {
+      return payload.data;
+    }
+    if (payload.data.data && Array.isArray(payload.data.data)) {
+      return payload.data.data;
+    }
+    if (payload.data.products && Array.isArray(payload.data.products)) {
+      return payload.data.products;
+    }
+  }
+
+  if (payload.products && Array.isArray(payload.products)) {
+    return payload.products;
+  }
+
+  return [];
+};
+
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -41,7 +75,7 @@ const Header: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const navigate = useNavigate();
   const { cartCount } = useCart();
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchResultsRef = useRef<HTMLDivElement>(null);
 
   const navigation = [
@@ -147,21 +181,8 @@ const Header: React.FC = () => {
     setIsSearching(true);
     setShowResults(true); // Always show dropdown when searching
     try {
-      const response = await apiService.get(`/products?search=${encodeURIComponent(query)}&limit=5`);
-      console.log('Search response:', response); // Debug log
-
-      // Handle different response structures
-      let products = [];
-      if (response.data) {
-        if (Array.isArray(response.data)) {
-          products = response.data;
-        } else if (response.data.data && Array.isArray(response.data.data)) {
-          products = response.data.data;
-        } else if (response.data.products && Array.isArray(response.data.products)) {
-          products = response.data.products;
-        }
-      }
-
+      const response = await apiService.get<SearchApiResponse>(`/products?search=${encodeURIComponent(query)}&limit=5`);
+      const products = extractProductsFromResponse(response);
       setSearchResults(products.slice(0, 5));
       setShowResults(true);
     } catch (error) {

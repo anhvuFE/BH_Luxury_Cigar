@@ -11,7 +11,7 @@ import {
   HiRefresh,
 } from "react-icons/hi";
 import { useCart } from "../contexts/CartContext";
-import { orderService } from "../services/order.service";
+import { orderService, type CreateOrderDto } from "../services/order.service";
 import { useToast } from "../hooks/useToast";
 
 const CartPage: React.FC = () => {
@@ -163,14 +163,17 @@ const CartPage: React.FC = () => {
 
       // Prepare order data - only include items with valid productId
       const validItems = cart.filter(item => item.productId && item.productId !== 'undefined' && item.quantity > 0);
-      const orderItems = validItems.map((item) => ({
-        product_id: item.productId,
+      const orderItems: CreateOrderDto['items'] = validItems.map((item) => ({
+        product: item.productId,
+        name: item.name,
+        price: item.price,
         quantity: item.quantity,
+        image: item.image,
       }));
 
-      const orderData = {
+      const orderData: CreateOrderDto = {
         items: orderItems,
-        shipping_address: {
+        shippingAddress: {
           name: shippingInfo.name,
           street: shippingInfo.street,
           city: shippingInfo.city,
@@ -179,7 +182,7 @@ const CartPage: React.FC = () => {
           country: shippingInfo.country || 'Vietnam',
           phone: shippingInfo.phone
         },
-        payment_method: paymentMethod,
+        paymentMethod,
         itemsPrice: totalPrice,
         taxPrice: 0,
         shippingPrice: 0,

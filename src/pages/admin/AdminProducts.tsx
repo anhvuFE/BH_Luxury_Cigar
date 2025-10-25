@@ -208,7 +208,9 @@ const AdminProducts: React.FC = () => {
                 <h3 className="text-sm font-medium text-red-800">Lỗi</h3>
                 <p className="text-sm text-red-700 mt-1">{error}</p>
                 <button
-                  onClick={fetchProducts}
+                  onClick={() => {
+                    void fetchProducts();
+                  }}
                   className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
                 >
                   Thử lại

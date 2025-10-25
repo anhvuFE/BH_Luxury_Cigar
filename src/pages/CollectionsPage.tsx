@@ -214,7 +214,9 @@ const CollectionsPage: React.FC = () => {
                          (responseData.data || responseData.products || []);
 
       if (allProducts.length > 0) {
-        const prices = allProducts.map((p: Product) => p.price || 0).filter(p => p > 0);
+        const prices = allProducts
+          .map((product: Product) => product.price || 0)
+          .filter((price: number) => price > 0);
         if (prices.length > 0) {
           const minP = Math.floor(Math.min(...prices));
           const maxP = Math.ceil(Math.max(...prices));

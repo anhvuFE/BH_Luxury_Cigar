@@ -10,13 +10,15 @@ interface OrderUpdateModalProps {
   onOrderUpdated: () => void;
 }
 
+type OrderStatus = Order['orderStatus'];
+
 const OrderUpdateModal: React.FC<OrderUpdateModalProps> = ({
   isOpen,
   onClose,
   order,
   onOrderUpdated
 }) => {
-  const [orderStatus, setOrderStatus] = useState<Order['orderStatus']>('pending');
+  const [orderStatus, setOrderStatus] = useState<OrderStatus>('pending');
   const [trackingNumber, setTrackingNumber] = useState<string>('');
   const [isPaid, setIsPaid] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
@@ -64,7 +66,13 @@ const OrderUpdateModal: React.FC<OrderUpdateModalProps> = ({
     }
   };
 
-  const orderStatusOptions = [
+  const orderStatusOptions: Array<{
+    value: OrderStatus;
+    label: string;
+    color: string;
+    bgColor: string;
+    borderColor: string;
+  }> = [
     { value: 'pending', label: 'Chờ xử lý', color: 'text-yellow-600', bgColor: 'bg-yellow-50', borderColor: 'border-yellow-200' },
     { value: 'processing', label: 'Đang xử lý', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
     { value: 'shipped', label: 'Đang giao', color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' },
@@ -73,16 +81,16 @@ const OrderUpdateModal: React.FC<OrderUpdateModalProps> = ({
   ];
 
   // Logic for allowed next statuses
-  const getAvailableStatuses = (currentStatus: string) => {
-    const statusFlow = {
-      'pending': ['pending', 'processing', 'cancelled'],
-      'processing': ['processing', 'shipped', 'cancelled'],
-      'shipped': ['shipped', 'delivered', 'cancelled'],
-      'delivered': ['delivered'], // Cannot change from delivered
-      'cancelled': ['cancelled'] // Cannot change from cancelled
+  const getAvailableStatuses = (currentStatus: OrderStatus): OrderStatus[] => {
+    const statusFlow: Record<OrderStatus, OrderStatus[]> = {
+      pending: ['pending', 'processing', 'cancelled'],
+      processing: ['processing', 'shipped', 'cancelled'],
+      shipped: ['shipped', 'delivered', 'cancelled'],
+      delivered: ['delivered'], // Cannot change from delivered
+      cancelled: ['cancelled'] // Cannot change from cancelled
     };
 
-    return statusFlow[currentStatus as keyof typeof statusFlow] || ['pending'];
+    return statusFlow[currentStatus] || ['pending'];
   };
 
   if (!order) return null;

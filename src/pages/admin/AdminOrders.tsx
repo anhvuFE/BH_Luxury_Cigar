@@ -242,6 +242,10 @@ const AdminOrders: React.FC = () => {
     };
   };
 
+  const getOrderIdentifier = (order: Order): string => {
+    return order.orderNumber ?? order._id ?? order.id ?? '';
+  };
+
   // Get product name helper
   const getProductName = (item?: OrderItem): string => {
     if (!item) return 'Unknown Product';
@@ -424,7 +428,9 @@ const AdminOrders: React.FC = () => {
             <div className="text-center">
               <p className="text-red-600">{error}</p>
               <button
-                onClick={fetchOrders}
+                onClick={() => {
+                  void fetchOrders();
+                }}
                 className="mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
               >
                 Thử lại
@@ -439,7 +445,7 @@ const AdminOrders: React.FC = () => {
             {filteredOrders && filteredOrders.length > 0 ? filteredOrders.map((order) => {
               if (!order) return null;
               const user = getUser(order);
-              const orderNumber = order.orderNumber || order._id;
+              const orderNumber = getOrderIdentifier(order);
               return (
                 <div key={order._id || Math.random()} className="bg-white rounded-xl border border-amber-100 p-4">
                   <div className="flex items-start justify-between mb-3">
@@ -449,7 +455,7 @@ const AdminOrders: React.FC = () => {
                     </div>
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleViewOrder(order._id || order.id || order.orderNumber)}
+                        onClick={() => handleViewOrder(getOrderIdentifier(order))}
                         className="text-amber-600 hover:text-amber-700 p-2 hover:bg-amber-50 rounded-lg transition-colors"
                         title="Xem chi tiết"
                       >
@@ -631,8 +637,8 @@ const AdminOrders: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end space-x-2">
-                            <button
-                              onClick={() => handleViewOrder(order._id || order.id || order.orderNumber)}
+                              <button
+                                onClick={() => handleViewOrder(getOrderIdentifier(order))}
                               className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors"
                               title="Xem chi tiết"
                             >
