@@ -10,22 +10,15 @@ import {
   HiOutlineUser,
   HiOutlineEye,
 } from "react-icons/hi";
-import authService from "../../services/auth.service";
+import authService, { type User as AuthUser } from "../../services/auth.service";
 import { useCart } from "../../contexts/CartContext";
 import apiService from "../../services/api";
 import { resolveImageUrl } from "../../utils/image";
 
-interface User {
-  id?: string;
-  email?: string;
+type HeaderUser = Partial<AuthUser> & {
   name?: string;
-  first_name?: string;
-  last_name?: string;
-  phone_number?: string;
-  role: 'customer' | 'staff' | 'admin';
-  created_at?: string;
-  updated_at?: string;
-}
+  phone?: string;
+};
 
 interface SearchProduct {
   _id: string;
@@ -37,18 +30,52 @@ interface SearchProduct {
   image?: string;
 }
 
+type SearchApiNestedData = {
+  data?: SearchProduct[];
+  products?: SearchProduct[];
+};
+
+type SearchApiResponse = SearchProduct[] | {
+  data?: SearchProduct[] | SearchApiNestedData;
+  products?: SearchProduct[];
+};
+
+const extractProductsFromResponse = (payload: SearchApiResponse): SearchProduct[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload.data) {
+    if (Array.isArray(payload.data)) {
+      return payload.data;
+    }
+    if (payload.data.data && Array.isArray(payload.data.data)) {
+      return payload.data.data;
+    }
+    if (payload.data.products && Array.isArray(payload.data.products)) {
+      return payload.data.products;
+    }
+  }
+
+  if (payload.products && Array.isArray(payload.products)) {
+    return payload.products;
+  }
+
+  return [];
+};
+
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<HeaderUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const navigate = useNavigate();
   const { cartCount } = useCart();
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchResultsRef = useRef<HTMLDivElement>(null);
 
   const navigation = [
@@ -103,10 +130,8 @@ const Header: React.FC = () => {
     if (isAuth) {
       // Try API first, fallback to localStorage
       try {
-        const response = await authService.getProfile();
-
-        // Extract user data - API returns wrapped response {success: true, data: user}
-        const profile = (response as any).data || response;
+        const profileResponse = await authService.getProfile();
+        const profile: HeaderUser = profileResponse;
         setUser(profile);
 
         // Update localStorage with fresh data
@@ -156,21 +181,8 @@ const Header: React.FC = () => {
     setIsSearching(true);
     setShowResults(true); // Always show dropdown when searching
     try {
-      const response = await apiService.get(`/products?search=${encodeURIComponent(query)}&limit=5`);
-      console.log('Search response:', response); // Debug log
-
-      // Handle different response structures
-      let products = [];
-      if (response.data) {
-        if (Array.isArray(response.data)) {
-          products = response.data;
-        } else if (response.data.data && Array.isArray(response.data.data)) {
-          products = response.data.data;
-        } else if (response.data.products && Array.isArray(response.data.products)) {
-          products = response.data.products;
-        }
-      }
-
+      const response = await apiService.get<SearchApiResponse>(`/products?search=${encodeURIComponent(query)}&limit=5`);
+      const products = extractProductsFromResponse(response);
       setSearchResults(products.slice(0, 5));
       setShowResults(true);
     } catch (error) {

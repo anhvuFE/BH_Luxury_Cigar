@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import {
   HiOutlineBookOpen,
   HiOutlineFire,
-  HiOutlineSparkles,
   HiOutlineAcademicCap,
   HiOutlineLightBulb,
-  HiOutlineGlobe,
   HiChevronRight,
 } from "react-icons/hi";
-import { FaStar, FaLeaf, FaTemperatureHigh, FaWineGlass } from "react-icons/fa";
+import { FaTemperatureHigh, FaWineGlass } from "react-icons/fa";
 import { GiCigar, GiCigarette, GiSmokeBomb } from "react-icons/gi";
 
 const GuidePage: React.FC = () => {

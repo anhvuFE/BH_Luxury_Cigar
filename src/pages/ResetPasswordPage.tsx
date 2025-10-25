@@ -34,6 +34,9 @@ const ResetPasswordPage: React.FC = () => {
     return '';
   };
 
+  const getErrorMessage = (error: unknown, fallback: string) =>
+    error instanceof Error ? error.message : fallback;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -66,8 +69,8 @@ const ResetPasswordPage: React.FC = () => {
       setTimeout(() => {
         navigate('/login');
       }, 3000);
-    } catch (err: any) {
-      setError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Có lỗi xảy ra. Vui lòng thử lại.'));
       showError('Đặt lại mật khẩu thất bại');
     } finally {
       setIsLoading(false);

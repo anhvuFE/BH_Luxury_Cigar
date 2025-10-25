@@ -9,6 +9,19 @@ interface AdminProfile {
   role: string;
 }
 
+type AdminProfileSource = {
+  name?: string;
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  phone?: string;
+  phone_number?: string;
+  avatar?: string;
+  role?: string;
+};
+
+type AdminProfileResponse = AdminProfileSource | { data: AdminProfileSource };
+
 export const useAdminProfile = () => {
   const [userProfile, setUserProfile] = useState<AdminProfile>({
     name: 'Admin User',
@@ -22,8 +35,8 @@ export const useAdminProfile = () => {
   const loadUserProfile = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await authService.request('/profile');
-      const user = (response as { data?: any }).data || response;
+      const response = await authService.request<AdminProfileResponse>('/profile');
+      const user = 'data' in response ? response.data : response;
 
       const profile = {
         name: user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim(),

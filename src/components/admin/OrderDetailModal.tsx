@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from '../common/Modal';
-import orderService, { type Order, type User, type Product } from '../../services/order.service';
+import orderService, { type Order, type User, type OrderItem } from '../../services/order.service';
 import {
   HiOutlineUser,
   HiOutlineLocationMarker,
   HiOutlineCreditCard,
   HiOutlineShoppingBag,
-  HiOutlineCalendar,
   HiOutlineCurrencyDollar,
-  HiOutlineTruck,
   HiOutlineDocumentText
 } from 'react-icons/hi';
 
@@ -27,13 +25,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isOpen && orderId) {
-      fetchOrderDetails();
-    }
-  }, [isOpen, orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     if (!orderId) return;
 
     try {
@@ -47,7 +39,13 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      void fetchOrderDetails();
+    }
+  }, [isOpen, fetchOrderDetails]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -145,7 +143,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     };
   };
 
-  const getProductName = (item: any): string => {
+  const getProductName = (item?: OrderItem): string => {
     if (!item) return 'Sản phẩm không xác định';
     if (typeof item.product === 'object' && item.product?.name) {
       return item.product.name;

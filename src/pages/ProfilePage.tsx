@@ -40,6 +40,14 @@ interface User {
   updatedAt: string;
 }
 
+interface TotalSpendingResponse {
+  totalOrders: number;
+  totalItems: number;
+  totalSpent: number;
+}
+
+type ApiPayload<T> = T | { data: T };
+
 const ProfilePage: React.FC = () => {
   const { showSuccess, showError } = useToast();
 
@@ -212,8 +220,8 @@ const ProfilePage: React.FC = () => {
   // Load total spending
   const loadTotalSpending = async () => {
     try {
-      const response = await authService.request('/orders/myorders/total');
-      const data = (response as any).data || response;
+      const response = await authService.request<ApiPayload<TotalSpendingResponse>>('/orders/myorders/total');
+      const data = 'data' in response ? response.data : response;
       setTotalSpending(data.totalSpent || 0);
     } catch {
       setTotalSpending(0);

@@ -135,6 +135,3 @@ class OrderService {
 
 export const orderService = new OrderService();
 export default orderService;
-
-// Re-export interfaces to ensure they're available
-export type { Order, OrderStats, User, Product, OrderItem, ShippingAddress, CreateOrderDto, ApiResponse };

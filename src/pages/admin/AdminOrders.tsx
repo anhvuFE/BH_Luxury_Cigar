@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import {
   HiOutlineSearch,
@@ -12,7 +12,7 @@ import {
 import Select from '../../components/common/Select';
 import OrderDetailModal from '../../components/admin/OrderDetailModal';
 import OrderUpdateModal from '../../components/admin/OrderUpdateModal';
-import orderService, { type Order, type OrderStats, type User, type Product } from '../../services/order.service';
+import orderService, { type Order, type OrderStats, type User, type OrderItem } from '../../services/order.service';
 import analyticsService from '../../services/analytics.service';
 
 const AdminOrders: React.FC = () => {
@@ -31,18 +31,7 @@ const AdminOrders: React.FC = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  // Fetch orders and stats
-  useEffect(() => {
-    fetchOrders();
-    fetchStats();
-  }, [page, selectedStatus]);
-
-  // Reset to page 1 when status filter changes
-  useEffect(() => {
-    setPage(1);
-  }, [selectedStatus]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -64,16 +53,27 @@ const AdminOrders: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, selectedStatus]);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const response = await orderService.getStats();
       setStats(response.data);
     } catch (err) {
       console.error('Error fetching stats:', err);
     }
-  };
+  }, []);
+
+  // Fetch orders and stats
+  useEffect(() => {
+    fetchOrders();
+    fetchStats();
+  }, [fetchOrders, fetchStats]);
+
+  // Reset to page 1 when status filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [selectedStatus]);
 
   // Export functionality
   const handleExportOrders = async () => {
@@ -242,8 +242,12 @@ const AdminOrders: React.FC = () => {
     };
   };
 
+  const getOrderIdentifier = (order: Order): string => {
+    return order.orderNumber ?? order._id ?? order.id ?? '';
+  };
+
   // Get product name helper
-  const getProductName = (item: any): string => {
+  const getProductName = (item?: OrderItem): string => {
     if (!item) return 'Unknown Product';
     if (typeof item.product === 'object' && item.product?.name) {
       return item.product.name;
@@ -260,18 +264,19 @@ const AdminOrders: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Quản lý đơn hàng</h1>
-            <p className="mt-2 text-gray-600">Theo dõi và xử lý tất cả đơn hàng</p>
-          </div>
-          <div className="mt-4 sm:mt-0 flex space-x-3">
+        <div className="mb-6">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Quản lý đơn hàng</h1>
+              <p className="mt-1 text-sm sm:text-base text-gray-600">Theo dõi và xử lý tất cả đơn hàng</p>
+            </div>
+            <div className="flex space-x-3">
             <button
               onClick={handleExportOrders}
               disabled={isExporting}
-              className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 sm:py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isExporting ? (
                 <>
@@ -285,68 +290,69 @@ const AdminOrders: React.FC = () => {
                 </>
               )}
             </button>
+            </div>
           </div>
         </div>
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-            <div className="bg-white rounded-lg border border-amber-100 p-6">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <HiOutlineCurrencyDollar className="w-6 h-6 text-white" />
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <HiOutlineCurrencyDollar className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Tổng doanh thu</p>
-                  <p className="text-xl font-bold text-gray-900">{formatPrice(stats.totalRevenue)}</p>
+                <div className="ml-2 sm:ml-4">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Tổng doanh thu</p>
+                  <p className="text-sm sm:text-xl font-bold text-gray-900">{formatPrice(stats.totalRevenue)}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-amber-100 p-6">
+            <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                  <HiOutlineCalendar className="w-6 h-6 text-white" />
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                  <HiOutlineCalendar className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Tổng đơn hàng</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalOrders}</p>
+                <div className="ml-2 sm:ml-4">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Tổng đơn hàng</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.totalOrders}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-amber-100 p-6">
+            <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
-                  <HiOutlineCalendar className="w-6 h-6 text-white" />
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
+                  <HiOutlineCalendar className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Chờ xử lý</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.pendingOrders || 0}</p>
+                <div className="ml-2 sm:ml-4">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Chờ xử lý</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.pendingOrders || 0}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-amber-100 p-6">
+            <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <HiOutlineCalendar className="w-6 h-6 text-white" />
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <HiOutlineCalendar className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Đang xử lý</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.processingOrders || 0}</p>
+                <div className="ml-2 sm:ml-4">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Đang xử lý</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.processingOrders || 0}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-amber-100 p-6">
+            <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
-                  <HiOutlineCalendar className="w-6 h-6 text-white" />
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                  <HiOutlineCalendar className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Đã hoàn thành</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.deliveredOrders || 0}</p>
+                <div className="ml-2 sm:ml-4">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Đã hoàn thành</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.deliveredOrders || 0}</p>
                 </div>
               </div>
             </div>
@@ -354,8 +360,8 @@ const AdminOrders: React.FC = () => {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg border border-amber-100 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl border border-amber-100 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Search */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -398,9 +404,10 @@ const AdminOrders: React.FC = () => {
             />
 
             {/* Advanced Filter Button */}
-            <button className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors">
+            <button className="inline-flex items-center justify-center px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors">
               <HiOutlineFilter className="w-5 h-5 mr-2" />
-              Lọc nâng cao
+              <span className="hidden sm:inline">Lọc nâng cao</span>
+              <span className="sm:hidden">Lọc</span>
             </button>
           </div>
         </div>
@@ -421,7 +428,9 @@ const AdminOrders: React.FC = () => {
             <div className="text-center">
               <p className="text-red-600">{error}</p>
               <button
-                onClick={fetchOrders}
+                onClick={() => {
+                  void fetchOrders();
+                }}
                 className="mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
               >
                 Thử lại
@@ -430,9 +439,125 @@ const AdminOrders: React.FC = () => {
           </div>
         )}
 
-        {/* Orders Table */}
+        {/* Mobile Orders Cards */}
         {!loading && !error && (
-          <div className="bg-white rounded-lg border border-amber-100 overflow-hidden">
+          <div className="lg:hidden space-y-4 mb-6">
+            {filteredOrders && filteredOrders.length > 0 ? filteredOrders.map((order) => {
+              if (!order) return null;
+              const user = getUser(order);
+              const orderNumber = getOrderIdentifier(order);
+              return (
+                <div key={order._id || Math.random()} className="bg-white rounded-xl border border-amber-100 p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900">#{orderNumber}</h3>
+                      <p className="text-xs text-gray-500">{formatDate(order.createdAt)}</p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleViewOrder(getOrderIdentifier(order))}
+                        className="text-amber-600 hover:text-amber-700 p-2 hover:bg-amber-50 rounded-lg transition-colors"
+                        title="Xem chi tiết"
+                      >
+                        <HiOutlineEye className="w-4 h-4" />
+                      </button>
+                      {canUpdateOrder(order) && (
+                        <button
+                          onClick={() => handleUpdateOrder(order)}
+                          className="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Cập nhật trạng thái"
+                        >
+                          <HiOutlinePencil className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-xs text-gray-500">Khách hàng</p>
+                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      {user.email && user.email !== 'N/A' && (
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                      )}
+                      {user.phone && user.phone !== 'N/A' && (
+                        <p className="text-xs text-gray-500">{user.phone}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-gray-500">Sản phẩm</p>
+                      <div className="text-sm text-gray-900">
+                        {order.items && order.items.length > 0 ? (
+                          order.items.map((item, index) => (
+                            <div key={index} className="text-xs">
+                              {getProductName(item)} (x{item?.quantity || 0})
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-xs">No items</div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-gray-500">Tổng tiền</p>
+                        <p className="text-sm font-bold text-amber-600">{formatPrice(order.totalPrice || 0)}</p>
+                      </div>
+                      <div className="flex flex-col items-end space-y-1">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.orderStatus || 'pending')}`}>
+                          {getStatusText(order.orderStatus || 'pending')}
+                        </span>
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPaymentStatusColor(order.isPaid || false, order.paymentStatus || 'pending')}`}>
+                          {getPaymentStatusText(order.isPaid || false, order.paymentStatus || 'pending')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }) : (
+              <div className="bg-white rounded-xl border border-amber-100 p-8 text-center">
+                <p className="text-gray-500">{loading ? 'Đang tải...' : 'Không có đơn hàng nào'}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Mobile Pagination */}
+        {!loading && !error && (
+          <div className="lg:hidden bg-white rounded-xl border border-amber-100 p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                className="relative inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Trước
+              </button>
+              <span className="text-sm text-gray-700 font-medium">
+                Trang {page} / {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={page === totalPages}
+                className="relative inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Sau
+              </button>
+            </div>
+            <div className="text-center mt-2">
+              <p className="text-xs text-gray-500">
+                Tổng {filteredOrders.length} đơn hàng
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Desktop Orders Table */}
+        {!loading && !error && (
+          <div className="hidden lg:block bg-white rounded-xl border border-amber-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-amber-50 border-b border-amber-100">
@@ -512,8 +637,8 @@ const AdminOrders: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end space-x-2">
-                            <button
-                              onClick={() => handleViewOrder(order._id || order.id || order.orderNumber)}
+                              <button
+                                onClick={() => handleViewOrder(getOrderIdentifier(order))}
                               className="text-amber-600 hover:text-amber-700 p-1 hover:bg-amber-50 rounded transition-colors"
                               title="Xem chi tiết"
                             >
@@ -556,24 +681,27 @@ const AdminOrders: React.FC = () => {
 
             {/* Pagination */}
             {!loading && !error && (
-              <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
-                <div className="flex-1 flex justify-between sm:hidden">
+              <div className="bg-gray-50 px-4 sm:px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                <div className="flex-1 flex justify-between lg:hidden">
                   <button
                     onClick={() => setPage(prev => Math.max(prev - 1, 1))}
                     disabled={page === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="relative inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Trước
                   </button>
+                  <span className="text-sm text-gray-700">
+                    {page} / {totalPages}
+                  </span>
                   <button
                     onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={page === totalPages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="relative inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Sau
                   </button>
                 </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div className="hidden lg:flex-1 lg:flex lg:items-center lg:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
                       Hiển thị trang <span className="font-medium">{page}</span> / <span className="font-medium">{totalPages}</span> - Tổng <span className="font-medium">{filteredOrders.length}</span> đơn hàng

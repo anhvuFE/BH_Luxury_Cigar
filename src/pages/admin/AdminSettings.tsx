@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import {
   HiOutlineUser,
@@ -7,7 +7,6 @@ import {
   HiOutlineGlobe,
   HiOutlineMail,
   HiOutlineCamera,
-  HiOutlineUpload,
   HiOutlineEye,
   HiOutlineEyeOff
 } from 'react-icons/hi';
@@ -16,12 +15,13 @@ import { API_CONFIG } from '../../config/api';
 import Select from '../../components/common/Select';
 import { useAdminProfile } from '../../hooks/useAdminProfile';
 
+type UploadAvatarResponse = { avatar?: string };
+
 const AdminSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const { userProfile, loadUserProfile, updateProfile } = useAdminProfile();
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [uploading, setUploading] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -37,6 +37,18 @@ const AdminSettings: React.FC = () => {
     confirm: false
   });
   const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const getApiErrorMessage = (error: unknown, fallback: string) => {
+    const defaultMessage = error instanceof Error && error.message ? error.message : fallback;
+    if (typeof error === 'object' && error !== null) {
+      const apiError = error as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      return apiError.response?.data?.message || apiError.message || defaultMessage;
+    }
+    return defaultMessage;
+  };
 
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,8 +88,8 @@ const AdminSettings: React.FC = () => {
       formData.append('name', userProfile.name);
       formData.append('phone', userProfile.phone);
 
-      const response = await authService.upload('/profile', formData, 'PUT');
-      const updatedUser = (response as { data?: any }).data || response;
+      const response = await authService.upload<UploadAvatarResponse | { data: UploadAvatarResponse }>('/profile', formData, 'PUT');
+      const updatedUser = 'data' in response ? response.data : response;
 
       // Update shared profile
       updateProfile({ avatar: updatedUser.avatar });
@@ -88,11 +100,11 @@ const AdminSettings: React.FC = () => {
       }));
 
       setMessage({ type: 'success', text: 'Cập nhật ảnh đại diện thành công!' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to upload avatar:', error);
       setMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Không thể tải lên ảnh đại diện'
+        text: getApiErrorMessage(error, 'Không thể tải lên ảnh đại diện')
       });
       // Reset preview on error
       setAvatarPreview(userProfile.avatar || '');
@@ -103,7 +115,6 @@ const AdminSettings: React.FC = () => {
 
   const handleProfileUpdate = async () => {
     try {
-      setLoading(true);
       setMessage(null);
 
       await authService.request('/auth/updatedetails', {
@@ -120,14 +131,12 @@ const AdminSettings: React.FC = () => {
       }));
 
       setMessage({ type: 'success', text: 'Cập nhật thông tin thành công!' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to update profile:', error);
       setMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Không thể cập nhật thông tin'
+        text: getApiErrorMessage(error, 'Không thể cập nhật thông tin')
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -158,10 +167,10 @@ const AdminSettings: React.FC = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        data: {
+        body: JSON.stringify({
           currentPassword: passwordForm.currentPassword,
           newPassword: passwordForm.newPassword
-        }
+        })
       });
 
       setPasswordForm({
@@ -171,11 +180,11 @@ const AdminSettings: React.FC = () => {
       });
 
       setMessage({ type: 'success', text: 'Đổi mật khẩu thành công!' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to change password:', error);
       setMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Đổi mật khẩu thất bại'
+        text: getApiErrorMessage(error, 'Đổi mật khẩu thất bại')
       });
     } finally {
       setPasswordLoading(false);

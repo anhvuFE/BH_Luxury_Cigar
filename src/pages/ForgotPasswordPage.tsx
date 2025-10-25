@@ -12,6 +12,9 @@ const ForgotPasswordPage: React.FC = () => {
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [error, setError] = useState('');
 
+  const getErrorMessage = (error: unknown, fallback: string) =>
+    error instanceof Error ? error.message : fallback;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -21,8 +24,8 @@ const ForgotPasswordPage: React.FC = () => {
       await apiService.post('/auth/forgotpassword', { email });
       setIsEmailSent(true);
       showSuccess('Email đã được gửi thành công!');
-    } catch (err: any) {
-      const errorMessage = err.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Có lỗi xảy ra. Vui lòng thử lại.');
       setError(errorMessage);
       showError(errorMessage);
     } finally {
@@ -35,8 +38,8 @@ const ForgotPasswordPage: React.FC = () => {
     try {
       await apiService.post('/auth/forgotpassword', { email });
       showSuccess('Email đã được gửi lại!');
-    } catch (err: any) {
-      showError(err.message || 'Có lỗi xảy ra khi gửi lại email.');
+    } catch (error: unknown) {
+      showError(getErrorMessage(error, 'Có lỗi xảy ra khi gửi lại email.'));
     } finally {
       setIsLoading(false);
     }
