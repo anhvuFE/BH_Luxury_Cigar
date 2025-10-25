@@ -1,6 +1,6 @@
 import { lazy, type ComponentType } from 'react';
 
-type LazyImport = () => Promise<{ default: ComponentType<any> }>;
+type LazyImport = () => Promise<{ default: ComponentType<object> }>;
 
 // Critical optimization: Add prefetch hints for likely next pages
 const createLazyComponent = (importFn: LazyImport, prefetch = false) => {
