@@ -12,6 +12,7 @@ import {
   HiOutlineTruck,
   HiOutlineChartBar
 } from 'react-icons/hi';
+import { resolveImageUrl } from '../../utils/image';
 
 const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -252,7 +253,7 @@ const AdminDashboard: React.FC = () => {
                 >
                   <div className="relative">
                     <img
-                      src={product.image}
+                      src={resolveImageUrl(product.image, '/placeholder-cigar.jpg')}
                       alt={product.name}
                       className="w-12 h-12 rounded-lg object-cover"
                       onError={(e) => {

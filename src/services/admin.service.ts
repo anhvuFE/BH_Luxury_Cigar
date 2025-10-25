@@ -24,17 +24,22 @@ export interface Order {
 }
 
 export interface Product {
-  _id: string;
+  id: string;
+  _id?: string;
   name: string;
   brand: string;
   price: number;
+  originalPrice?: number;
   image?: string;
+  images?: string[];
   category: string;
   inStock?: boolean;
   isNew?: boolean;
   isFeatured?: boolean;
   description?: string;
   specifications?: Record<string, string>;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Customer {
@@ -53,11 +58,17 @@ class AdminService {
   // Dashboard Stats
   async getDashboardStats(): Promise<AdminStats> {
     try {
-      const [products, orders, customers] = await Promise.all([
-        this.getProducts(),
+      // Get products response to get total count
+      const allProductsResponse = await apiService.get('/products');
+      const totalProducts = allProductsResponse.total || 0;
+
+      const [topProductsResponse, orders, customers] = await Promise.all([
+        this.getProducts(1, 3), // Get first 3 for topProducts
         this.getOrders(),
         this.getCustomers()
       ]);
+
+      const products = topProductsResponse.data;
 
       // Calculate stats from data
       const totalRevenue = orders.reduce((sum, order) => {
@@ -69,7 +80,7 @@ class AdminService {
       const topProducts = products.slice(0, 3);
 
       return {
-        totalProducts: products.length,
+        totalProducts,
         totalOrders: orders.length,
         totalCustomers: customers.length,
         totalRevenue,
@@ -91,38 +102,27 @@ class AdminService {
   }
 
   // Products
-  async getProducts(): Promise<Product[]> {
+  async getProducts(page?: number, limit?: number): Promise<{ data: Product[], total: number, pagination: any }> {
     try {
-      const response = await apiService.get('/products');
-      interface ApiProduct {
-        id: string;
-        name: string;
-        brand?: string;
-        price: number;
-        image?: string;
-        category?: string;
-        inStock?: boolean;
-        isNew?: boolean;
-        isFeatured?: boolean;
-        description?: string;
-        specifications?: string;
-      }
+      const params = new URLSearchParams();
+      if (page) params.append('page', page.toString());
+      if (limit) params.append('limit', limit.toString());
 
-      return (response as { data: ApiProduct[] }).data.map((product: ApiProduct) => ({
-        _id: product.id,
-        name: product.name,
-        brand: product.brand || 'Unknown',
-        price: product.price,
-        image: product.image,
-        category: product.category || 'Uncategorized',
-        inStock: product.inStock || false,
-        isNew: product.isNew || false,
-        isFeatured: product.isFeatured || false,
-        description: product.description,
-        specifications: product.specifications ? { spec: product.specifications } : undefined
-      }));
+      const url = `/products${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await apiService.get(url);
+      return response as { data: Product[], total: number, pagination: any };
     } catch (error) {
       console.error('Error fetching products:', error);
+      throw error;
+    }
+  }
+
+  async getProductsTotal(): Promise<number> {
+    try {
+      const response = await apiService.get('/products?limit=1');
+      return (response as { total: number }).total;
+    } catch (error) {
+      console.error('Error fetching products total:', error);
       throw error;
     }
   }
@@ -152,6 +152,18 @@ class AdminService {
       await apiService.delete(`/products/${id}`);
     } catch (error) {
       console.error('Error deleting product:', error);
+      throw error;
+    }
+  }
+
+  async uploadProductImage(file: File): Promise<{ filename: string; path: string; url: string }> {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await apiService.upload('/products/upload', formData);
+      return (response as { data: { filename: string; path: string; url: string } }).data;
+    } catch (error) {
+      console.error('Error uploading product image:', error);
       throw error;
     }
   }
