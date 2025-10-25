@@ -9,6 +9,7 @@ import Pagination from '../components/common/Pagination';
 import Select from '../components/common/Select';
 import { API_ENDPOINTS, API_CONFIG } from '../config/api';
 import axios from 'axios';
+import { resolveImageUrl } from '../utils/image';
 
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -481,7 +482,10 @@ const CollectionsPage: React.FC = () => {
                 <div key={product.id} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border-0 overflow-hidden h-full flex flex-col transform hover:-translate-y-1">
                   <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
                     <img
-                      src={product.image || '/assets/images/placeholder.png'}
+                      src={resolveImageUrl(
+                        product.image || product.featured_image,
+                        '/assets/images/placeholder.png'
+                      )}
                       alt={product.name}
                       loading="lazy"
                       className="w-full h-48 sm:h-56 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-500"

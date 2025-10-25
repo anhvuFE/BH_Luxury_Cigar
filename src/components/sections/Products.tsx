@@ -6,6 +6,7 @@ import { useCart } from "../../contexts/CartContext";
 import { useToast } from "../../hooks/useToast";
 import type { Product } from "../../types/database";
 import "../../styles/animations.css";
+import { resolveImageUrl } from '../../utils/image';
 
 const Products: React.FC = () => {
   const { products: featuredProducts, loading, error } = useFeaturedProducts(6);
@@ -168,10 +169,10 @@ const Products: React.FC = () => {
 
               <div className="relative overflow-hidden rounded-t-3xl">
                 <img
-                  src={
-                    product.image || product.featured_image ||
-                    "/assets/images/placeholder.png"
-                  }
+                  src={resolveImageUrl(
+                    product.image || product.featured_image,
+                    '/assets/images/placeholder.png'
+                  )}
                   alt={product.name}
                   loading="lazy"
                   className="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-700 filter group-hover:brightness-110"
