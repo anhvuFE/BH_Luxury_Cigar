@@ -13,6 +13,7 @@ import {
 import authService from "../../services/auth.service";
 import { useCart } from "../../contexts/CartContext";
 import apiService from "../../services/api";
+import { resolveImageUrl } from "../../utils/image";
 
 interface User {
   id?: string;
@@ -33,6 +34,7 @@ interface SearchProduct {
   discountedPrice?: number;
   images?: string[];
   category?: string;
+  image?: string;
 }
 
 const Header: React.FC = () => {
@@ -283,7 +285,16 @@ const Header: React.FC = () => {
                               <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                                 {product.images && product.images[0] ? (
                                   <img
-                                    src={product.images[0].startsWith('http') ? product.images[0] : `/images/${product.images[0]}`}
+                                    src={resolveImageUrl(product.images[0], '/images/placeholder.png')}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = '/images/placeholder.png';
+                                    }}
+                                  />
+                                ) : product.image ? (
+                                  <img
+                                    src={resolveImageUrl(product.image, '/images/placeholder.png')}
                                     alt={product.name}
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
@@ -519,7 +530,16 @@ const Header: React.FC = () => {
                             <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                               {product.images && product.images[0] ? (
                                 <img
-                                  src={product.images[0].startsWith('http') ? product.images[0] : `/images/${product.images[0]}`}
+                                  src={resolveImageUrl(product.images[0], '/images/placeholder.png')}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/images/placeholder.png';
+                                  }}
+                                />
+                              ) : product.image ? (
+                                <img
+                                  src={resolveImageUrl(product.image, '/images/placeholder.png')}
                                   alt={product.name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {

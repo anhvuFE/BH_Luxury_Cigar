@@ -9,6 +9,7 @@ import {
 import { useProduct } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../hooks/useToast';
+import { resolveImageUrl } from '../utils/image';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -102,7 +103,11 @@ const ProductDetailPage: React.FC = () => {
       images.push(product.featured_image);
     }
 
-    return images.length > 0 ? images : ['/assets/images/placeholder.png'];
+    if (images.length === 0) {
+      return ['/assets/images/placeholder.png'];
+    }
+
+    return images.map((img) => resolveImageUrl(img, '/assets/images/placeholder.png'));
   };
 
   const productImages = getProductImages();
