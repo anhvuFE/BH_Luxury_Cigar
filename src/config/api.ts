@@ -92,6 +92,7 @@ export const API_ENDPOINTS = {
     SALES: '/analytics/sales',
     PRODUCTS: '/analytics/products',
     CUSTOMERS: '/analytics/customers',
+    EXPORT: '/analytics/export',
   },
 };
 

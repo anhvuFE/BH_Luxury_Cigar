@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { API_CONFIG } from '../../config/api';
+import { useAdminProfile } from '../../hooks/useAdminProfile';
 import {
   HiOutlineHome,
   HiOutlineShoppingBag,
@@ -27,6 +29,30 @@ interface NavigationItem {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const { userProfile, loadUserProfile, updateProfile } = useAdminProfile();
+
+  // Listen for profile updates from settings page
+  useEffect(() => {
+    const handleProfileUpdate = (event: CustomEvent) => {
+      const { avatar, name } = event.detail;
+      updateProfile({ avatar, name });
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate as EventListener);
+    };
+  }, [updateProfile]);
+
+  // Reload profile when navigating to settings
+  useEffect(() => {
+    if (location.pathname === '/admin/settings') {
+      setTimeout(() => {
+        loadUserProfile();
+      }, 200);
+    }
+  }, [location.pathname, loadUserProfile]);
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: HiOutlineHome },
@@ -109,12 +135,22 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2 hover:bg-amber-50 transition-colors cursor-pointer">
                 <img
                   className="h-8 w-8 rounded-full object-cover border-2 border-amber-200"
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  src={userProfile.avatar && userProfile.avatar.trim() ?
+                    (userProfile.avatar.startsWith('http') ?
+                      userProfile.avatar :
+                      `${API_CONFIG.BASE_URL}${userProfile.avatar}`
+                    ) :
+                    "https://ui-avatars.com/api/?name=" + encodeURIComponent(userProfile.name) + "&background=f59e0b&color=fff"
+                  }
                   alt="Admin"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(userProfile.name) + "&background=f59e0b&color=fff";
+                  }}
                 />
                 <div className="ml-2 lg:ml-3 hidden sm:block">
-                  <span className="text-sm font-semibold text-gray-800">Xuan Anh</span>
-                  <p className="text-xs text-gray-500 hidden lg:block">Administrator</p>
+                  <span className="text-sm font-semibold text-gray-800">{userProfile.name}</span>
+                  <p className="text-xs text-gray-500 hidden lg:block">{userProfile.role}</p>
                 </div>
               </div>
             </div>

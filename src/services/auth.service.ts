@@ -21,6 +21,7 @@ export interface User {
   last_name: string;
   phone_number?: string;
   role: 'customer' | 'staff' | 'admin';
+  avatar?: string;
   created_at: string;
   updated_at: string;
 }
@@ -102,6 +103,10 @@ class AuthService {
 
   async upload<T = unknown>(endpoint: string, formData: FormData, method: string = 'POST'): Promise<T> {
     return apiService.upload<T>(endpoint, formData, method);
+  }
+
+  async download(endpoint: string, filename?: string): Promise<void> {
+    return apiService.download(endpoint, filename);
   }
 }
 
