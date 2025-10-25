@@ -10,22 +10,15 @@ import {
   HiOutlineUser,
   HiOutlineEye,
 } from "react-icons/hi";
-import authService from "../../services/auth.service";
+import authService, { type User as AuthUser } from "../../services/auth.service";
 import { useCart } from "../../contexts/CartContext";
 import apiService from "../../services/api";
 import { resolveImageUrl } from "../../utils/image";
 
-interface User {
-  id?: string;
-  email?: string;
+type HeaderUser = Partial<AuthUser> & {
   name?: string;
-  first_name?: string;
-  last_name?: string;
-  phone_number?: string;
-  role: 'customer' | 'staff' | 'admin';
-  created_at?: string;
-  updated_at?: string;
-}
+  phone?: string;
+};
 
 interface SearchProduct {
   _id: string;
@@ -41,7 +34,7 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<HeaderUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -103,10 +96,8 @@ const Header: React.FC = () => {
     if (isAuth) {
       // Try API first, fallback to localStorage
       try {
-        const response = await authService.getProfile();
-
-        // Extract user data - API returns wrapped response {success: true, data: user}
-        const profile = (response as any).data || response;
+        const profileResponse = await authService.getProfile();
+        const profile: HeaderUser = profileResponse;
         setUser(profile);
 
         // Update localStorage with fresh data

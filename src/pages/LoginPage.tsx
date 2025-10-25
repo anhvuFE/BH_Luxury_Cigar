@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlineEye, HiOutlineEyeOff, HiOutlineMail, HiOutlineLockClosed, HiChevronRight } from 'react-icons/hi';
-import { GiCigar, GiCigarette, GiSmokeBomb } from 'react-icons/gi';
+import { GiCigar, GiCigarette } from 'react-icons/gi';
 import { authService } from '../services/auth.service';
 
 const LoginPage: React.FC = () => {

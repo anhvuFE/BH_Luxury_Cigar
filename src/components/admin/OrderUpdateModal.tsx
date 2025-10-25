@@ -16,7 +16,7 @@ const OrderUpdateModal: React.FC<OrderUpdateModalProps> = ({
   order,
   onOrderUpdated
 }) => {
-  const [orderStatus, setOrderStatus] = useState<string>('');
+  const [orderStatus, setOrderStatus] = useState<Order['orderStatus']>('pending');
   const [trackingNumber, setTrackingNumber] = useState<string>('');
   const [isPaid, setIsPaid] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
@@ -38,15 +38,9 @@ const OrderUpdateModal: React.FC<OrderUpdateModalProps> = ({
       setLoading(true);
       setError(null);
 
-      // Update order status
-      const statusData: any = { orderStatus };
-      if (trackingNumber.trim()) {
-        statusData.trackingNumber = trackingNumber.trim();
-      }
-
       await orderService.updateStatus(
         order._id || order.id || '',
-        orderStatus as any,
+        orderStatus,
         trackingNumber.trim() || undefined
       );
 

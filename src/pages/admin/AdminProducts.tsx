@@ -20,6 +20,13 @@ import ProductDeleteModal from '../../components/admin/ProductDeleteModal';
 
 const getProductIdentifier = (product: Product) => product.id || product._id || '';
 
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(amount);
+};
+
 const AdminProducts: React.FC = () => {
   const { showSuccess } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
@@ -164,20 +171,22 @@ const AdminProducts: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Quản lý sản phẩm</h1>
-            <p className="mt-2 text-gray-600">Quản lý tất cả sản phẩm trong cửa hàng</p>
+        <div className="mb-6">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Quản lý sản phẩm</h1>
+              <p className="mt-1 text-sm sm:text-base text-gray-600">Quản lý tất cả sản phẩm trong cửa hàng</p>
+            </div>
+            <button
+              onClick={handleCreateProduct}
+              className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 sm:py-2 rounded-lg text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
+            >
+              <HiOutlinePlus className="w-5 h-5 mr-2" />
+              Thêm sản phẩm
+            </button>
           </div>
-          <button
-            onClick={handleCreateProduct}
-            className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
-          >
-            <HiOutlinePlus className="w-5 h-5 mr-2" />
-            Thêm sản phẩm
-          </button>
         </div>
 
         {/* Loading and Error States */}
@@ -212,59 +221,59 @@ const AdminProducts: React.FC = () => {
         {!loading && !error && (
           <>
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white rounded-xl border border-amber-100 p-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+              <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <HiOutlineEye className="w-6 h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <HiOutlineEye className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Tổng sản phẩm</p>
-                    <p className="text-2xl font-bold text-gray-900">{totalProducts}</p>
+                  <div className="ml-2 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Tổng sản phẩm</p>
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900">{totalProducts}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-amber-100 p-6">
+              <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                    <HiOutlineEye className="w-6 h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                    <HiOutlineEye className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Còn hàng</p>
-                    <p className="text-2xl font-bold text-gray-900">{inStockCount}</p>
+                  <div className="ml-2 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Còn hàng</p>
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900">{inStockCount}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-amber-100 p-6">
+              <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
-                    <HiOutlineEye className="w-6 h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-red-600 rounded-lg flex items-center justify-center">
+                    <HiOutlineEye className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Hết hàng</p>
-                    <p className="text-2xl font-bold text-gray-900">{outOfStockCount}</p>
+                  <div className="ml-2 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Hết hàng</p>
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900">{outOfStockCount}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-amber-100 p-6">
+              <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-6">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <HiOutlineEye className="w-6 h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                    <HiOutlineEye className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Sản phẩm mới</p>
-                    <p className="text-2xl font-bold text-gray-900">{newProductsCount}</p>
+                  <div className="ml-2 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Sản phẩm mới</p>
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900">{newProductsCount}</p>
                   </div>
                 </div>
               </div>
             </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-amber-100 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl border border-amber-100 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Search */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -312,8 +321,8 @@ const AdminProducts: React.FC = () => {
           </div>
         </div>
 
-        {/* Products Table */}
-        <div className="bg-white rounded-xl border border-amber-100 overflow-hidden">
+        {/* Products Table - Desktop */}
+        <div className="hidden md:block bg-white rounded-xl border border-amber-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-amber-50 border-b border-amber-100">
@@ -471,6 +480,74 @@ const AdminProducts: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Products Cards - Mobile */}
+        <div className="md:hidden space-y-4 mb-6">
+          {filteredProducts.map((product) => (
+            <div key={getProductIdentifier(product)} className="bg-white rounded-xl border border-amber-100 p-4">
+              <div className="flex items-start space-x-3">
+                <img
+                  src={resolveImageUrl(product.image, '/images/default-product.svg')}
+                  alt={product.name}
+                  className="w-16 h-16 rounded-lg object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/images/default-product.svg';
+                  }}
+                />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                  <p className="text-xs text-gray-500 mt-1">{product.brand}</p>
+                  <p className="text-xs text-gray-500">ID: #{getProductIdentifier(product)}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-sm font-bold text-gray-900">{formatCurrency(product.price)}</span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      product.inStock
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {product.inStock ? 'Còn hàng' : 'Hết hàng'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-end mt-3 space-x-2">
+                    <button
+                      onClick={() => handleViewProduct(product)}
+                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <HiOutlineEye className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                    >
+                      <HiOutlinePencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product)}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <HiOutlineTrash className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination - Mobile */}
+        {filteredProducts.length > 0 && (
+          <div className="md:hidden mb-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalProducts}
+              itemsPerPage={itemsPerPage}
+              onPageChange={fetchProducts}
+              loading={loading}
+            />
+          </div>
+        )}
           </>
         )}
 

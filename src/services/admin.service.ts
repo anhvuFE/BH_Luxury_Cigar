@@ -54,12 +54,19 @@ export interface Customer {
   avatar?: string;
 }
 
+interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  pages?: number;
+}
+
 class AdminService {
   // Dashboard Stats
   async getDashboardStats(): Promise<AdminStats> {
     try {
       // Get products response to get total count
-      const allProductsResponse = await apiService.get('/products');
+      const allProductsResponse = await apiService.get<{ total?: number }>('/products');
       const totalProducts = allProductsResponse.total || 0;
 
       const [topProductsResponse, orders, customers] = await Promise.all([
@@ -102,15 +109,14 @@ class AdminService {
   }
 
   // Products
-  async getProducts(page?: number, limit?: number): Promise<{ data: Product[], total: number, pagination: any }> {
+  async getProducts(page?: number, limit?: number): Promise<{ data: Product[]; total: number; pagination: PaginationMeta }> {
     try {
       const params = new URLSearchParams();
       if (page) params.append('page', page.toString());
       if (limit) params.append('limit', limit.toString());
 
       const url = `/products${params.toString() ? `?${params.toString()}` : ''}`;
-      const response = await apiService.get(url);
-      return response as { data: Product[], total: number, pagination: any };
+      return apiService.get<{ data: Product[]; total: number; pagination: PaginationMeta }>(url);
     } catch (error) {
       console.error('Error fetching products:', error);
       throw error;
@@ -119,8 +125,8 @@ class AdminService {
 
   async getProductsTotal(): Promise<number> {
     try {
-      const response = await apiService.get('/products?limit=1');
-      return (response as { total: number }).total;
+      const response = await apiService.get<{ total: number }>('/products?limit=1');
+      return response.total;
     } catch (error) {
       console.error('Error fetching products total:', error);
       throw error;
@@ -129,8 +135,8 @@ class AdminService {
 
   async createProduct(productData: Partial<Product>): Promise<Product> {
     try {
-      const response = await apiService.post('/products', productData);
-      return (response as { data: Product }).data;
+      const response = await apiService.post<{ data: Product }>('/products', productData);
+      return response.data;
     } catch (error) {
       console.error('Error creating product:', error);
       throw error;
@@ -139,8 +145,8 @@ class AdminService {
 
   async updateProduct(id: string, productData: Partial<Product>): Promise<Product> {
     try {
-      const response = await apiService.put(`/products/${id}`, productData);
-      return (response as { data: Product }).data;
+      const response = await apiService.put<{ data: Product }>(`/products/${id}`, productData);
+      return response.data;
     } catch (error) {
       console.error('Error updating product:', error);
       throw error;
@@ -160,8 +166,8 @@ class AdminService {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      const response = await apiService.upload('/products/upload', formData);
-      return (response as { data: { filename: string; path: string; url: string } }).data;
+      const response = await apiService.upload<{ data: { filename: string; path: string; url: string } }>('/products/upload', formData);
+      return response.data;
     } catch (error) {
       console.error('Error uploading product image:', error);
       throw error;

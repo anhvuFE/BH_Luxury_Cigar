@@ -1,7 +1,9 @@
-import { lazy } from 'react';
+import { lazy, type ComponentType } from 'react';
+
+type LazyImport = () => Promise<{ default: ComponentType<unknown> }>;
 
 // Critical optimization: Add prefetch hints for likely next pages
-const createLazyComponent = (importFn: () => Promise<any>, prefetch = false) => {
+const createLazyComponent = (importFn: LazyImport, prefetch = false) => {
   const Component = lazy(importFn);
 
   // Prefetch for likely navigation paths
