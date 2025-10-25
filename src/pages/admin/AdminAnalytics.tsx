@@ -9,10 +9,12 @@ import {
   HiOutlineDownload
 } from 'react-icons/hi';
 import Select from '../../components/common/Select';
+import analyticsService from '../../services/analytics.service';
 
 const AdminAnalytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [selectedChart, setSelectedChart] = useState('revenue');
+  const [isExporting, setIsExporting] = useState(false);
 
   // Mock analytics data
   const analyticsData = {
@@ -97,6 +99,21 @@ const AdminAnalytics: React.FC = () => {
     }
   };
 
+  const handleExportReport = async () => {
+    try {
+      setIsExporting(true);
+      await analyticsService.exportReport({
+        period: selectedPeriod,
+        format: 'xlsx'
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Không thể xuất báo cáo. Vui lòng thử lại.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   interface ChartData {
     period: string;
     value: number;
@@ -148,9 +165,22 @@ const AdminAnalytics: React.FC = () => {
                 size="md"
               />
 
-              <button className="bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center hover:bg-amber-700 transition-colors">
-                <HiOutlineDownload className="w-5 h-5 mr-2" />
-                Xuất báo cáo
+              <button
+                onClick={handleExportReport}
+                disabled={isExporting}
+                className="bg-amber-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isExporting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Đang xuất...
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineDownload className="w-5 h-5 mr-2" />
+                    Xuất báo cáo
+                  </>
+                )}
               </button>
             </div>
           </div>
