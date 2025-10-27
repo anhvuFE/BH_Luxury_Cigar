@@ -18,13 +18,11 @@ export const resolveImageUrl = (
     return trimmedPath;
   }
 
-  if (trimmedPath.startsWith('/uploads')) {
-    return `${API_CONFIG.BASE_URL}${trimmedPath}`;
+  const normalizedPath = trimmedPath.startsWith('/') ? trimmedPath : `/${trimmedPath}`;
+
+  if (normalizedPath.startsWith('/uploads')) {
+    return `${API_CONFIG.BASE_URL}${normalizedPath}`;
   }
 
-  if (trimmedPath.startsWith('/')) {
-    return trimmedPath;
-  }
-
-  return `${API_CONFIG.BASE_URL}/uploads/products/${trimmedPath}`;
+  return normalizedPath;
 };

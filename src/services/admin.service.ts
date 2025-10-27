@@ -1,4 +1,5 @@
 import { apiService } from './api';
+import { API_ENDPOINTS } from '../config/api';
 
 export interface AdminStats {
   totalProducts: number;
@@ -44,17 +45,76 @@ export interface Product {
 
 export interface Customer {
   _id: string;
+  id?: string;
   name: string;
   email: string;
   phone?: string;
-  orders: number;
-  totalSpent: number;
-  status: 'active' | 'inactive' | 'vip';
-  joinDate: string;
-  avatar?: string;
+  orders?: number;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  };
+  orderCount?: number;
+  totalSpent?: number;
+  averageOrderValue?: number;
+  lastOrderDate?: string;
+  isActive?: boolean;
+  joinDate?: string;
+  avatar?: string | null;
+  image?: string | null;
+  totalOrders?: number;
 }
 
-interface PaginationMeta {
+export interface CustomerStats {
+  totalCustomers: number;
+  activeCustomers: number;
+  inactiveCustomers: number;
+  newCustomersThisMonth: number;
+  averageSpent: number;
+  totalRevenueFromCustomers: number;
+}
+
+interface CustomersResponse {
+  data: Customer[];
+  pagination: PaginationMeta & { pages: number };
+  stats?: CustomerStats;
+}
+
+export interface CustomerDetailResponse {
+  user: Customer;
+  metrics: {
+    orderCount: number;
+    paidOrders: number;
+    totalSpent: number;
+    lastOrderDate: string | null;
+    averageOrderValue: number;
+    statusBreakdown: Array<{ status: string; count: number }>;
+  };
+  recentOrders: Array<{
+    _id?: string;
+    orderNumber?: string;
+    totalPrice: number;
+    orderStatus: string;
+    createdAt: string;
+    isPaid: boolean;
+  }>;
+}
+
+export interface GetCustomersParams {
+  page?: number;
+  limit?: number;
+  role?: string;
+  status?: 'active' | 'inactive';
+  search?: string;
+  includeStats?: boolean;
+  sortField?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface PaginationMeta {
   page: number;
   limit: number;
   total: number;
@@ -69,13 +129,15 @@ class AdminService {
       const allProductsResponse = await apiService.get<{ total?: number }>('/products');
       const totalProducts = allProductsResponse.total || 0;
 
-      const [topProductsResponse, orders, customers] = await Promise.all([
+      const [topProductsResponse, orders, customerPayload] = await Promise.all([
         this.getProducts(1, 3), // Get first 3 for topProducts
         this.getOrders(),
-        this.getCustomers()
+        this.getCustomers({ page: 1, limit: 100, includeStats: true })
       ]);
 
       const products = topProductsResponse.data;
+      const customers = customerPayload.customers;
+      const customerStats = customerPayload.stats;
 
       // Calculate stats from data
       const totalRevenue = orders.reduce((sum, order) => {
@@ -89,13 +151,15 @@ class AdminService {
       return {
         totalProducts,
         totalOrders: orders.length,
-        totalCustomers: customers.length,
+        totalCustomers: customerStats?.totalCustomers ?? customers.length,
         totalRevenue,
         recentOrders,
         topProducts,
         monthlyRevenue: totalRevenue,
-        newCustomers: customers.filter(c => {
+        newCustomers: customerStats?.newCustomersThisMonth ?? customers.filter(c => {
+          if (!c.joinDate) return false;
           const joinDate = new Date(c.joinDate);
+          if (Number.isNaN(joinDate.getTime())) return false;
           const monthAgo = new Date();
           monthAgo.setMonth(monthAgo.getMonth() - 1);
           return joinDate > monthAgo;
@@ -219,47 +283,89 @@ class AdminService {
   }
 
   // Customers
-  async getCustomers(): Promise<Customer[]> {
+  async getCustomers(params: GetCustomersParams = {}): Promise<{
+    customers: Customer[];
+    pagination: PaginationMeta & { pages: number };
+    stats?: CustomerStats;
+  }> {
     try {
-      // Mock data since users endpoint might require auth
-      const mockCustomers: Customer[] = [
-        {
-          _id: '1',
-          name: 'Nguyễn Văn A',
-          email: 'nguyenvana@gmail.com',
-          phone: '0901234567',
-          orders: 12,
-          totalSpent: 45600000,
-          status: 'active',
-          joinDate: '2023-06-15',
-          avatar: 'https://ui-avatars.com/api/?name=Nguyen+Van+A&background=f59e0b&color=fff'
+      const query: Record<string, string | number | boolean> = {
+        page: params.page ?? 1,
+        limit: params.limit ?? 10,
+        role: params.role ?? 'user',
+        includeStats: params.includeStats ?? true
+      };
+
+      if (params.status) {
+        query.status = params.status;
+      }
+
+      if (params.search) {
+        query.search = params.search;
+      }
+
+      if (params.sortField) {
+        query.sortField = params.sortField;
+      }
+
+      if (params.sortOrder) {
+        query.sortOrder = params.sortOrder;
+      }
+
+      const response = await apiService.get<CustomersResponse>(API_ENDPOINTS.USERS.LIST, query);
+
+      return {
+        customers: response.data || [],
+        pagination: response.pagination || {
+          page: Number(query.page) || 1,
+          limit: Number(query.limit) || 10,
+          pages: 1,
+          total: response.data?.length || 0
         },
-        {
-          _id: '2',
-          name: 'Trần Thị B',
-          email: 'tranthib@gmail.com',
-          phone: '0912345678',
-          orders: 8,
-          totalSpent: 28400000,
-          status: 'active',
-          joinDate: '2023-08-20',
-          avatar: 'https://ui-avatars.com/api/?name=Tran+Thi+B&background=f59e0b&color=fff'
-        },
-        {
-          _id: '3',
-          name: 'Lê Minh C',
-          email: 'leminhc@gmail.com',
-          phone: '0923456789',
-          orders: 15,
-          totalSpent: 67250000,
-          status: 'vip',
-          joinDate: '2023-03-10',
-          avatar: 'https://ui-avatars.com/api/?name=Le+Minh+C&background=f59e0b&color=fff'
-        }
-      ];
-      return mockCustomers;
+        stats: response.stats
+      };
     } catch (error) {
       console.error('Error fetching customers:', error);
+      throw error;
+    }
+  }
+
+  async getCustomerById(id: string): Promise<CustomerDetailResponse> {
+    try {
+      const response = await apiService.get<{ data: CustomerDetailResponse }>(API_ENDPOINTS.USERS.GET(id));
+      return response.data || response;
+    } catch (error) {
+      console.error('Error fetching customer detail:', error);
+      throw error;
+    }
+  }
+
+  async updateCustomer(id: string, data: Partial<Customer>): Promise<Customer> {
+    try {
+      const response = await apiService.put<{ data: Customer }>(API_ENDPOINTS.USERS.UPDATE(id), data);
+      return response.data || response;
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      throw error;
+    }
+  }
+
+  async updateCustomerStatus(id: string, isActive: boolean): Promise<Customer> {
+    try {
+      const response = await apiService.patch<{ data: Customer }>(API_ENDPOINTS.USERS.STATUS(id), { isActive });
+      return response.data || response;
+    } catch (error) {
+      console.error('Error updating customer status:', error);
+      throw error;
+    }
+  }
+
+  async getUserOrderSummary(id: string): Promise<{ orderCount: number; totalSpent: number }> {
+    try {
+      const response = await apiService.get<{ data: { orderCount: number; totalSpent: number } }>(`/users/${id}/orders/summary`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user order summary:', error);
       throw error;
     }
   }

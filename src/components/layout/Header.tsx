@@ -15,10 +15,7 @@ import { useCart } from "../../contexts/CartContext";
 import apiService from "../../services/api";
 import { resolveImageUrl } from "../../utils/image";
 
-type HeaderUser = Partial<AuthUser> & {
-  name?: string;
-  phone?: string;
-};
+type HeaderUser = Partial<AuthUser>;
 
 interface SearchProduct {
   _id: string;
@@ -407,7 +404,7 @@ const Header: React.FC = () => {
                 >
                   <HiOutlineUser className="w-5 h-5 text-gray-300" />
                   <span className="text-xs text-gray-300 font-medium max-w-[60px] truncate">
-                    {user?.name || user?.first_name || user?.email?.split('@')[0] || 'User'}
+                    {user?.name || user?.email?.split('@')[0] || 'User'}
                   </span>
                 </Link>
               ) : (
@@ -453,7 +450,7 @@ const Header: React.FC = () => {
                   >
                     <HiOutlineUser className="w-4 h-4 text-gray-300" />
                     <span className="text-sm text-gray-300 font-medium">
-                      {user?.name || user?.first_name || user?.email?.split('@')[0] || 'User'}
+                      {user?.name || user?.email?.split('@')[0] || 'User'}
                     </span>
                   </Link>
                   {/* Logout Button */}
@@ -650,7 +647,7 @@ const Header: React.FC = () => {
                     >
                       <HiOutlineUser className="w-4 h-4 mr-3" />
                       <span className="font-medium">
-                        Xin chào, {user?.name || user?.first_name || user?.email?.split('@')[0] || 'User'}
+                        Xin chào, {user?.name || user?.email?.split('@')[0] || 'User'}
                       </span>
                     </Link>
                     <button
