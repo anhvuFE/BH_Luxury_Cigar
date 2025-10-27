@@ -9,24 +9,25 @@ export interface LoginDto {
 export interface RegisterDto {
   email: string;
   password: string;
-  first_name: string;
-  last_name: string;
-  phone_number?: string;
+  name: string;
+  phone?: string;
 }
 
 export interface User {
   id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  phone_number?: string;
-  role: 'customer' | 'staff' | 'admin';
+  name: string;
+  phone?: string;
+  role: 'user' | 'admin';
   avatar?: string;
-  created_at: string;
-  updated_at: string;
+  image?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthResponse {
+  success: boolean;
   user: User;
   token: string;
 }
@@ -67,7 +68,8 @@ class AuthService {
   }
 
   async getProfile(): Promise<User> {
-    return apiService.get<User>(API_ENDPOINTS.AUTH.PROFILE);
+    const response = await apiService.get<{success: boolean; data: User}>(API_ENDPOINTS.AUTH.PROFILE);
+    return response.data;
   }
 
   async updateProfile(data: Partial<User>): Promise<User> {

@@ -40,8 +40,6 @@ const LoginPage: React.FC = () => {
       // Redirect based on role
       if (response.user.role === 'admin') {
         navigate('/admin');
-      } else if (response.user.role === 'staff') {
-        navigate('/admin');
       } else {
         navigate('/'); // User goes to homepage
       }

@@ -35,6 +35,7 @@ interface User {
     country?: string;
   };
   avatar?: string;
+  image?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -432,9 +433,12 @@ const ProfilePage: React.FC = () => {
               {/* Avatar Section */}
               <div className="relative flex-shrink-0">
                 <div className="w-32 h-32 sm:w-40 sm:h-40 lg:w-44 lg:h-44 rounded-full border-4 border-white/30 overflow-hidden bg-white/10 backdrop-blur-sm shadow-2xl">
-                  {previewUrl || user.avatar ? (
+                  {previewUrl || user.avatar || user.image ? (
                     <img
-                      src={previewUrl || (user.avatar?.startsWith('http') ? user.avatar : `${API_CONFIG.BASE_URL}${user.avatar}`)}
+                      src={previewUrl
+                        || ((user.avatar || user.image)?.startsWith('http')
+                          ? (user.avatar || user.image)
+                          : `${API_CONFIG.BASE_URL}${user.avatar || user.image}`)}
                       alt="Avatar"
                       className="w-full h-full object-cover"
                     />

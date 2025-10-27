@@ -20,12 +20,14 @@ export const API_ENDPOINTS = {
 
   // User endpoints
   USERS: {
-    LIST: '/users',
-    GET: (id: string) => `/users/${id}`,
-    CREATE: '/users',
-    UPDATE: (id: string) => `/users/${id}`,
-    DELETE: (id: string) => `/users/${id}`,
+    LIST: '/auth/users',
+    GET: (id: string) => `/auth/users/${id}`,
+    CREATE: '/auth/users',
+    UPDATE: (id: string) => `/auth/users/${id}`,
+    DELETE: (id: string) => `/auth/users/${id}`,
     PROFILE: '/users/profile',
+    STATS: '/auth/users/stats',
+    STATUS: (id: string) => `/users/${id}/status`,
   },
 
   // Product endpoints
