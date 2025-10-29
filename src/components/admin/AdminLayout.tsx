@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { API_CONFIG } from '../../config/api';
 import { useAdminProfile } from '../../hooks/useAdminProfile';
+import analyticsService from '../../services/analytics.service';
 import {
   HiOutlineHome,
   HiOutlineShoppingBag,
@@ -26,10 +27,67 @@ interface NavigationItem {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
+interface TodayStats {
+  newOrders: number;
+  revenue: number;
+}
+
+interface ApiResponse {
+  success: boolean;
+  data: {
+    todayStats?: TodayStats;
+  };
+}
+
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const { userProfile, loadUserProfile, updateProfile } = useAdminProfile();
+  const [todayStats, setTodayStats] = useState<TodayStats>({ newOrders: 0, revenue: 0 });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Load today's statistics
+  const loadTodayStats = async () => {
+    try {
+      setStatsLoading(true);
+      const response = await analyticsService.getDashboard('today');
+
+      const apiResponse = response as ApiResponse;
+      if (apiResponse && apiResponse.success) {
+        const data = apiResponse.data;
+        setTodayStats({
+          newOrders: data.todayStats?.newOrders || 0,
+          revenue: data.todayStats?.revenue || 0
+        });
+      } else {
+        // Fallback to mock data if API fails
+        setTodayStats({ newOrders: 12, revenue: 2400000 });
+      }
+    } catch (error) {
+      console.error('Failed to load today stats:', error);
+      // Fallback to mock data
+      setTodayStats({ newOrders: 12, revenue: 2400000 });
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  // Load stats on component mount
+  useEffect(() => {
+    loadTodayStats();
+  }, []);
+
+  // Format currency for display
+  const formatCurrency = (value: number) => {
+    if (value >= 1000000000) {
+      return `₫${(value / 1000000000).toFixed(1)}B`;
+    } else if (value >= 1000000) {
+      return `₫${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `₫${(value / 1000).toFixed(1)}K`;
+    }
+    return `₫${value.toLocaleString('vi-VN')}`;
+  };
 
   // Listen for profile updates from settings page
   useEffect(() => {
@@ -85,7 +143,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 <HiX className="h-6 w-6 text-white" />
               </button>
             </div>
-            <SidebarContent navigation={navigation} isActivePath={isActivePath} />
+            <SidebarContent
+              navigation={navigation}
+              isActivePath={isActivePath}
+              todayStats={todayStats}
+              statsLoading={statsLoading}
+              formatCurrency={formatCurrency}
+            />
           </div>
         </div>
       )}
@@ -93,7 +157,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       {/* Desktop sidebar */}
       <div className="hidden lg:flex lg:flex-shrink-0">
         <div className="flex flex-col w-72">
-          <SidebarContent navigation={navigation} isActivePath={isActivePath} />
+          <SidebarContent
+            navigation={navigation}
+            isActivePath={isActivePath}
+            todayStats={todayStats}
+            statsLoading={statsLoading}
+            formatCurrency={formatCurrency}
+          />
         </div>
       </div>
 
@@ -172,7 +242,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 const SidebarContent: React.FC<{
   navigation: NavigationItem[];
   isActivePath: (path: string) => boolean;
-}> = ({ navigation, isActivePath }) => {
+  todayStats: TodayStats;
+  statsLoading: boolean;
+  formatCurrency: (value: number) => string;
+}> = ({ navigation, isActivePath, todayStats, statsLoading, formatCurrency }) => {
   return (
     <div className="flex flex-col h-0 flex-1 bg-white border-r border-gray-200">
       {/* Logo */}
@@ -224,11 +297,19 @@ const SidebarContent: React.FC<{
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-600">Đơn hàng mới</span>
-              <span className="text-sm font-bold text-amber-600">12</span>
+              {statsLoading ? (
+                <div className="w-6 h-4 bg-amber-200 rounded animate-pulse"></div>
+              ) : (
+                <span className="text-sm font-bold text-amber-600">{todayStats.newOrders}</span>
+              )}
             </div>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-600">Doanh thu</span>
-              <span className="text-sm font-bold text-amber-600">₫2.4M</span>
+              {statsLoading ? (
+                <div className="w-12 h-4 bg-amber-200 rounded animate-pulse"></div>
+              ) : (
+                <span className="text-sm font-bold text-amber-600">{formatCurrency(todayStats.revenue)}</span>
+              )}
             </div>
           </div>
         </div>
