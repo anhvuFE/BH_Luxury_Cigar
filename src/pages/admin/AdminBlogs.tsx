@@ -49,7 +49,7 @@ const AdminBlogs: React.FC = () => {
       setAllBlogs(response.data);
 
       // Apply initial filtering
-      filterAndPaginateBlogs(response.data, searchQuery, filters.page);
+      filterAndPaginateBlogs(response.data, searchQuery, filters.page || 1);
     } catch (error) {
       showToast('Không thể tải danh sách bài viết', 'error');
       console.error('Failed to load blogs:', error);
@@ -321,12 +321,12 @@ const AdminBlogs: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          blog.status === 'published'
+                          blog.isPublished
                             ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
                         }`}
                       >
-                        {blog.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                        {blog.isPublished ? 'Đã xuất bản' : 'Bản nháp'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -403,12 +403,12 @@ const AdminBlogs: React.FC = () => {
                         </span>
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            blog.status === 'published'
+                            blog.isPublished
                               ? 'bg-green-100 text-green-800'
                               : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
-                          {blog.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                          {blog.isPublished ? 'Đã xuất bản' : 'Bản nháp'}
                         </span>
                       </div>
                     </div>

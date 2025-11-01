@@ -51,7 +51,7 @@ const Knowledge: React.FC = () => {
               <div className="p-4 sm:p-6">
                 <div className="flex items-center text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
                   <HiOutlineCalendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0 text-amber-500" />
-                  <span className="truncate">{formatDate(post.publishDate)}</span>
+                  <span className="truncate">{formatDate(post.publishDate || '')}</span>
                   <span className="mx-1 sm:mx-2 text-amber-400">•</span>
                   <span className="truncate text-amber-600 font-medium">{post.author}</span>
                 </div>
