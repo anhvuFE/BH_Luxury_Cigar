@@ -26,6 +26,7 @@ export const AdminOrders = createLazyComponent(() => import('../pages/admin/Admi
 export const AdminCustomers = createLazyComponent(() => import('../pages/admin/AdminCustomers'));
 export const AdminAnalytics = createLazyComponent(() => import('../pages/admin/AdminAnalytics'));
 export const AdminSettings = createLazyComponent(() => import('../pages/admin/AdminSettings'));
+export const AdminBlogs = createLazyComponent(() => import('../pages/admin/AdminBlogs'));
 
 // High priority pages - Prefetch for better UX
 export const ProfilePage = createLazyComponent(() => import('../pages/ProfilePage'), true);

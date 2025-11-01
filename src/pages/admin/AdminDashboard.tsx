@@ -153,9 +153,9 @@ const AdminDashboard: React.FC = () => {
               change: '+22%',
               subtitle: 'Doanh thu tháng này'
             }
-          ].map((stat) => (
+          ].map((stat, index) => (
             <div
-              key={stat.name}
+              key={`stat-${stat.name}-${index}`}
               className="bg-white rounded-2xl border border-amber-100 p-6 hover:shadow-lg transition-all duration-300 hover:border-amber-200"
             >
               <div className="flex items-start justify-between mb-4">

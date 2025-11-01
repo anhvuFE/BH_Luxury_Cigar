@@ -85,25 +85,21 @@ export interface UserProfile {
 }
 
 export interface BlogPost {
-  id: string;
+  _id?: string;
+  id?: string;
   title: string;
   slug: string;
-  excerpt?: string;
+  excerpt: string;
   content: string;
-  author_id: string;
-  featured_image?: string;
-  gallery_images?: string[];
-  status: 'draft' | 'published' | 'archived';
-  is_featured: boolean;
-  tags?: string[];
-  meta_title?: string;
-  meta_description?: string;
-  published_at?: string;
-  created_at: string;
-  updated_at: string;
-
-  // Relations
-  author?: UserProfile;
+  image: string;
+  author: string;
+  publishDate?: string;
+  category: string;
+  isPublished?: boolean;
+  views?: number;
+  viewsCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Order {

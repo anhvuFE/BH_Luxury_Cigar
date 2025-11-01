@@ -21,17 +21,8 @@ export interface Product {
   };
 }
 
-export interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  image: string;
-  author: string;
-  publishDate: string;
-  category: string;
-  slug: string;
-}
+// Re-export BlogPost from database.ts to maintain backward compatibility
+export type { BlogPost } from './database';
 
 export interface StoreInfo {
   name: string;

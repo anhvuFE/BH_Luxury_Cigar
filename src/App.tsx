@@ -30,7 +30,8 @@ import {
   AdminOrders,
   AdminCustomers,
   AdminAnalytics,
-  AdminSettings
+  AdminSettings,
+  AdminBlogs
 } from './utils/lazyImports';
 import { PageLoader } from './components/ui/LoadingSpinner';
 
@@ -105,6 +106,14 @@ function AppContent() {
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminAnalytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/blogs"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'staff']}>
+                <AdminBlogs />
               </ProtectedRoute>
             }
           />
