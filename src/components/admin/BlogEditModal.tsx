@@ -139,8 +139,8 @@ const BlogEditModal: React.FC<BlogEditModalProps> = ({ isOpen, onClose, onSucces
       await blogService.update(blogId, formData);
       showToast('Cập nhật bài viết thành công!', 'success');
       onSuccess();
-    } catch (error: any) {
-      showToast(error.message || 'Không thể cập nhật bài viết', 'error');
+    } catch (error) {
+      showToast((error as Error).message || 'Không thể cập nhật bài viết', 'error');
     } finally {
       setLoading(false);
     }

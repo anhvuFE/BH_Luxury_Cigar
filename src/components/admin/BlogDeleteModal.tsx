@@ -25,8 +25,8 @@ const BlogDeleteModal: React.FC<BlogDeleteModalProps> = ({ isOpen, onClose, onSu
       await blogService.delete(blogId);
       showToast('Xóa bài viết thành công!', 'success');
       onSuccess();
-    } catch (error: any) {
-      showToast(error.message || 'Không thể xóa bài viết', 'error');
+    } catch (error) {
+      showToast((error as Error).message || 'Không thể xóa bài viết', 'error');
     } finally {
       setLoading(false);
     }

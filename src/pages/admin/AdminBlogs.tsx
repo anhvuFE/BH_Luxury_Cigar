@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import blogService from '../../services/blog.service';
 import type { BlogFilters } from '../../services/blog.service';
@@ -59,7 +59,7 @@ const AdminBlogs: React.FC = () => {
   };
 
   // Filter and paginate blogs
-  const filterAndPaginateBlogs = (blogsData: BlogPost[], search: string, page: number) => {
+  const filterAndPaginateBlogs = useCallback((blogsData: BlogPost[], search: string, page: number) => {
     setSearching(true);
 
     // Apply search filter
@@ -86,11 +86,12 @@ const AdminBlogs: React.FC = () => {
     setTotalPages(Math.ceil(filteredData.length / limit));
 
     setTimeout(() => setSearching(false), 100);
-  };
+  }, [filters.limit]);
 
   // Load blogs on mount and when filters change
   useEffect(() => {
     loadAllBlogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, selectedStatus]);
 
   // Handle search with debounce
@@ -103,13 +104,13 @@ const AdminBlogs: React.FC = () => {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, allBlogs]);
+  }, [searchQuery, allBlogs, filterAndPaginateBlogs]);
 
   // Handle page change
   useEffect(() => {
     if (allBlogs.length === 0) return;
     filterAndPaginateBlogs(allBlogs, filters.search || '', filters.page || 1);
-  }, [filters.page]);
+  }, [filters.page, filters.search, allBlogs, filterAndPaginateBlogs]);
 
   // CRUD Handlers
   const handleCreate = () => {

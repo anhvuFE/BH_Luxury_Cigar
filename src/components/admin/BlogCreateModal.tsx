@@ -119,8 +119,8 @@ const BlogCreateModal: React.FC<BlogCreateModalProps> = ({ isOpen, onClose, onSu
       await blogService.create(formData);
       showToast('Tạo bài viết thành công!', 'success');
       onSuccess();
-    } catch (error: any) {
-      showToast(error.message || 'Không thể tạo bài viết', 'error');
+    } catch (error) {
+      showToast((error as Error).message || 'Không thể tạo bài viết', 'error');
     } finally {
       setLoading(false);
     }
