@@ -50,7 +50,7 @@ const BlogPage: React.FC = () => {
 
               <div className="p-6 sm:p-7">
                 <div className="flex items-center text-sm text-gray-500 mb-4">
-                  <span>{formatDate(post.publishDate)}</span>
+                  <span>{formatDate(post.publishDate || '')}</span>
                   <span className="mx-2 text-amber-400">•</span>
                   <span className="text-amber-600 font-medium">{post.author}</span>
                 </div>
@@ -95,7 +95,7 @@ const BlogPage: React.FC = () => {
                     <span className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-1 text-xs rounded-full mr-3 shadow-lg">
                       {blogPosts[0].category}
                     </span>
-                    <span>{formatDate(blogPosts[0].publishDate)}</span>
+                    <span>{formatDate(blogPosts[0].publishDate || '')}</span>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-4 font-heading">
                     {blogPosts[0].title}

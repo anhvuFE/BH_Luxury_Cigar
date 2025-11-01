@@ -117,6 +117,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: 'Sản phẩm', href: '/admin/products', icon: HiOutlineShoppingBag },
     { name: 'Đơn hàng', href: '/admin/orders', icon: HiOutlineDocumentText },
     { name: 'Khách hàng', href: '/admin/customers', icon: HiOutlineUsers },
+    { name: 'Bài viết', href: '/admin/blogs', icon: HiOutlineDocumentText },
     { name: 'Báo cáo', href: '/admin/analytics', icon: HiOutlineChartBar },
     { name: 'Cài đặt', href: '/admin/settings', icon: HiOutlineCog },
   ];
@@ -130,25 +131,19 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-50">
-      {/* Mobile sidebar overlay */}
+      {/* Mobile and Tablet sidebar overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 flex z-40 md:hidden">
+        <div className="fixed inset-0 flex z-40 lg:hidden">
           <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)}></div>
           <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-xl">
-            <div className="absolute top-0 right-0 -mr-12 pt-2">
-              <button
-                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white bg-gray-800 hover:bg-gray-700 transition-colors"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <HiX className="h-6 w-6 text-white" />
-              </button>
-            </div>
             <SidebarContent
               navigation={navigation}
               isActivePath={isActivePath}
               todayStats={todayStats}
               statsLoading={statsLoading}
               formatCurrency={formatCurrency}
+              onClose={() => setSidebarOpen(false)}
+              showCloseButton={true}
             />
           </div>
         </div>
@@ -245,12 +240,14 @@ const SidebarContent: React.FC<{
   todayStats: TodayStats;
   statsLoading: boolean;
   formatCurrency: (value: number) => string;
-}> = ({ navigation, isActivePath, todayStats, statsLoading, formatCurrency }) => {
+  onClose?: () => void;
+  showCloseButton?: boolean;
+}> = ({ navigation, isActivePath, todayStats, statsLoading, formatCurrency, onClose, showCloseButton }) => {
   return (
     <div className="flex flex-col h-0 flex-1 bg-white border-r border-gray-200">
-      {/* Logo */}
+      {/* Logo and Close Button */}
       <div className="flex-1 flex flex-col pt-6 pb-4 overflow-y-auto">
-        <div className="flex items-center flex-shrink-0 px-4 mb-6">
+        <div className="flex items-center justify-between flex-shrink-0 px-4 mb-6">
           <Link to="/" className="flex items-center">
             <img
               className="h-10 w-auto"
@@ -262,6 +259,14 @@ const SidebarContent: React.FC<{
               <p className="text-xs text-gray-500">Dashboard</p>
             </div>
           </Link>
+          {showCloseButton && (
+            <button
+              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
+              onClick={onClose}
+            >
+              <HiX className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
         {/* Navigation */}

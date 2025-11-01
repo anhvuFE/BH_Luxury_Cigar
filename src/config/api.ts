@@ -79,13 +79,15 @@ export const API_ENDPOINTS = {
 
   // Blog endpoints
   BLOG: {
-    LIST: '/blog/posts',
-    GET: (id: string) => `/blog/posts/${id}`,
-    GET_BY_SLUG: (slug: string) => `/blog/posts/slug/${slug}`,
-    CREATE: '/blog/posts',
-    UPDATE: (id: string) => `/blog/posts/${id}`,
-    DELETE: (id: string) => `/blog/posts/${id}`,
-    PUBLISHED: '/blog/posts/published',
+    LIST: '/blogs',
+    GET: (id: string) => `/blogs/${id}`,
+    GET_BY_SLUG: (slug: string) => `/blogs/slug/${slug}`,
+    CREATE: '/blogs',
+    UPDATE: (id: string) => `/blogs/${id}`,
+    DELETE: (id: string) => `/blogs/${id}`,
+    PUBLISHED: '/blogs',
+    FEATURED: '/blogs/featured',
+    RECENT: '/blogs/recent',
   },
 
   // Analytics endpoints
